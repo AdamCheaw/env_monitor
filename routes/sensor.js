@@ -4,6 +4,14 @@ var mongoose = require('mongoose');
 var bodyParser = require('body-parser');
 var SensorData = require('../model/sensor');
 var moment = require('moment');
+var emitter = require('socket.io-emitter')({ host: 'localhost', port: '6379' });
+
+emitter.redis.on('error', onError);
+
+function onError(err){
+  console.log(err);
+}
+
 router.post('/insert', (req, res, next) => {
   // res.status(200).json({
   //   message: "receive request packet!"
@@ -42,6 +50,9 @@ router.post('/insert', (req, res, next) => {
 router.patch('/update', (req, res, next) => {
   var id = req.body.sensorId;
   console.log("received notification message from "+id);
+  emitter.emit('notification',function () {
+    console.log('Notification to user about data change');
+  });
   SensorData.findById(id, (err, doc) => {
     if (err) {
       console.error('error, no entry found');
@@ -64,6 +75,12 @@ router.patch('/update', (req, res, next) => {
       res.status(200).json({
         message: "updated !"
       });
+
+      // io.on('connection', function (socket) {
+      //  socket.emit('notification',function () { });
+      //   // socket.on('message', function () { });
+      //   // socket.on('disconnect', function () { });
+      // });
     }
     else {
       res.status(500).json({

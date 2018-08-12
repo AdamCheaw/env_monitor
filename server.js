@@ -8,6 +8,9 @@ const io = socketIO(server);
 
 io.on('connection', (socket) => {
   console.log('a user connected');
+  socket.on('c', () => {
+    console.log('xxxx');
+  });
   socket.on('disconnect', () => {
     console.log('User was disconnected');
   });

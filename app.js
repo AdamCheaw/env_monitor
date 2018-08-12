@@ -8,19 +8,20 @@ var cookieParser = require('cookie-parser');
 var bodyParser = require('body-parser');
 var sensor = require('./routes/sensor');
 var user = require('./routes/user');
+var hbs = require('express-handlebars');
+var test = require('./playground/test');
 
-// const productRoutes = require('./api/routes/products');
-// const orderRoutes = require('./api/routes/orders');
+app.engine('hbs', hbs({extname: 'hbs', defaultLayout: 'layout', layoutsDir: __dirname + '/views/layouts/'}));
+app.set('views', path.join(__dirname, 'views'));
+app.set('view engine', 'hbs');
+
 app.use(express.static(path.join(__dirname, 'public')));
-console.log(path.join(__dirname, 'public'));
+
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(cookieParser());
 
 app.use("/sensors", sensor);
 app.use("/getData", user);
-
-// app.get('/socketIO', function(req, res){
-//   res.sendFile(__dirname + '/public/socket.html');
-// });
+app.use("/test", test);
 module.exports = app;

@@ -4,7 +4,11 @@ var mongoose = require('mongoose');
 var bodyParser = require('body-parser');
 var SensorData = require('../model/sensor');
 var moment = require('moment');
-
+// var a = { people: [
+//     {firstName: "Yehuda", lastName: "Katz"},
+//     {firstName: "Carl", lastName: "Lerche"},
+//     {firstName: "Alan", lastName: "Johnson"}
+//   ]} ;
 router.get('/all',(req, res, next) => {
   SensorData.find()
     .select("name date _id temp")
@@ -22,7 +26,8 @@ router.get('/all',(req, res, next) => {
           };
         })
       };
-      res.status(200).json(response);
+      res.render('index2',{items:response});
+      //res.status(200).json(response.data[0].date);
       console.log("From database", response);
     })
     .catch(err => {
@@ -59,5 +64,6 @@ router.get('/:sensorId', (req, res, next) =>{
       res.status(500).json({ error: err });
     });
 });
+
 
 module.exports = router;
