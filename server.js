@@ -5,11 +5,16 @@ const port = process.env.PORT || 3000;
 
 const server = http.createServer(app);
 const io = socketIO(server);
-
+const {generateData} = require('./server/utils/generate');
 io.on('connection', (socket) => {
   console.log('a user connected');
-  socket.on('c', () => {
-    console.log('xxxx');
+  //testing
+  socket.on('c', (data) => {
+    console.log(data.message);
+  });
+  socket.on('update', (data) => {
+    console.log(`listening a updated event from ${data._id}` );
+    io.emit('notification',generateData(data));
   });
   socket.on('disconnect', () => {
     console.log('User was disconnected');
