@@ -1,0 +1,21 @@
+<h1>testing</h1>
+{{# if name }}
+
+<section>
+  <h2>Successful login!</h2>
+  <p>{{ name }}</p>
+  <p>{{ sessionID }}</p>
+</section>
+
+{{ else}}
+<section class="login">
+    <h3>User login</h3>
+    <form action="/test/insert" method="post">
+        <div class="input">
+            <label for="title">name</label>
+            <input type="text" id="name" name="name">
+        </div>
+        <button type="submit">Login</button>
+    </form>
+</section>
+{{/if}}

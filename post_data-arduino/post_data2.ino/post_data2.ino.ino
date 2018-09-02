@@ -8,7 +8,7 @@
 #include "pins_arduino.h"
 
 //DHT Constants
-#define DHTPIN 13     // what pin we're connected to
+#define DHTPIN 12     // what pin we're connected to (D6)
 #define DHTTYPE DHT22   // DHT 22  (AM2302)
 DHT dht(DHTPIN, DHTTYPE); //// Initialize DHT sensor for normal 16mhz Arduino
 int temp; //Stores temperature value
@@ -152,7 +152,7 @@ void loop() {
     temp = (int)dht.readTemperature();
     notification(temp,SID);
     start_time = current_time;
-    delay(1000);
+    delay(3000);
   }
   else if(current_time - start_time > timer)
   {

@@ -3,6 +3,11 @@ var socket = io();
 
 socket.on('connect', function () {
   console.log('Connected to server');
+  console.log(socket.id);
+  var get_param_from_url = decodeURI($(location).attr('href')).split('/').reverse()[0];
+  socket.emit('subscribe',{sensorID: get_param_from_url }, function() {
+
+  });
 });
 socket.on('notification', function (data) {
   console.log(data);

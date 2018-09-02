@@ -11,11 +11,15 @@ const {generateData} = require('../server/utils/generate');
 //received advertisement from sensor
 router.post('/insert', (req, res, next) => {
   SensorData.findOne({name:req.body.name},(err,doc) =>{
+    var currentDate = new Date();
     if (!doc) {//nothing found , insert a new document
       var item = {
         name: req.body.name,
         temp: req.body.temp,
-        date: new Date()
+        date: currentDate,
+        //expireTime : 30
+        onConnect:true,
+        expireDate:moment(currentDate).add(30, 's')
       };
       var data = new SensorData(item);
       data.save()
@@ -41,6 +45,9 @@ router.post('/insert', (req, res, next) => {
     else {//if the sensor already insert before , update and responce sensorId
       doc.temp = doc.temp;
       doc.date = new Date();
+      onConnect = true,
+      expireDate = moment(currentDate).add(30, 's')
+      //doc.onConnect = true;
       doc.save();
       res.status(200).json({
         message: "receive request packet!",
@@ -58,6 +65,7 @@ router.post('/insert', (req, res, next) => {
 });
 //receive a notification from sensor
 router.patch('/update', (req, res, next) => {
+  var currentDate = new Date();
   var id = req.body.sensorId;
   console.log("received notification message from ("+id+")");
   SensorData.findById(id, (err, doc) => {
@@ -69,7 +77,10 @@ router.patch('/update', (req, res, next) => {
     }
     //doc.title = req.body.title;
     doc.temp = req.body.temp;
-    doc.date = new Date();
+    doc.date = currentDate;
+    doc.onConnect = true,
+    doc.expireDate = moment(currentDate).add(30, 's')
+    //doc.onConnect = true;
     doc.save();
      console.log(doc.name+" updated data");
     // console.log("ID : "+req.body.sensorId);
@@ -80,10 +91,10 @@ router.patch('/update', (req, res, next) => {
   .then(doc => {
     if(doc) {
       res.status(200).json({
-        message: "updated !"
+        message: "updated success!"
       });
-      var socket = io('http://localhost:3000');
-      socket.emit('update', generateData(doc));
+      // var socket = io('http://localhost:3000');
+      // socket.emit('update', generateData(doc));
       //console.log('emit an update event to server about data change');
     }
     else {
