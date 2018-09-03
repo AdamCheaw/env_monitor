@@ -45,8 +45,8 @@ router.post('/insert', (req, res, next) => {
     else {//if the sensor already insert before , update and responce sensorId
       doc.temp = doc.temp;
       doc.date = new Date();
-      onConnect = true,
-      expireDate = moment(currentDate).add(30, 's')
+      doc.onConnect = true;
+      doc.expireDate = moment(currentDate).add(30, 's');
       //doc.onConnect = true;
       doc.save();
       res.status(200).json({
@@ -78,8 +78,8 @@ router.patch('/update', (req, res, next) => {
     //doc.title = req.body.title;
     doc.temp = req.body.temp;
     doc.date = currentDate;
-    doc.onConnect = true,
-    doc.expireDate = moment(currentDate).add(30, 's')
+    doc.onConnect = true;
+    doc.expireDate = moment(currentDate).add(30, 's');
     //doc.onConnect = true;
     doc.save();
      console.log(doc.name+" updated data");

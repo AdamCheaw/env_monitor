@@ -5,11 +5,14 @@ var bodyParser = require('body-parser');
 var SensorData = require('../model/sensor');
 var moment = require('moment');
 const {searchSubscribeList} = require('../server/utils/search');
+// const {userOnConnect} = require('../controllers/user');
+
 router.get('/', (req, res, next) => {
   if (!req.session.views) {
     res.render('login');
     return;
   }
+  // userOnConnect();
   // var doc = searchSubscribeList(req.session.views);
   // console.log(doc);
   // res.send(doc);
@@ -18,7 +21,7 @@ router.get('/', (req, res, next) => {
       res.render('observe',{items:result, session:req.session.views});
     }
     else {
-      res.send("nothing can be observe");
+      res.render('observe',{items:result, session:req.session.views});
     }
     console.log(result);
   });

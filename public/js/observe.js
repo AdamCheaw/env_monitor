@@ -10,4 +10,5 @@ socket.on('connect', function () {
 
 socket.on('disconnect', function () {
   console.log('Disconnected from server');
+  alert("Disconnected from server");
 });
