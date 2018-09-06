@@ -15,6 +15,7 @@ var expressValidator = require('express-validator');
 var expressSession = require('express-session');
 var {checkDisconnect} = require('./controllers/sensor');
 
+
 app.engine('hbs', hbs({extname: 'hbs', defaultLayout: 'layout', layoutsDir: __dirname + '/views/layouts/'}));
 app.set('views', path.join(__dirname, 'views'));
 app.set('view engine', 'hbs');
