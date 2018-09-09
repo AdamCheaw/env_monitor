@@ -1,5 +1,6 @@
 var SensorData = require('../model/sensor');
 var moment = require('moment');
+const {checkExpire} = require('../server/utils/checkExpire');
 
 var expireDate;
 var checkDisconnect = (callback) => {
@@ -53,5 +54,34 @@ var checkDisconnect = (callback) => {
       return err
     });
 }
+var searchAllSensor = (callback) => {
+  SensorData.find()
+    .select("name date _id temp expireTime")
+    .exec()
+    .then(docs => {
+      //console.log(docs);
+      var doc;
+      var response = {
 
-module.exports = {checkDisconnect};
+        count: docs.length,
+        data: docs.map(doc => {
+          return  {
+            _id: doc._id,
+            date: moment.parseZone(doc.date).local().format('YYYY MMM Do h:mm:ss a'),
+            name: doc.name,
+            temp: doc.temp,
+            onConnect: checkExpire(doc.date, parseInt(doc.expireTime)),
+            expireTime: doc.expireTime
+          };
+        })
+      };
+      callback(response);
+      return;
+      //res.render('getAll',{items:response, session:req.session.views});
+
+      //res.status(200).json(response.data[0].date);
+      //console.log("From database", response);
+    })
+}
+
+module.exports = {checkDisconnect,searchAllSensor};

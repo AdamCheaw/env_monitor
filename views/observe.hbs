@@ -1,24 +1,25 @@
 <h1>OBSERVE</h1>
 <p class="sensorData">
   {{#each items }}
-    {{#if this.onConnect }}
-        <div>Id: {{ this._sensorID._id }}</div>
-        <div>Date: {{ this._sensorID.date }}</div>
-        <div>Name: {{ this._sensorID.name }}</div>
-        <div>temp: {{ this._sensorID.temp }}</div>
-        <div>onConnect: {{ this._sensorID.onConnect }}</div>
-        <div>------------------------------------</div>
+    {{#if this._sensorID.onConnect }}
+      <div id="{{this._sensorID._id}}" class="sensor">
+          <div>Date: {{ this._sensorID.date }}</div>
+          <div>Name: {{ this._sensorID.name }}</div>
+          <div>temp: {{ this._sensorID.temp }}</div>
+          <div>onConnect: {{ this._sensorID.onConnect }}</div>
+          <div>------------------------------------</div>
+      </div>
     {{else}}
-        <div><s>Id: {{ this._sensorID._id }}</s></div>
-        <div><s>Date: {{ this._sensorID.date }}</s></div>
-        <div><s>Name: {{ this._sensorID.name }}</s></div>
-        <!--<div><input type="checkbox" name="subscribe_checkbox" id="checkbox_{{ this._id }}" value="{{ this._id }}"> Subscribe</div>-->
-        <div>------------------------------------</div>
+      <div id="{{this._sensorID._id}}" class="sensor">
+          <div><s>Date: {{ this._sensorID.date }}</s></div>
+          <div><s>Name: {{ this._sensorID.name }}</s></div>
+          <!--<div><input type="checkbox" name="subscribe_checkbox" id="checkbox_{{ this._id }}" value="{{ this._id }}"> Subscribe</div>-->
+          <div>------------------------------------</div>
+      </div>
     {{/if}}
   {{/each}}
 </p>
 <script>
   var name = "{{session}}";
-  console.log(name);
 </script>
 <script src="/js/observe.js"></script>

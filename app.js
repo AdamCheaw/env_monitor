@@ -39,7 +39,7 @@ setInterval(function() {
       console.log("checkDisconnect: "+result);
     }
   });
-}, 60000);
+}, 30000);
 
 //testing use
 //app.use("/test", test);

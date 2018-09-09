@@ -6,7 +6,8 @@ var Schema = mongoose.Schema;
 var SubscribeListSchema = new mongoose.Schema({
 
   _sensorID: {type: mongoose.Schema.Types.ObjectId, required: true, ref: 'SensorData'},
-  subscriber: {type: String, required: true},
+  _subscriber:{type: mongoose.Schema.Types.ObjectId, required: true, ref: 'User'},
+  subscriberName: {type: String, required: true},
   socketID:{type: String},
   option:{type: String,default: 'default'}
   // user_list: [{

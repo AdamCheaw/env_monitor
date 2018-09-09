@@ -58,4 +58,34 @@ var userDisconnect = (socketID) => {
     }
   });
 };
-module.exports = {userOnConnect,userDisconnect};
+
+//find user's id
+var searchUser_withName = (name,callback) => {
+  UserData.findOne({name:name}, (err, doc) => {
+    if(err) {
+      console.log(err);
+      return;
+    }
+    if(doc) {
+      callback(doc._id);
+      //console.log("searchUser_withName "+name+": "+doc._id);
+      return;
+    }
+    else {
+      var item = {
+        name: name,
+        onConnect: false,
+        socketID: ""
+      };
+      var data = new UserData(item);
+      data.save()
+      .catch(err => {
+        console.log(err);
+      });
+      callback(data._id);
+      console.log("insert new user "+name+": "+doc._id);
+      return;
+    }
+  })
+}
+module.exports = {userOnConnect,userDisconnect,searchUser_withName};

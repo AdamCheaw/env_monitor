@@ -5,7 +5,8 @@ var bodyParser = require('body-parser');
 var expressSession = require('express-session');
 var SensorData = require('../model/sensor');
 var moment = require('moment');
-const {checkExpire} = require('../server/utils/checkExpire');
+const {searchUser_withName} = require('../controllers/user');
+const {searchAllSensor} = require('../controllers/sensor');
 const {subscribe,unsubscribe_with_socketID,unsubscribe_with_name} = require('../server/utils/subscribe_event');
 // var a = { people: [
 //     {firstName: "Yehuda", lastName: "Katz"},
@@ -17,37 +18,9 @@ router.get('/',(req, res, next) => {
     res.render('login');
     return;
   }
-  SensorData.find()
-    .select("name date _id temp expireTime")
-    .exec()
-    .then(docs => {
-      console.log(docs);
-      var doc;
-      var response = {
-
-        count: docs.length,
-        data: docs.map(doc => {
-          return  {
-            _id: doc._id,
-            date: moment.parseZone(doc.date).local().format('YYYY MMM Do h:mm:ss a'),
-            name: doc.name,
-            temp: doc.temp,
-            onConnect: checkExpire(doc.date, parseInt(doc.expireTime)),
-            expireTime: doc.expireTime
-          };
-        })
-      };
-      res.render('getAll',{items:response, session:req.session.views});
-
-      //res.status(200).json(response.data[0].date);
-      //console.log("From database", response);
-    })
-    .catch(err => {
-      console.log(err);
-      res.status(500).json({
-        error: err
-      });
-    });
+  searchAllSensor((result) => {
+    res.render('getAll',{items:result, session:req.session.views});
+  })
 });
 
 router.get('/:sensorId', (req, res, next) => {
@@ -81,27 +54,39 @@ router.get('/:sensorId', (req, res, next) => {
 });
 //handle user login
 router.post('/submit', (req, res, next) => {
+
+  //req.session.views = sessionData;
+  //assign username and id to session
   req.session.views = req.body.name;
-  //name = {name:req.session.views,id:123};
+  //req.session.userID = sessionData;
   res.redirect('/getData/');
-  console.log(req.session.views+" 's "+req.session.id);
+  console.log(req.session);
+  console.log("sessionID: "+req.session.id);
 });
 //user subscribe
 router.post('/subscribe', (req, res, next) => {
+  var userID;
+
   //remove previous subscribe
   if(req.body.subscribe_checkbox) {unsubscribe_with_name(req.session.views);}
   else{ return res.redirect('/getData'); }
-  var subscribe_array = [];
-  //check subscribe_checkbox is greater than 1
-  if(Array.isArray(req.body.subscribe_checkbox)) {
-    for(var i = 0; i < req.body.subscribe_checkbox.length;i++) {
-      subscribe_array.push(req.body.subscribe_checkbox[i])
+
+  searchUser_withName(req.session.views,(result) => {
+    var userID = result;
+    var subscribe_array = [];
+    //check subscribe_checkbox is greater than 1
+    if(Array.isArray(req.body.subscribe_checkbox)) {
+      for(var i = 0; i < req.body.subscribe_checkbox.length;i++) {
+        subscribe_array.push(req.body.subscribe_checkbox[i])
+      }
     }
-  }
-  else {
-    subscribe_array.push(req.body.subscribe_checkbox)
-  }
-  subscribe(req.session.views,subscribe_array);
+    else {
+      subscribe_array.push(req.body.subscribe_checkbox)
+    }
+    //console.log(userID);
+    subscribe(req.session.views,userID,subscribe_array);
+  })
+
   res.redirect('/getData');
 });
 module.exports = router;

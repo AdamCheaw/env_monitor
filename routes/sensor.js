@@ -6,7 +6,7 @@ var SensorData = require('../model/sensor');
 var moment = require('moment');
 // var emitter = require('socket.io-emitter')({ host: 'localhost', port: '6379' });
 var io = require('socket.io-client');
-const {generateData} = require('../server/utils/generate');
+const {generateSensorData} = require('../server/utils/generate');
 
 //received advertisement from sensor
 router.post('/insert', (req, res, next) => {
@@ -93,9 +93,9 @@ router.patch('/update', (req, res, next) => {
       res.status(200).json({
         message: "updated success!"
       });
-      // var socket = io('http://localhost:3000');
-      // socket.emit('update', generateData(doc));
-      //console.log('emit an update event to server about data change');
+      var socket = io('http://localhost:3000');
+      socket.emit('update', generateSensorData(doc));
+      console.log('emit an update event to server about data change');
     }
     else {
       res.status(500).json({

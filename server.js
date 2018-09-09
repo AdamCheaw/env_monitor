@@ -5,9 +5,10 @@ const port = process.env.PORT || 3000;
 
 const server = http.createServer(app);
 const io = socketIO(server);
-const {generateData} = require('./server/utils/generate');
+const {generateSensorData} = require('./server/utils/generate');
 const {subscribe,unsubscribe} = require('./server/utils/subscribe_event');
 const {userOnConnect,userDisconnect} = require('./controllers/user');
+const {searchSubscribeList_withSensorID} = require('./controllers/SubscribeList');
 io.on('connection', (socket) => {
   socket.on('auth',(data) => {
     console.log(data.name+' have connected, socket id: '+socket.id);
@@ -30,11 +31,25 @@ io.on('connection', (socket) => {
   //   console.log(data);
   //   subscribe(socket.id,data.sensorID);
   // });
-  // //sensor notification
-  // socket.on('update', (data) => {
-  //   console.log(`listening a updated event from ${data._id}` );
-  //   io.emit('notification',generateData(data));
-  // });
+  //sensor notification
+  socket.on('update', (SensorData) => {
+    console.log(`socket: listening a updated event from sensor ${SensorData._id}` );
+    //searching subscriber current connect to socket
+    searchSubscribeList_withSensorID(SensorData._id, (socketID) =>{
+      if(socketID!= "") {
+        for(var i = 0;i < socketID.length;i++) {
+          if (io.sockets.connected[socketID[i]]) {
+            io.to(socketID[i]).emit('notification', generateSensorData(SensorData));
+            console.log("socket: emit update msg to socket " + socketID[i]);
+          }
+        }
+      }
+      else {
+        console.log("socket: no user subscribe this sensor or subscriber not online");
+      }
+    })
+    //io.emit('notification',generateData(data));
+  });
   socket.on('disconnect', () => {
     console.log('User was disconnected');
     userDisconnect(socket.id);

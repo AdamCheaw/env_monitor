@@ -4,7 +4,7 @@ var mongoose = require('mongoose');
 var bodyParser = require('body-parser');
 var SensorData = require('../model/sensor');
 var moment = require('moment');
-const {searchSubscribeList} = require('../server/utils/search');
+const {searchSubList_withSubName} = require('../controllers/SubscribeList');
 // const {userOnConnect} = require('../controllers/user');
 
 router.get('/', (req, res, next) => {
@@ -16,8 +16,8 @@ router.get('/', (req, res, next) => {
   // var doc = searchSubscribeList(req.session.views);
   // console.log(doc);
   // res.send(doc);
-  searchSubscribeList(req.session.views,function(result) {
-    if(result != "") {
+  searchSubList_withSubName(req.session.views,function(result) {
+    if(result != "" || result !== undefined) {
       res.render('observe',{items:result, session:req.session.views});
     }
     else {
