@@ -4,7 +4,13 @@ var bodyParser = require('body-parser');
 var moment = require('moment');
 var SubscribeList = require('../model/SubscribeList');
 var SensorData = require('../model/sensor');
-const {searchSubscribeList_withSensorID} = require('../controllers/SubscribeList');
+
+router.get('/', (req, res, next) => {
+  res.render('test/test');
+});
+
+module.exports = router;
+//const {searchSubscribeList_withSensorID} = require('../controllers/SubscribeList');
 // var myObject = {
 //     message: 'Hello World!',
 //     name: 'test',
