@@ -35,7 +35,7 @@ io.on('connection', (socket) => {
   socket.on('update', (SensorData) => {
     console.log(`socket: listening a updated event from sensor ${SensorData._id}` );
     //searching subscriber current connect to socket
-    searchSubscribeList_withSensorID(SensorData._id, (socketID) =>{
+    searchSubscribeList_withSensorID(SensorData._id, (socketID,sensorID) =>{
       if(socketID!= "") {
         for(var i = 0;i < socketID.length;i++) {
           if (io.sockets.connected[socketID[i]]) {
@@ -50,6 +50,29 @@ io.on('connection', (socket) => {
     })
     //io.emit('notification',generateData(data));
   });
+  socket.on('sensor disconnect',(data) => {
+    console.log("socket : listening Sensor Disconnect event "+data.disconnect_SID);
+    //var disconnectSID_array = data.disconnect_SID;
+    //multiple sensor id,because will have multiple sensor disconnect in 30sc
+    for(var i = 0;i < data.disconnect_SID.length;i++) {
+      //notification multiple user with this sensor disconnect
+      searchSubscribeList_withSensorID(data.disconnect_SID[i], (socketID,disconnectSensorID) => {
+        if(socketID!= "") {
+          for(var j = 0;j < socketID.length;j++) {
+            if (io.sockets.connected[socketID[j]]) {
+              io.to(socketID[j]).emit('sensor disconnect', {disconnectSensorID:disconnectSensorID});
+              console.log("socket: emit sensor "+disconnectSensorID+" disconnect msg to socket " + socketID[j]);
+            }
+          }
+        }
+        else {
+          console.log("socket: no user subscribe this sensor or subscriber not online");
+        }
+      });
+    }
+
+
+  })
   socket.on('disconnect', () => {
     console.log('User was disconnected');
     userDisconnect(socket.id);

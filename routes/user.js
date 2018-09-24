@@ -7,7 +7,9 @@ var SensorData = require('../model/sensor');
 var moment = require('moment');
 const {searchUser_withName} = require('../controllers/user');
 const {searchAllSensor} = require('../controllers/sensor');
+const {subscribeOne} = require('../controllers/SubscribeList');
 const {subscribe,unsubscribe_with_socketID,unsubscribe_with_name} = require('../server/utils/subscribe_event');
+const {countLine} = require('../server/utils/countLine');
 // var a = { people: [
 //     {firstName: "Yehuda", lastName: "Katz"},
 //     {firstName: "Carl", lastName: "Lerche"},
@@ -19,6 +21,7 @@ router.get('/',(req, res, next) => {
     return;
   }
   searchAllSensor((result) => {
+    //console.log(result);
     res.render('getAll',{items:result, session:req.session.views});
   })
 });
@@ -59,34 +62,47 @@ router.post('/submit', (req, res, next) => {
   //assign username and id to session
   req.session.views = req.body.name;
   //req.session.userID = sessionData;
-  res.redirect('/getData/');
+  res.redirect('/getData');
   console.log(req.session);
   console.log("sessionID: "+req.session.id);
 });
 //user subscribe
 router.post('/subscribe', (req, res, next) => {
-  var userID;
+  //var userID;
 
-  //remove previous subscribe
-  if(req.body.subscribe_checkbox) {unsubscribe_with_name(req.session.views);}
-  else{ return res.redirect('/getData'); }
-
-  searchUser_withName(req.session.views,(result) => {
-    var userID = result;
-    var subscribe_array = [];
-    //check subscribe_checkbox is greater than 1
-    if(Array.isArray(req.body.subscribe_checkbox)) {
-      for(var i = 0; i < req.body.subscribe_checkbox.length;i++) {
-        subscribe_array.push(req.body.subscribe_checkbox[i])
+  // //remove previous subscribe
+  // if(req.body.subscribe_checkbox) {unsubscribe_with_name(req.session.views);}
+  // else{ return res.redirect('/getData'); }
+  //
+  // searchUser_withName(req.session.views,(result) => {
+  //   var userID = result;
+  //   var subscribe_array = [];
+  //   //check subscribe_checkbox is greater than 1
+  //   if(Array.isArray(req.body.subscribe_checkbox)) {
+  //     for(var i = 0; i < req.body.subscribe_checkbox.length;i++) {
+  //       subscribe_array.push(req.body.subscribe_checkbox[i])
+  //     }
+  //   }
+  //   else {
+  //     subscribe_array.push(req.body.subscribe_checkbox)
+  //   }
+  //   //console.log(userID);
+  //   subscribe(req.session.views,userID,subscribe_array);
+  // })
+  searchUser_withName(req.session.views,(id) => {
+    var userID = id;
+    console.log("sensorID :"+req.body.sensorID);
+    subscribeOne(req.session.views,userID,req.body.sensorID,(result) => {
+      if(result == "success") {//response to ajax
+        res.json({msg:"success"});
       }
-    }
-    else {
-      subscribe_array.push(req.body.subscribe_checkbox)
-    }
-    //console.log(userID);
-    subscribe(req.session.views,userID,subscribe_array);
+      else {
+        res.json({msg:"error"});
+      }
+    });
   })
 
-  res.redirect('/getData');
+
+  //res.redirect('/getData');
 });
 module.exports = router;

@@ -31,16 +31,19 @@ app.use("/getData", user);
 app.use("/observe", observer);
 app.use("/test", test);
 setInterval(function() {
-  checkDisconnect(function(result) {
-    if((result == ""||result === undefined))
-    {
-      console.log("no sensor disconnect");
-    }
-    else if (result){
-      console.log("checkDisconnect: "+result);
-    }
-  });
+  checkDisconnect();
 }, 30000);
+// setInterval(function() {
+//   checkDisconnect(function(result) {
+//     if((result == ""||result === undefined))
+//     {
+//       console.log("no sensor disconnect");
+//     }
+//     else if (result){
+//       console.log("checkDisconnect: "+result);
+//     }
+//   });
+// }, 30000);
 
 //testing use
 //app.use("/test", test);

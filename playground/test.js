@@ -8,6 +8,17 @@ var SensorData = require('../model/sensor');
 router.get('/', (req, res, next) => {
   res.render('test/test');
 });
+router.post('/form', (req, res, next) => {
+  console.log("from ajax : "+req.body.data);
+  if(req.body.data != "nothing") {
+    res.json({data:req.body.data});
+    console.log(req.session.views);
+  }
+  else {
+    res.json({data:"nothing"});
+  }
+
+});
 
 module.exports = router;
 //const {searchSubscribeList_withSensorID} = require('../controllers/SubscribeList');

@@ -662,7 +662,7 @@ input[type=button].btn-block, input[type=reset].btn-block, input[type=submit].bt
 	box-shadow: 0 0 5px rgba(0,0,0,0.2)
 }
 .modal .modal-header .close {
-	color: rgba(0,0,0,0.5);
+	color: white;
 	font-size: 16px;
 	line-height: 30px;
 	height: 30px;
@@ -670,9 +670,20 @@ input[type=button].btn-block, input[type=reset].btn-block, input[type=submit].bt
 	text-shadow: 1px 1px 2px #ddd, 0 0 0 #000, 0 0 1px #fff
 }
 .modal-backdrop, .modal-backdrop.fade.in {
-	background: #fff;
-	opacity: .9
+	background: black;
+	opacity: .6
 }
+.modal .modal-header {
+	background-color: #262626;
+	color:white;
+
+}
+.modal .modal-header .modal-title {
+	margin-top:20px;
+	color:#f2f2f2;
+	text-align: center;
+}
+
 .accordion-group {
 	background: #fff;
 	-webkit-border-radius: 3px;
@@ -1717,4 +1728,8 @@ table td .online {
 	border:1px solid #47d147;
 	border-radius:2px;
 	color:white;
+}
+.enabled {
+	pointer-events: none;
+	opacity: 0.5;
 }

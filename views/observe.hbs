@@ -1,24 +1,3 @@
-{{!-- <h1>OBSERVE</h1>
-<p class="sensorData">
-  {{#each items }}
-    {{#if this._sensorID.onConnect }}
-      <div id="{{this._sensorID._id}}" class="sensor">
-          <div>Date: {{ this._sensorID.date }}</div>
-          <div>Name: {{ this._sensorID.name }}</div>
-          <div>temp: {{ this._sensorID.temp }}</div>
-          <div>onConnect: {{ this._sensorID.onConnect }}</div>
-          <div>------------------------------------</div>
-      </div>
-    {{else}}
-      <div id="{{this._sensorID._id}}" class="sensor">
-          <div><s>Date: {{ this._sensorID.date }}</s></div>
-          <div><s>Name: {{ this._sensorID.name }}</s></div>
-          <!--<div><input type="checkbox" name="subscribe_checkbox" id="checkbox_{{ this._id }}" value="{{ this._id }}"> Subscribe</div>-->
-          <div>------------------------------------</div>
-      </div>
-    {{/if}}
-  {{/each}}
-</p> --}}
 
 {{>header}}
 <div class="wrapper">
@@ -61,33 +40,31 @@
                 <tr>
                   <th>#</th>
                   <th>Name</th>
-                  <th>Descrition</th>
                   <th>Temparature</th>
                   <th>Status</th>
+                  <th>last updated</th>
                 </tr>
                 </thead>
                 <tbody>
-                <tr>
-                  <td>1</td>
-                  <td>Sensor 1</td>
-                  <td>B24 Lab</td>
-                  <td>24 C</td>
-                  <td><b class="online" >online</b></td>
-                </tr>
-                <tr>
-                  <td>2</td>
-                  <td>Sensor 1</td>
-                  <td>B24 Lab</td>
-                  <td>24 C</td>
-                  <td><b class="offline" >offline</b></td>
-                </tr>
-                <tr>
-                  <td>3</td>
-                  <td>Sensor 1</td>
-                  <td>B24 Lab</td>
-                  <td>24 C</td>
-                  <td><b class="offline" >offline</b></td>
-                </tr>
+                  {{#each items }}
+                      {{#if this._sensorID.onConnect }}
+                      <tr id="{{this._sensorID._id}}">
+                        <td class="sensor-index">{{@index}}</td>
+                        <td>{{this._sensorID.name}}</td>
+                        <td class="sensor-temp">{{this._sensorID.temp}}</td>
+                        <td class="sensor-status"><b class="online" >online</b></td>
+                        <td class="sensor-date">{{this._sensorID.date}}</td>
+                      </tr>
+                      {{else}}
+                      <tr id="{{this._sensorID._id}}">
+                        <td class="sensor-index">{{@index}}</td>
+                        <td>{{this._sensorID.name}}</td>
+                        <td class="sensor-temp">? </td>
+                        <td class="sensor-status"><b class="offline" >offline</b></td>
+                        <td class="sensor-date">{{this._sensorID.date}}</td>
+                      </tr>
+                      {{/if}}
+                  {{/each}}
                 </tbody>
               </table>
               <br>
@@ -101,7 +78,8 @@
   </div>
 </div>
 {{>footer}}
-<script>
+
+<script type="text/javascript">
   var name = "{{session}}";
 </script>
 <script src="/js/observe.js"></script>

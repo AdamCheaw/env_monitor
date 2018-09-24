@@ -11,12 +11,12 @@
 #define DHTPIN 12     // what pin we're connected to (D6)
 #define DHTTYPE DHT22   // DHT 22  (AM2302)
 DHT dht(DHTPIN, DHTTYPE); //// Initialize DHT sensor for normal 16mhz Arduino
-int temp; //Stores temperature value
+float temp; //Stores temperature value
 ///////please enter your sensitive data in the Secret tab/arduino_secrets.h
 /////// Wifi Settings ///////
 char ssid[] = "CHEAW";//type your ssid
 char pass[] = "0978579421";//type your password
-String n = "Sensor-2";
+String n = "sensor1";
 //String jsonStr = "{\"name\":\"Sensor-1\",\"temp\":\"25.0\"}";// 定義JSON字串
 
 char serverAddress[] = "192.168.0.3";  // server address
@@ -36,14 +36,14 @@ const char* sensorId;
 String SID;
 const char* responseData;
 //post data to server , initial connect
-void advertisement(int temp) {
+void advertisement(float temp) {
   
   Serial.println("making POST request(advertisement)");
   String contentType = "application/json";
   StaticJsonBuffer<200> jsonBuffer;
   JsonObject& roots = jsonBuffer.createObject();
   
-  roots["name"] = "sensor1";
+  roots["name"] = n;
   //temp = (int)dht.readTemperature();
   roots["temp"] = temp;
   String jsonStr;
@@ -77,7 +77,7 @@ void advertisement(int temp) {
   Serial.print("Sid: ");
   Serial.println(SID);
 }
-void notification(int temp,String sensorId)
+void notification(float temp,String sensorId)
 {
   Serial.println("notification");
   String contentType = "application/json";
@@ -137,7 +137,8 @@ void setup() {
 
   // you're connected now, so print out the data
   Serial.println("You're connected to the network");
-  temp = (int)dht.readTemperature();
+  //temp = (int)dht.readTemperature();
+  temp = dht.readTemperature();
   // advertisement to the server
   while(SID == NULL)
   {
@@ -147,16 +148,16 @@ void setup() {
 
 void loop() {
   current_time = millis();
-  if(temp != (int)dht.readTemperature())
+  if(temp != dht.readTemperature())
   {
-    temp = (int)dht.readTemperature();
+    temp = dht.readTemperature();
     notification(temp,SID);
     start_time = current_time;
     delay(3000);
   }
   else if(current_time - start_time > timer)
   {
-    temp = (int)dht.readTemperature();
+    temp = dht.readTemperature();
     notification(temp,SID);
     start_time = current_time;
     
