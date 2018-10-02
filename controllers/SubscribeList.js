@@ -50,7 +50,7 @@ var searchSubList_withSubName = (name, callback) => {
   SubscribeListData.find({subscriberName:name})
     .populate({
       path:'_sensorID',
-      select:'name temp date onConnect'
+      select:'_id name temp date onConnect'
     })
     .select('subscriberName')
     .exec()
@@ -93,18 +93,26 @@ var subscribeOne = (name,userID,sensorID,callback) => {
         .then(result => {
           if(result) {
             console.log("DB : subscribe success");
-            callback("success");
+
+            callback(result);
           }
         })
         .catch(err => {
           console.log(err);
-          callback(err);
+          callback("error");
         });
       }
       else {//already insert before so do nothing first
-        callback("success");
+        callback("already insert");
       }
     });
     return;
 }
-module.exports = {searchSubscribeList_withSensorID,searchSubList_withSubName,subscribeOne};
+var unsubscribeOne = (subscribeListID,callback) => {
+  SubscribeListData.remove({_id:ObjectId(subscribeListID)}, (err) => {
+    if (err) return callback(err);
+    return callback("success");
+    console.log('the subdocs were removed');
+  });
+}
+module.exports = {searchSubscribeList_withSensorID,searchSubList_withSubName,subscribeOne,unsubscribeOne};

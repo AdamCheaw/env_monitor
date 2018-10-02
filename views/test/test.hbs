@@ -9,6 +9,8 @@
       <button type="button" class="btn btn-default" id="myBtn"> Login </button>
       {{!-- <button type="button" class="btn btn-info btn-lg" data-toggle="modal" data-target="#myModal" data-backdrop="true">Open Modal</button> --}}
       <!-- Modal -->
+      <div style="color:red">{{SensorData}}</div>
+      <div style="color:blue">{{subscribe_sensor}}</div>
       <div class="modal fade" id="myModal" role="dialog">
         <div class="modal-dialog">
           <!-- Modal content-->
@@ -76,6 +78,8 @@
 
 <script>
 $(document).ready(function(){
+    var result = "{{subscribe_sensor}}";
+    log
     $("#myBtn").click(function(){
         $("#myModal").modal("show");
     });

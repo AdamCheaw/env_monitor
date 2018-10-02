@@ -7,7 +7,7 @@ var SensorData = require('../model/sensor');
 var moment = require('moment');
 const {searchUser_withName} = require('../controllers/user');
 const {searchAllSensor} = require('../controllers/sensor');
-const {subscribeOne} = require('../controllers/SubscribeList');
+const {subscribeOne,unsubscribeOne,searchSubList_withSubName} = require('../controllers/SubscribeList');
 const {subscribe,unsubscribe_with_socketID,unsubscribe_with_name} = require('../server/utils/subscribe_event');
 const {countLine} = require('../server/utils/countLine');
 // var a = { people: [
@@ -20,10 +20,25 @@ router.get('/',(req, res, next) => {
     res.render('login');
     return;
   }
-  searchAllSensor((result) => {
-    //console.log(result);
-    res.render('getAll',{items:result, session:req.session.views});
-  })
+  searchAllSensor((sensorData_result) =>{
+    //searching the sensor subscribe by this user
+    searchSubList_withSubName(req.session.views,(sub_result) => {
+      console.log("sub_result : "+sub_result);
+      if(sub_result != "" || sub_result !== undefined) {
+        var subscribe_sensor = sub_result.map(data => {
+          return {
+            sensorID: data._sensorID._id,
+            subscribeID: data._id
+          };
+        });
+      }
+      res.render('getAll',{items:sensorData_result, session:req.session.views, subscribe_sensor:JSON.stringify(subscribe_sensor)});
+    });
+  });
+  // searchAllSensor((result) => {
+  //   //console.log(result);
+  //   res.render('getAll',{items:result, session:req.session.views});
+  // })
 });
 
 router.get('/:sensorId', (req, res, next) => {
@@ -93,16 +108,26 @@ router.post('/subscribe', (req, res, next) => {
     var userID = id;
     console.log("sensorID :"+req.body.sensorID);
     subscribeOne(req.session.views,userID,req.body.sensorID,(result) => {
-      if(result == "success") {//response to ajax
-        res.json({msg:"success"});
+      if(result == "error" || result == "already insert") {//response to ajax
+        res.status(400).json({msg:"error"});
       }
       else {
-        res.json({msg:"error"});
+        res.json({subListID:result._id, sensorID:result._sensorID});
       }
     });
   })
 
 
   //res.redirect('/getData');
+});
+router.post('/unsubscribe', (req, res, next) => {
+  unsubscribeOne(req.body.subscribeListID,(result) => {
+    if(result == "success") {//response to ajax
+      res.json({msg:"success"});
+    }
+    else {
+      res.status(400).json({msg:result});
+    }
+  })
 });
 module.exports = router;

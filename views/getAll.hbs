@@ -34,7 +34,7 @@
                           All Sensors</h3>
                   </div>
                   <div class="module-option clearfix">
-                      <form>
+                      {{!-- <form> --}}
                       {{!-- <div class="input-append pull-left">
                           <input type="text" class="span3" placeholder="Filter by name...">
                           <button type="submit" class="btn">
@@ -57,7 +57,7 @@
                   </div>
                   <div class="module-body">
 
-                      <table class="table table-condensed table-striped datatable-1">
+                      <table class="table table-condensed table-striped datatable-1" id="sub-table">
                         <thead>
                         <tr >
                           <th>#</th>
@@ -82,8 +82,8 @@
                                   Subscribe
                                 </label>
                               </td>
-                              <td>
-                                <a class="btn btn-default sub-btn" id="btn-{{ this._id }}"><i class="icon-eye-open"></i> sub</a>
+                              <td class="setting">
+                                <a class="btn btn-success sub-btn" id="btn-{{ this._id }}"><i class="icon-eye-open"></i></a>
                               </td>
                             </tr>
                             {{else}}
@@ -98,8 +98,8 @@
                                   Subscribe
                                 </label>
                               </td>
-                              <td class="enabled">
-                                <a class="btn btn-default sub-btn" id="btn-{{ this._id }}"><i class="icon-eye-open"></i> sub</a>
+                              <td class="setting">
+                                <a class="enabled btn btn-success sub-btn" id="btn-{{ this._id }}"><i class="icon-eye-open"></i></a>
                               </td>
                             </tr>
                             {{/if}}
@@ -185,7 +185,7 @@
                           </ul>
                       </div> --}}
                   </div>
-                </form>
+                {{!-- </form> --}}
               </div>
           </div>
           <!--/.content-->
@@ -202,10 +202,10 @@
       <button type="button" class="close" data-dismiss="modal">&times;</button>
       <h4 class="modal-title">Subscribe sensor1 ?</h4>
     </div>
-    <div class="modal-body">
-      <form class="form-horizontal row-fluid">
+    <div class="modal-body" >
+      <form class="form-horizontal row-fluid" >
 
-          <div class="control-group">
+          <div class="control-group" >
             <label class="control-label">Option</label>
             <div class="controls">
               <label class="radio inline">
@@ -219,7 +219,7 @@
             </div>
           </div>
 
-          <div class="control-group">
+          <div class="control-group" >
             <label class="control-label" for="basicinput1">Maximum value</label>
             <div class="controls" id="i1">
               <input type="text" id="input1" placeholder="You can't type something here..." class="span8" disabled>
@@ -246,13 +246,21 @@
 
           </div>
       </form>
+
+
     </div>
+
+
     <div class="modal-footer">
       <button type="button" class="btn btn-danger " data-dismiss="modal">Close</button>
     </div>
   </div>
   </div>
 </div>
-{{>footer}}
 
+{{>footer}}
+<script>
+  var sub_result = {{{subscribe_sensor}}};
+  //console.log(sub_result);
+</script>
 <script src="js/getAll.js" type="text/javascript"></script>

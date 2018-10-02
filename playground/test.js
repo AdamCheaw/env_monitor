@@ -4,19 +4,25 @@ var bodyParser = require('body-parser');
 var moment = require('moment');
 var SubscribeList = require('../model/SubscribeList');
 var SensorData = require('../model/sensor');
-
+const {searchAllSensor} = require('../controllers/sensor');
+const {searchSubList_withSubName} = require('../controllers/SubscribeList');
+var testing = (callback) => {
+  return callback("123");
+};
+// router.get('/', (req, res, next) => {
+//   res.render('test/test');
+// });
 router.get('/', (req, res, next) => {
-  res.render('test/test');
-});
-router.post('/form', (req, res, next) => {
-  console.log("from ajax : "+req.body.data);
-  if(req.body.data != "nothing") {
-    res.json({data:req.body.data});
-    console.log(req.session.views);
-  }
-  else {
-    res.json({data:"nothing"});
-  }
+  searchAllSensor((sensorData_result) =>{
+    searchSubList_withSubName("Adam",(sub_result) => {
+      var subscribe_sensor = sub_result.map(data => {
+        return {
+          sid: data._sensorID._id
+        };
+      });
+      res.render('test/test',{SensorData:sensorData_result,subscribe_sensor:JSON.stringify(subscribe_sensor)});
+    });
+  });
 
 });
 

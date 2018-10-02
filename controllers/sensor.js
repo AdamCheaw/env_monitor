@@ -88,7 +88,7 @@ var searchAllSensor = (callback) => {
             temp: doc.temp,
             onConnect: checkExpire(doc.date, parseInt(doc.expireTime)),
             expireTime: doc.expireTime,
-            line: countLine(number+=1)
+            //line: countLine(number+=1)
           };
         })
       };
