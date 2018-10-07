@@ -1733,3 +1733,10 @@ table td .online {
 	pointer-events: none;
 	opacity: 0.5;
 }
+.pull-left .btn {
+	z-index: 1041;
+}
+.icon-eye-open, .icon-remove {
+
+    pointer-events:none;
+}

@@ -1,5 +1,45 @@
 var socket = io();
+$('#sub-table').on('click', '.unsubBtn', function(e) {
+  idClicked = e.target.id;//get btn clicked id
+  idClicked = idClicked.replace('unsubBtn-', '');
+  console.log("idClicked: "+idClicked);
+  if(idClicked)
+  {
+    var data = {
+        "subscribeListID" : idClicked
+    };
+    $.ajax({
+        type        : 'POST', // define the type of HTTP verb we want to use (POST for our form)
+        url         : '/getData/unsubscribe', // the url where we want to POST
+        data        : data, // our data object
+        dataType    : 'json', // what type of data do we expect back from the server
+        encode          : true,
+        beforeSend: function(){
+          // $.LoadingOverlay("show", {
+          //   image       : "",
+          //   fontawesome : "fa fa-cog fa-spin"
+          // });
+        },
+        complete: function(){
+           // $.LoadingOverlay("hide");
+           // console.log("ajax send finish");
+           // $("#myModal").modal("hide");
+        },
+        success: function(data){
+          $("#unsubBtn-"+idClicked).parent().parent().remove();
+          alert("unsubscribe success!");
+        },
+        error: function(){
+          alert("unsubscribe failed!");
+        }
+    })
 
+  }
+  else {
+
+  }
+
+});
 socket.on('connect', function () {
   console.log('Connected to server');
   console.log('user: '+name);
@@ -14,7 +54,7 @@ socket.on('notification', function(SensorData) {
   $("#"+SensorData._id+' .sensor-temp').html(html);
   html = "<b class=\"online\" >online</b>";
   $("#"+SensorData._id+' .sensor-status').html(html);
-  html = SensorData.date;
+  html = moment.parseZone(SensorData.date).local().format('YYYY MMM Do, h:mm:ssa');
   $("#"+SensorData._id+' .sensor-date').html(html);
   //console.log(html);
 

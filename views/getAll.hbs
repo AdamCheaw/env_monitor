@@ -28,7 +28,7 @@
       <div class="span9">
           <div class="content">
               <div class="module">
-                <form action="/getData/subscribe" method="post">
+                {{!-- <form action="/getData/subscribe" method="post"> --}}
                   <div class="module-head">
                       <h3>
                           All Sensors</h3>
@@ -51,7 +51,7 @@
                               Offline</button>
                       </div> --}}
                       <div class="pull-left">
-									       <button type="submit" class="btn btn-primary">Submit</button>
+									       <button type="button" class="btn btn-primary">Submit</button>
                          <a href="/observe" class="btn btn-info">Observe Window</a>
 								      </div>
                   </div>
@@ -194,6 +194,9 @@
     </div>
   </div>
 </div>
+
+
+{{>footer}}
 <div class="modal fade" id="myModal" role="dialog">
   <div class="modal-dialog">
     <!-- Modal content-->
@@ -203,7 +206,7 @@
       <h4 class="modal-title">Subscribe sensor1 ?</h4>
     </div>
     <div class="modal-body" >
-      <form class="form-horizontal row-fluid" >
+      <form id="sub-form" class="form-horizontal row-fluid">
 
           <div class="control-group" >
             <label class="control-label">Option</label>
@@ -242,8 +245,7 @@
           </div>
           <div class="control-group">
 
-            <button type="submit" class="btn btn-large btn-success btn-block "> Submit</button>
-
+            <button type="button" class="btn btn-large btn-success btn-block " id="form-submit"> Submit</button>
           </div>
       </form>
 
@@ -257,8 +259,8 @@
   </div>
   </div>
 </div>
+<div class="modal fade" id="myModal2" role="dialog">
 
-{{>footer}}
 <script>
   var sub_result = {{{subscribe_sensor}}};
   //console.log(sub_result);

@@ -4,6 +4,7 @@ var SubscribeListData = require('../model/SubscribeList');
 var mongoose = require('mongoose');
 var express = require('express');
 var ObjectId = require('mongodb').ObjectID;
+var moment = require('moment');
 
 // find all subscriber subscribe this sensor
 var searchSubscribeList_withSensorID = (sensorID,callback) => {
@@ -56,10 +57,24 @@ var searchSubList_withSubName = (name, callback) => {
     .exec()
     .then(docs => {
       if(docs){
+        var result = docs.map(doc => {
+          return {
+            _id: doc._id,
+            _sensorID: {
+              _id: doc._sensorID._id,
+              name: doc._sensorID.name,
+              temp: doc._sensorID.temp,
+              date: moment.parseZone(doc._sensorID.date).local().format('YYYY MMM Do, h:mm:ssa'),
+              onConnect: doc._sensorID.onConnect
+            },
+            subscriberName: doc.subscriberName
+          }
+        });
         //doc = docs
-        callback(docs);
-        return;
+        callback(result);
         //console.log("searchSubscribeList_withSubscriberName: "+docs);
+        return;
+
       }
       else {
         //callback(null);
