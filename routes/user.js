@@ -10,11 +10,7 @@ const {searchAllSensor} = require('../controllers/sensor');
 const {subscribeOne,unsubscribeOne,searchSubList_withSubName} = require('../controllers/SubscribeList');
 const {subscribe,unsubscribe_with_socketID,unsubscribe_with_name} = require('../server/utils/subscribe_event');
 const {countLine} = require('../server/utils/countLine');
-// var a = { people: [
-//     {firstName: "Yehuda", lastName: "Katz"},
-//     {firstName: "Carl", lastName: "Lerche"},
-//     {firstName: "Alan", lastName: "Johnson"}
-//   ]} ;
+const {convertCondition} = require('../server/utils/convert');
 router.get('/',(req, res, next) => {
   if (!req.session.views) {
     res.render('login');
@@ -35,10 +31,6 @@ router.get('/',(req, res, next) => {
       res.render('getAll',{items:sensorData_result, session:req.session.views, subscribe_sensor:JSON.stringify(subscribe_sensor)});
     });
   });
-  // searchAllSensor((result) => {
-  //   //console.log(result);
-  //   res.render('getAll',{items:result, session:req.session.views});
-  // })
 });
 
 router.get('/:sensorId', (req, res, next) => {
@@ -73,53 +65,36 @@ router.get('/:sensorId', (req, res, next) => {
 //handle user login
 router.post('/submit', (req, res, next) => {
 
-  //req.session.views = sessionData;
-  //assign username and id to session
+  //session = user name
   req.session.views = req.body.name;
-  //req.session.userID = sessionData;
   res.redirect('/getData');
   console.log(req.session);
   console.log("sessionID: "+req.session.id);
 });
 //user subscribe
 router.post('/subscribe', (req, res, next) => {
-  //var userID;
-
-  // //remove previous subscribe
-  // if(req.body.subscribe_checkbox) {unsubscribe_with_name(req.session.views);}
-  // else{ return res.redirect('/getData'); }
-  //
-  // searchUser_withName(req.session.views,(result) => {
-  //   var userID = result;
-  //   var subscribe_array = [];
-  //   //check subscribe_checkbox is greater than 1
-  //   if(Array.isArray(req.body.subscribe_checkbox)) {
-  //     for(var i = 0; i < req.body.subscribe_checkbox.length;i++) {
-  //       subscribe_array.push(req.body.subscribe_checkbox[i])
-  //     }
-  //   }
-  //   else {
-  //     subscribe_array.push(req.body.subscribe_checkbox)
-  //   }
-  //   //console.log(userID);
-  //   subscribe(req.session.views,userID,subscribe_array);
-  // })
   searchUser_withName(req.session.views,(id) => {
     var userID = id;
-    console.log("sensorID :"+req.body.sensorID);
-    subscribeOne(req.session.views,userID,req.body.sensorID,(result) => {
-      if(result == "error" || result == "already insert") {//response to ajax
-        res.status(400).json({msg:"error"});
-      }
-      else {
-        res.json({subListID:result._id, sensorID:result._sensorID});
-      }
-    });
+    console.log();
+    subscribeOne(
+      req.session.views,
+      userID,
+      req.body.sensorID,
+      req.body.option,
+      convertCondition(req.body.condition),
+      (result) => {
+        if(result == "error") {//response to ajax
+          res.status(400).json({msg:"error"});
+        }
+        else {
+          res.json({subListID:result._id, sensorID:result._sensorID});
+        }
+      });
+
+
   })
-
-
-  //res.redirect('/getData');
 });
+//user unsubscribe
 router.post('/unsubscribe', (req, res, next) => {
   unsubscribeOne(req.body.subscribeListID,(result) => {
     if(result == "success") {//response to ajax

@@ -68,13 +68,45 @@ $(document).ready(function(){
        if(optionValue == "default")
        {
          var formData = {
-             "sensorID" : idClicked
+             "sensorID": idClicked,
+             "option": "default"
          };
        }
        else {
+         var condition = [];
+         if($("#input1").val()) {
+           var data = {
+             "type": "max",
+             "value": parseInt($("#input1").val())
+           };
+           condition.push(data);
+         }
+         if($("#input2").val()) {
+           var data = {
+             "type": "min",
+             "value": parseInt($("#input2").val())
+           };
+           condition.push(data);
+         }
+         if($("#selectOption1 option:selected").val()) {
+           var data = {
+             "type": "precision",
+             "value": $("#selectOption1 option:selected").val()
+           };
+           condition.push(data);
+         }
+         if(condition.length == 0) {
+           alert("input text or select option is empty");
+           return;
+         }
+         // var maxValue = $("#input1").val();
+         // var minValue = $("#input2").val();
          var formData = {
-             "data" : "nothing"
+             "sensorID": idClicked,
+             "option": "advanced",
+             "condition": condition
          };
+         console.log(formData);
        }
        // there are many ways to get this data using jQuery (you can use the class or id also)
        // process the form
@@ -97,6 +129,9 @@ $(document).ready(function(){
            },
            success: function(data){
              console.log(data);
+             if($("#unsubBtn-"+data.subListID).html()) {
+               $("#unsubBtn-"+data.subListID).remove();
+             }
              var html = '<a type="button" class="btn btn-danger unsubBtn" id="unsubBtn-'+data.subListID+'" ><i class="icon-remove"></i></a>';
              $("#"+data.sensorID+" .setting").append(html)
            }

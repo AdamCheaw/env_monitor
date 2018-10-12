@@ -25,8 +25,9 @@ var searchSubscribeList_withSensorID = (sensorID,callback) => {
       if(docs){
         console.log(docs);
         var items = [];
+        //find the current onConnect subscriber
         docs.forEach(item => {
-          if(item._subscriber){
+          if(item._subscriber){//if !null push to the items
             items.push(item._subscriber.socketID);
             //console.log("items.push(item._subscriber.socketID)"+item._subscriber.socketID);
           }
@@ -91,7 +92,7 @@ var searchSubList_withSubName = (name, callback) => {
     // }
 }
 
-var subscribeOne = (name,userID,sensorID,callback) => {
+var subscribeOne = (name,userID,sensorID,option,condition,callback) => {
   SubscribeListData.findOne({
       _subscriber : mongoose.Types.ObjectId(userID),
       _sensorID : mongoose.Types.ObjectId(sensorID),
@@ -101,7 +102,9 @@ var subscribeOne = (name,userID,sensorID,callback) => {
         var item = {
           _subscriber : mongoose.Types.ObjectId(userID),
           _sensorID : mongoose.Types.ObjectId(sensorID),
-          subscriberName : name
+          subscriberName : name,
+          option:option,
+          condition : condition
         };
         var data = new SubscribeListData(item);
         data.save()
@@ -117,8 +120,23 @@ var subscribeOne = (name,userID,sensorID,callback) => {
           callback("error");
         });
       }
-      else {//already insert before so do nothing first
-        callback("already insert");
+      else {//already insert before
+        doc.option = option;
+        doc.condition = condition;
+        doc.save()
+        .then(result => {
+          if(result) {
+            console.log("DB : subscribe success");
+
+            callback(result);
+          }
+        })
+        .catch(err => {
+          console.log(err);
+          callback("error");
+        });
+
+
       }
     });
     return;

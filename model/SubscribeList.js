@@ -6,10 +6,11 @@ var Schema = mongoose.Schema;
 var SubscribeListSchema = new mongoose.Schema({
 
   _sensorID: {type: mongoose.Schema.Types.ObjectId, required: true, ref: 'SensorData'},
-  _subscriber:{type: mongoose.Schema.Types.ObjectId, required: true, ref: 'User'},
+  _subscriber: {type: mongoose.Schema.Types.ObjectId, required: true, ref: 'User'},
   subscriberName: {type: String, required: true},
-  socketID:{type: String},
-  option:{type: String,default: 'default'}
+  socketID: {type: String},
+  option: {type: String,default: 'default'},
+  condition: {type: Schema.Types.Mixed}
   // user_list: [{
   //   _id:false,
   //   socketID:{type: String,required: true},

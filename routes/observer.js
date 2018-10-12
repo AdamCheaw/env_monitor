@@ -12,10 +12,7 @@ router.get('/', (req, res, next) => {
     res.render('login');
     return;
   }
-  // userOnConnect();
-  // var doc = searchSubscribeList(req.session.views);
-  // console.log(doc);
-  // res.send(doc);
+  // response current user subscribe 's sensor info
   searchSubList_withSubName(req.session.views,function(result) {
     if(result != "" || result !== undefined) {
       res.render('observe',{items:result, session:req.session.views});

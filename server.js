@@ -19,6 +19,7 @@ io.on('connection', (socket) => {
   socket.on('c', (data) => {
     console.log(data.message);
   });
+  //when user open new observe page
   socket.on('disconnectSocket', (data) => {
 
     console.log("disconnect old socket "+data.socketID);
@@ -26,15 +27,11 @@ io.on('connection', (socket) => {
       io.sockets.connected[data.socketID].disconnect();
     }
   });
-  //users subscribe
-  // socket.on('subscribe',(data) => {
-  //   console.log(data);
-  //   subscribe(socket.id,data.sensorID);
-  // });
+
   //sensor notification
   socket.on('update', (SensorData) => {
     console.log(`socket: listening a updated event from sensor ${SensorData._id}` );
-    //searching subscriber current connect to socket
+    //searching subscriber current connect 's socket id
     searchSubscribeList_withSensorID(SensorData._id, (socketID,sensorID) =>{
       if(socketID!= "") {
         for(var i = 0;i < socketID.length;i++) {
@@ -52,7 +49,6 @@ io.on('connection', (socket) => {
   });
   socket.on('sensor disconnect',(data) => {
     console.log("socket : listening Sensor Disconnect event "+data.disconnect_SID);
-    //var disconnectSID_array = data.disconnect_SID;
     //multiple sensor id,because will have multiple sensor disconnect in 30sc
     for(var i = 0;i < data.disconnect_SID.length;i++) {
       //notification multiple user with this sensor disconnect
@@ -70,20 +66,12 @@ io.on('connection', (socket) => {
         }
       });
     }
-
-
   })
   socket.on('disconnect', () => {
     console.log('User was disconnected');
     userDisconnect(socket.id);
-    //unsubscribe(socket.id);
   });
 });
 server.listen(port,() => {
   console.log('server is start on port 3000');
 });
-
-/*
-unsubscribe
-search SubscribeList with socket.id and remove user_list with the socket.id
-*/
