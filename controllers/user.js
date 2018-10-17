@@ -59,6 +59,7 @@ var userDisconnect = (socketID) => {
   });
 };
 
+
 //find user's id
 var searchUser_withName = (name,callback) => {
   UserData.findOne({name:name}, (err, doc) => {
@@ -74,7 +75,7 @@ var searchUser_withName = (name,callback) => {
     else {
       var item = {
         name: name,
-        onConnect: false,
+        onConnect: sfalse,
         socketID: ""
       };
       var data = new UserData(item);

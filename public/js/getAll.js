@@ -4,7 +4,7 @@ $(document).ready(function(){
     // $("#myModal").modal("show");
     // $("#myModal").modal("hide");
     for(var i = 0;i < sub_result.length;i++) {
-      var html = '<a class="btn btn-danger unsubBtn" id="unsubBtn-'+sub_result[i].subscribeID+'" ><i class="icon-remove"></i></a>';
+      var html = '<a class="btn-icon btn-danger unsubBtn" id="unsubBtn-'+sub_result[i].subscribeID+'" ><i class="icon-remove"></i></a>';
       $("#"+sub_result[i].sensorID+" .setting").append(html)
     }
 

@@ -20,6 +20,7 @@ var searchSubscribeList_withSensorID = (sensorID,callback) => {
       match:{onConnect:true},
       select:'socketID'
     })
+    .select('_subscriber option condition')
     .exec()
     .then(docs => {
       if(docs){
@@ -28,7 +29,12 @@ var searchSubscribeList_withSensorID = (sensorID,callback) => {
         //find the current onConnect subscriber
         docs.forEach(item => {
           if(item._subscriber){//if !null push to the items
-            items.push(item._subscriber.socketID);
+            var doc = {
+              socketID : item._subscriber.socketID,
+              option : item.option,
+              condition : item.condition
+            };
+            items.push(doc);
             //console.log("items.push(item._subscriber.socketID)"+item._subscriber.socketID);
           }
         });
@@ -54,23 +60,42 @@ var searchSubList_withSubName = (name, callback) => {
       path:'_sensorID',
       select:'_id name temp date onConnect'
     })
-    .select('subscriberName')
+    .select('subscriberName option condition')
     .exec()
     .then(docs => {
       if(docs){
-        var result = docs.map(doc => {
-          return {
-            _id: doc._id,
-            _sensorID: {
-              _id: doc._sensorID._id,
-              name: doc._sensorID.name,
-              temp: doc._sensorID.temp,
-              date: moment.parseZone(doc._sensorID.date).local().format('YYYY MMM Do, h:mm:ssa'),
-              onConnect: doc._sensorID.onConnect
-            },
-            subscriberName: doc.subscriberName
-          }
-        });
+        var result = [];
+        docs.forEach(doc => {
+          var item = {
+             _id: doc._id,
+             _sensorID: {
+               _id: doc._sensorID._id,
+               name: doc._sensorID.name,
+               temp: doc._sensorID.temp,
+               date: moment.parseZone(doc._sensorID.date).local().format('YYYY MMM Do, h:mm:ssa'),
+               onConnect: doc._sensorID.onConnect
+             },
+             subscriberName: doc.subscriberName,
+             option: doc.option,
+             condition: doc.condition
+          };
+          result.push(item);
+        })
+        // var result = docs.map(doc => {
+        //   return {
+        //     _id: doc._id,
+        //     _sensorID: {
+        //       _id: doc._sensorID._id,
+        //       name: doc._sensorID.name,
+        //       temp: doc._sensorID.temp,
+        //       date: moment.parseZone(doc._sensorID.date).local().format('YYYY MMM Do, h:mm:ssa'),
+        //       onConnect: doc._sensorID.onConnect
+        //     },
+        //     subscriberName: doc.subscriberName,
+        //     option: doc.option,
+        //     condition: doc.condition
+        //   }
+        // });
         //doc = docs
         callback(result);
         //console.log("searchSubscribeList_withSubscriberName: "+docs);
@@ -148,4 +173,64 @@ var unsubscribeOne = (subscribeListID,callback) => {
     console.log('the subdocs were removed');
   });
 }
-module.exports = {searchSubscribeList_withSensorID,searchSubList_withSubName,subscribeOne,unsubscribeOne};
+var notificationList = (sensorID,temp,callback) => {
+  SubscribeListData.find({
+    $and: [
+      {_sensorID:ObjectId(sensorID)},
+      {$or : [
+        { option: "default" },
+        {
+          option: "advanced",
+          $or : [
+            {
+              condition: {
+                $elemMatch: {type:"max",value:{$lt: temp }}
+              }
+            },
+            {
+              condition: {
+                $elemMatch: {type:"min",value:{$gte: temp }}
+              }
+            }
+          ]
+        }
+      ]}
+    ]
+  })
+  .populate({
+    path:'_subscriber',
+    match:{onConnect:true},
+    select:'socketID'
+  })
+  .select('_id _subscriber option condition')
+  .exec((err,subscribers) =>{
+    if(err){
+      console.log(err);
+      return;
+    }
+    else {
+      //console.log("DB searching match subscriber :"+subscribers);
+      var items = [];
+      subscribers.forEach(item => {
+        if(item._subscriber){//if !null push to the items
+          var result = {
+            socketID : item._subscriber.socketID,
+            option : item.option,
+            condition : item.condition
+          }
+          items.push(result);
+          //console.log("items.push(item._subscriber.socketID)"+item._subscriber.socketID);
+        }
+      });
+      return callback(items);
+      //console.log(items);
+    }
+  });
+}
+module.exports = {
+  searchSubscribeList_withSensorID,
+  searchSubList_withSubName,
+  subscribeOne,
+  unsubscribeOne,
+  notificationList
+};

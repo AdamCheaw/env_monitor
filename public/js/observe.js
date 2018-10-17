@@ -40,6 +40,10 @@ $('#sub-table').on('click', '.unsubBtn', function(e) {
   }
 
 });
+
+$(document).ready(function() {
+  
+});
 socket.on('connect', function () {
   console.log('Connected to server');
   console.log('user: '+name);
@@ -50,14 +54,37 @@ socket.on('connect', function () {
 socket.on('notification', function(SensorData) {
 
   //var i = $('#'+SensorData._id+' .index').html();
-  var html = SensorData.temp;
+  var html = ""
+  if(SensorData.option == "default") {
+    html = SensorData.temp;
+  }
+  else {
+    SensorData.condition.forEach(thisCondition => {
+      if(thisCondition.type == "max" && parseInt(SensorData.temp) > parseInt(thisCondition.value)) {
+        value = '<span class="font-warning"><i class="icon-warning-sign"></i> '+SensorData.temp+'</span>';
+      }
+      else if (thisCondition.type == "min" && parseInt(SensorData.temp) < parseInt(thisCondition.value)) {
+        value = '<span class="font-warning"><i class="icon-warning-sign"></i> '+SensorData.temp+'</span>';
+      }
+      else if(thisCondition.type == "precision")
+      {
+        value = doc._sensorID.temp;
+      }
+      else {
+        value = '<span class="font-safe"><i class="icon-star"></i></span>';
+      }
+    });
+    html = value;
+  }
+  //temp value
   $("#"+SensorData._id+' .sensor-temp').html(html);
+  //status
   html = "<b class=\"online\" >online</b>";
   $("#"+SensorData._id+' .sensor-status').html(html);
+  //date
   html = moment.parseZone(SensorData.date).local().format('YYYY MMM Do, h:mm:ssa');
   $("#"+SensorData._id+' .sensor-date').html(html);
-  //console.log(html);
-
+  console.log("listen a notification");
 });
 socket.on('sensor disconnect', function(data) {
 

@@ -1,10 +1,12 @@
-var generateSensorData = (data) => {
+var generateSensorData = (data,subInfo) => {
   return {
     _id: data._id,
-    name:data.name,
+    name: data.name,
     temp: data.temp,
     date: data.date,
-    onConnect: data.onConnect
+    onConnect: data.onConnect,
+    option: subInfo.option,
+    condition: subInfo.condition
   };
 };
 

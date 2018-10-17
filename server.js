@@ -8,7 +8,7 @@ const io = socketIO(server);
 const {generateSensorData} = require('./server/utils/generate');
 const {subscribe,unsubscribe} = require('./server/utils/subscribe_event');
 const {userOnConnect,userDisconnect} = require('./controllers/user');
-const {searchSubscribeList_withSensorID} = require('./controllers/SubscribeList');
+const {searchSubscribeList_withSensorID,notificationList} = require('./controllers/SubscribeList');
 io.on('connection', (socket) => {
   socket.on('auth',(data) => {
     console.log(data.name+' have connected, socket id: '+socket.id);
@@ -32,19 +32,30 @@ io.on('connection', (socket) => {
   socket.on('update', (SensorData) => {
     console.log(`socket: listening a updated event from sensor ${SensorData._id}` );
     //searching subscriber current connect 's socket id
-    searchSubscribeList_withSensorID(SensorData._id, (socketID,sensorID) =>{
-      if(socketID!= "") {
-        for(var i = 0;i < socketID.length;i++) {
-          if (io.sockets.connected[socketID[i]]) {
-            io.to(socketID[i]).emit('notification', generateSensorData(SensorData));
-            console.log("socket: emit update msg to socket " + socketID[i]);
+    // searchSubscribeList_withSensorID(SensorData._id, (socketID,sensorID) =>{
+    //   if(socketID!= "") {
+    //     for(var i = 0;i < socketID.length;i++) {
+    //       if (io.sockets.connected[socketID[i]]) {
+    //         io.to(socketID[i]).emit('notification', generateSensorData(SensorData));
+    //         console.log("socket: emit update msg to socket " + socketID[i]);
+    //       }
+    //     }
+    //   }
+    //   else {
+    //     console.log("socket: no user subscribe this sensor or subscriber not online");
+    //   }
+    // })
+    notificationList(SensorData._id,parseInt(SensorData.temp),(results) => {
+      if(results!= "") {
+        for(var i = 0;i < results.length;i++) {
+          if (io.sockets.connected[results[i].socketID]) {
+            io.to(results[i].socketID).emit('notification', generateSensorData(SensorData,results[i]));
+            console.log("socket: emit update msg to socket " + results[i].socketID);
           }
         }
       }
-      else {
-        console.log("socket: no user subscribe this sensor or subscriber not online");
-      }
     })
+
     //io.emit('notification',generateData(data));
   });
   socket.on('sensor disconnect',(data) => {

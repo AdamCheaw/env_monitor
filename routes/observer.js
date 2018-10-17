@@ -7,13 +7,15 @@ var moment = require('moment');
 const {searchSubList_withSubName} = require('../controllers/SubscribeList');
 // const {userOnConnect} = require('../controllers/user');
 
+
+
 router.get('/', (req, res, next) => {
   if (!req.session.views) {
     res.render('login');
     return;
   }
   // response current user subscribe 's sensor info
-  searchSubList_withSubName(req.session.views,function(result) {
+  searchSubList_withSubName(req.session.views,function(result,subInfo) {
     if(result != "" || result !== undefined) {
       res.render('observe',{items:result, session:req.session.views});
     }

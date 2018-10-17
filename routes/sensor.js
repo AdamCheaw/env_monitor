@@ -94,7 +94,7 @@ router.patch('/update', (req, res, next) => {
         message: "updated success!"
       });
       var socket = io('http://localhost:3000');
-      socket.emit('update', generateSensorData(doc));
+      socket.emit('update', generateSensorData(doc,""));
       console.log('emit an update event to server about data change');
     }
     else {

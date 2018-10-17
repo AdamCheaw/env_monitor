@@ -428,7 +428,25 @@ transition: all .2s ease-in-out;
 
 /* Buttons */
 
-
+.btn-icon {
+	display: inline-block;
+	margin-bottom: 0;
+	font-weight: 400;
+	text-align: center;
+	vertical-align: middle;
+	cursor: pointer;
+	background-image: none;
+	border: 1px solid transparent;
+	white-space: nowrap;
+	padding: 1px 6px;
+	font-size: 13px;
+	line-height: 1.42857;
+	border-radius: 2px;
+	-webkit-user-select: none;
+	-moz-user-select: none;
+	-ms-user-select: none;
+	user-select: none
+}
 .btn {
 	display: inline-block;
 	margin-bottom: 0;
@@ -453,7 +471,7 @@ transition: all .2s ease-in-out;
 	outline: 5px auto -webkit-focus-ring-color;
 	outline-offset: -2px
 }
-.btn:focus, .btn:hover {
+.btn:focus, .btn:hover , .btn-icon:focus, .btn-icon:hover{
 	color: #767676;
 	text-decoration: none
 }
@@ -1739,4 +1757,14 @@ table td .online {
 .icon-eye-open, .icon-remove {
 
     pointer-events:none;
+}
+
+.font-warning {
+	color: #e63900;
+}
+.font-safe {
+	color: #47d147;
+}
+.sub-btn {
+
 }
