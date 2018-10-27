@@ -1,8 +1,10 @@
 
 var idClicked;
+$("#vertical-menu1 a:first").addClass("active");
 $(document).ready(function(){
     // $("#myModal").modal("show");
     // $("#myModal").modal("hide");
+    toastr.options.closeButton = true;
     for(var i = 0;i < sub_result.length;i++) {
       var html = '<a class="btn-icon btn-danger unsubBtn" id="unsubBtn-'+sub_result[i].subscribeID+'" ><i class="icon-remove"></i></a>';
       $("#"+sub_result[i].sensorID+" .setting").append(html)
@@ -37,10 +39,13 @@ $(document).ready(function(){
             },
             success: function(data){
               $("#unsubBtn-"+idClicked).remove();
-              alert("unsubscribe success!");
+              toastr.success('unsubscribe success!')
+
+              //alert("unsubscribe success!");
             },
             error: function(){
-              alert("unsubscribe failed!");
+              toastr.error('unsubscribe failed!')
+              //alert("unsubscribe failed!");
             }
         })
 
@@ -96,11 +101,15 @@ $(document).ready(function(){
            condition.push(data);
          }
          if(condition.length == 0) {
-           alert("input text or select option is empty");
+           swal("something went wrong", "input text or select option is empty", "warning")
            return;
          }
-         // var maxValue = $("#input1").val();
-         // var minValue = $("#input2").val();
+         // data
+         // {
+         //   "sensorID": "as6df4sa64fs6d64",
+         //   "option": "advanced",
+         //   "condition": [{type:"max",value:30}]
+         // }
          var formData = {
              "sensorID": idClicked,
              "option": "advanced",
@@ -164,4 +173,167 @@ $(document).ready(function(){
       html += '</select>';
       $("#o1").html(html);
     });
+
+    var sensorArray = [];
+    allSensor.data.forEach(thisSensor => {
+      sensorArray.push(thisSensor.name);
+    });
+    // Initialize autocomplete with custom appendTo:
+    $('#autocomplete-dynamic').autocomplete({
+        source: sensorArray
+    });
+    //vertical-menu1 is click
+    $("#vertical-menu1 a").click(function(e){
+      e.preventDefault();
+      $("#vertical-menu1 a").removeClass( "active" );
+      $(this).addClass("active");
+      var text = $(this).text();
+      $("#form1 #autocomplete-dynamic").val(text);
+    });
+    //switching enabled
+    $("#form1 #Radios2").click(function(){
+      $("#form1 #advanced-block").removeClass("enabled");
+    });
+    $("#form1 #Radios1").click(function(){
+      $("#form1 #advanced-block").addClass("enabled");
+    });
+    //when form1 add btn being click
+    var subscription = [];//used for saving multiple subscrition
+    $('#form1').on('click', '#form1-add', function(e) {
+      var form1_inputName = $("#autocomplete-dynamic").val();
+      var form1_id = "";
+      //find the sensor._id
+      for(var i = 0;i < allSensor.data.length;i++) {
+        if(form1_inputName == allSensor.data[i].name) {
+          form1_id = allSensor.data[i]._id;
+          break;
+        }
+      }
+      if(!form1_id) {
+        swal("something went wrong", "this sensor does not exist", "warning")
+        return;
+      }
+      var form1_optionValue = $("input[name='form1-optionsRadios']:checked").val();
+      if(form1_optionValue == "default")//optionValue is default
+      {
+        var form1_Data = {
+            _sensorID: form1_id,
+            name: form1_inputName,
+            option: form1_optionValue
+        };
+      }
+      else {//optionValue is advanced
+        var condition = [];
+        if($("#form1_maxValue").val()) {
+          var data = {
+            type: "max",
+            value: parseInt($("#form1_maxValue").val())
+          };
+          condition.push(data);
+        }
+        if($("#form1_minValue").val()) {
+          var data = {
+            type: "min",
+            value: parseInt($("#form1_minValue").val())
+          };
+          condition.push(data);
+        }
+        if($("#form1_precisionValue option:selected").val()) {
+          var data = {
+            type: "precision",
+            value: $("#form1_precisionValue option:selected").val()
+          };
+          condition.push(data);
+        }
+        //advanced input field is empty
+        if(condition.length == 0) {
+          swal("something went wrong", "advanced condition can't be empty", "warning")
+          return;
+        }
+        var form1_Data = {
+          _sensorID: form1_id,
+          name: form1_inputName,
+          option: "advanced",
+          condition: condition
+        };
+      }
+      // end else //
+      //find user subscribe insert before
+      var findMatch = subscription.findIndex(obj => obj.name == form1_Data.name);
+      if(findMatch > -1) {
+        subscription.splice(findMatch, 1);//remove the matching subscription
+      }
+      subscription.push(form1_Data);
+
+      $("#form2 #form2-subscription").val(
+        JSON.stringify(subscription.map(thisSub =>{
+          if(thisSub.option == "default") {
+            return {
+              name:thisSub.name,
+              option:thisSub.option
+            };
+          }
+          else {
+            return {
+              name:thisSub.name,
+              option:thisSub.option,
+              condition:thisSub.condition
+            };
+          }
+        }),null,3)
+      );
+
+    });
+
+    //clear subscription
+    $("#form2 #form2-clearBtn").click(function(){
+      subscription = [];
+      $("#form2 #form2-subscription").val("");
+    });
+
+    //submit subscription
+    $("#form2 #form2-submitBtn").click(function(){
+      if(subscription.length > 0)
+      { //calling ajax to post subscription
+        $.ajax({
+            type        : 'POST', // define the type of HTTP verb we want to use (POST for our form)
+            url         : '/getData/subscribeMany', // the url where we want to POST
+            data        : {subscription}, // {subscription : subscription}
+            dataType    : 'json', // what type of data do we expect back from the server
+            // encode      : true,
+            beforeSend: function(){
+              // $.LoadingOverlay("show", {
+              //   image       : "",
+              //   fontawesome : "fa fa-cog fa-spin"
+              // });
+              $("#form2 #form2-submitBtn").attr('disabled', 'disabled').text('Sending');
+            },
+            complete: function(){
+
+               console.log("ajax send finish");
+               //$("#myModal").modal("hide");
+            },
+            success: function(data){
+              //alert("success");
+              // $.LoadingOverlay("hide");
+              $("#form2 #form2-submitBtn").removeAttr('disabled').text('Submit');
+              swal("Yours subscribe is success", " ", "success")
+                .then(() => {
+                  window.location.reload();
+                })
+            },
+            error: function(data){
+              $("#form2 #form2-submitBtn").removeAttr('disabled').text('Submit');
+              swal("something went wrong", "please check your subscription", "error")
+            }
+        })
+
+      }
+      else {
+
+        swal("something went wrong", "subscription is empty", "warning")
+      }
+    });
+
+
 });

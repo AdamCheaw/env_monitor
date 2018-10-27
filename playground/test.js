@@ -4,64 +4,112 @@ var bodyParser = require('body-parser');
 var moment = require('moment');
 var SubscribeList = require('../model/SubscribeList');
 var SensorData = require('../model/sensor');
+var UserData = require('../model/user');
 const {searchAllSensor} = require('../controllers/sensor');
-const {searchSubList_withSubName} = require('../controllers/SubscribeList');
+const {findUserID} = require('../controllers/user');
+const {searchSubList_withSubName,unsubscribeMany,subscribeMany,findExist} = require('../controllers/SubscribeList');
 var ObjectId = require('mongodb').ObjectID;
 var testing = (callback) => {
   return callback("123");
 };
-// results: { $elemMatch: { $gte: 80, $lt: 85 } }
-// SubscribeList.find({
-//   $and: [
-//     {_sensorID:ObjectId('5b8264ef8f83e53b726fdeda')},
-//     {$or : [
-//       { option: "default" },
-//       {
-//         option: "advanced",
-//         $or : [
-//           {
-//             condition: {
-//               $elemMatch: {type:"max",value:{$gte: 29 }}
-//             }
-//           },
-//           {
-//             condition: {
-//               $elemMatch: {type:"min",value:{$lt: 29 }}
-//             }
-//           }
-//         ]
-//       }
-//     ]}
-//   ]
-// })
-// .populate({
-//   path:'_subscriber',
-//   match:{onConnect:true},
-//   select:'socketID'
-// })
-// // .select('_id')
-// .exec((err,subscribers) =>{
-//   if(err){
+var userName = "cheaw";
+var sensorIDArray = [ObjectId("5b9390b05c74d041e2f2ecaa"),ObjectId("5b8264ef8f83e53b726fdeda"),ObjectId("5b8264ef8f83e53b726fdedb"),ObjectId("5b8264ef8f83e53b726fdedc")];
+var subscription = [{
+    _sensorID: "5ba7394a3405d424dad7d5ad",
+    name: "asfsd",
+    option: "advanced",
+    condition: [
+        {
+            "type" : "max",
+            "value" : "30"
+        },
+        {
+            "type" : "min",
+            "value" : "30"
+        }
+    ]
+  },
+  {
+      _sensorID: "5b9390b05c74d041e2f2ecaa",
+      name: "ddddd",
+      option: "default",
+      condition: []
+    }
+];
+
+findExist(userName,subscription)//find exist subscription
+  .then(exist => {
+    console.log("exist : "+exist);
+    findUserID(userName)//find user ID
+      .then(userID => {
+        if(!userID)
+        {
+          console.log("did not found userID");
+          throw new Error("did not found userID");
+        }
+        //subscribe new
+        return subscribeMany(userName,userID,subscription);
+      })
+      .then(result => {
+        if(result) {
+          console.log("subscribeMany : "+result);
+          //unsubscribe previous exist subscription
+          return unsubscribeMany(userName,exist);
+        }
+      })
+      .then(result => {
+        console.log(result);
+      })
+      .catch(err => {
+        console.log(err);
+      });
+
+  })
+  .catch(err => {
+    console.log(err);
+  });
+// unsubscribeMany(userName,sensorIDArray)
+//   .then(result => {
+//     console.log(result);
+//     return findUserID(userName);
+//   })
+//   .then(userID => {
+//     if(!userID)
+//     {
+//       console.log("did not found userID");
+//       throw new Error("did not found userID");
+//     }
+//     return subscribeMany(userName,userID,subscription);
+//   })
+//   .then(result => {
+//     console.log("subscribeMany : "+result);
+//   })
+//   .catch(err => {
 //     console.log(err);
-//   }
-//   else {
-//     console.log(subscribers);
-//     var items = [];
-//     subscribers.forEach(item => {
-//       if(item._subscriber){//if !null push to the items
-//         items.push(item._subscriber.socketID);
-//         //console.log("items.push(item._subscriber.socketID)"+item._subscriber.socketID);
-//       }
-//     });
-//     console.log(items);
-//   }
-// });
-// .then(docs => {
-//   console.log(docs);
+//   });
+
+// function getUser(username) {
+//     return UserData.findOne({name: username})
+//       .then(function(user) {
+//           return user;
+//       })
+//       .catch(function(err) {
+//         //console.log(err);
+//         return err;
+//       });
+// }
+// function doSomething(input) {
+//   return input._id;
+// }
+// getUser('cheaw').then(function(result) {
+//
+//   return doSomething(result);
+//   console.log("result : "+result);
 // })
-// .catch(err => {
-//   console.log(err);
+// .then((result2) => {
+//   console.log("result2 : "+result2);
 // });
+
 
 // router.post('/', (req, res, next) => {
 //   res.json({msg:"ok"});

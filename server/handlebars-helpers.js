@@ -41,6 +41,9 @@ module.exports = {
     else {
       value = sensorValue;
     }
-    return value
+    return value;
+  },
+  toJSON: function(object) {
+    return JSON.stringify(object);
   }
 }

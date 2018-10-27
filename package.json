@@ -1,7 +1,7 @@
 {
   "name": "test",
   "version": "1.0.0",
-  "description": "testing using jquery write some data in html file",
+  "description": "observe multi-sensor with proxy",
   "main": "app.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
@@ -21,7 +21,7 @@
     "handlebars": "^4.0.12",
     "http": "0.0.0",
     "moment": "^2.22.2",
-    "mongoose": "^5.2.14",
+    "mongoose": "^5.2.12",
     "morgan": "^1.9.1",
     "mustache": "^2.3.0",
     "path": "^0.12.7",

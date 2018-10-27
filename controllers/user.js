@@ -75,7 +75,7 @@ var searchUser_withName = (name,callback) => {
     else {
       var item = {
         name: name,
-        onConnect: sfalse,
+        onConnect: false,
         socketID: ""
       };
       var data = new UserData(item);
@@ -89,4 +89,13 @@ var searchUser_withName = (name,callback) => {
     }
   })
 }
-module.exports = {userOnConnect,userDisconnect,searchUser_withName};
+//find user's id with name ,no callback style
+var findUserID = (name) => {
+  return UserData.findOne({name:name}).select("_id").exec();
+}
+module.exports = {
+  userOnConnect,
+  userDisconnect,
+  searchUser_withName,
+  findUserID
+};

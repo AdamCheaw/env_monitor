@@ -5,11 +5,12 @@ var bodyParser = require('body-parser');
 var expressSession = require('express-session');
 var SensorData = require('../model/sensor');
 var moment = require('moment');
-const {searchUser_withName} = require('../controllers/user');
+const {findUserID} = require('../controllers/user');
 const {searchAllSensor} = require('../controllers/sensor');
-const {subscribeOne,unsubscribeOne,searchSubList_withSubName} = require('../controllers/SubscribeList');
+const { subscribeOne,unsubscribeOne,searchSubList_withSubName,
+        unsubscribeMany,subscribeMany,findExist} = require('../controllers/SubscribeList');
 const {subscribe,unsubscribe_with_socketID,unsubscribe_with_name} = require('../server/utils/subscribe_event');
-const {countLine} = require('../server/utils/countLine');
+// const {countLine} = require('../server/utils/countLine');
 const {convertCondition} = require('../server/utils/convert');
 router.get('/',(req, res, next) => {
   if (!req.session.views) {
@@ -19,7 +20,7 @@ router.get('/',(req, res, next) => {
   searchAllSensor((sensorData_result) =>{
     //searching the sensor subscribe by this user
     searchSubList_withSubName(req.session.views,(sub_result) => {
-      console.log("sub_result : "+sub_result);
+      //console.log("sub_result : "+sub_result);
       if(sub_result != "" || sub_result !== undefined) {
         var subscribe_sensor = sub_result.map(data => {
           return {
@@ -73,7 +74,7 @@ router.post('/submit', (req, res, next) => {
 });
 //user subscribe
 router.post('/subscribe', (req, res, next) => {
-  searchUser_withName(req.session.views,(id) => {
+  findUserID(req.session.views,(id) => {
     var userID = id;
     console.log();
     subscribeOne(
@@ -93,6 +94,46 @@ router.post('/subscribe', (req, res, next) => {
 
 
   })
+});
+//user subscribe multiple sensor
+router.post('/subscribeMany', (req, res, next) => {
+  //console.log(req.session.views+" "+JSON.stringify(req.body));
+  // var str = req.body;
+  // console.log(str);
+  // res.json("received msg");
+  findExist(req.session.views,req.body.subscription)//find exist subscription
+    .then(exist => {
+      console.log("exist : "+exist);
+      findUserID(req.session.views)//find user ID
+        .then(userID => {
+          if(!userID)
+          {
+            console.log("did not found userID");
+            throw new Error("did not found userID");
+          }
+          //subscribe new
+          return subscribeMany(req.session.views,userID,req.body.subscription);
+        })
+        .then(result => {
+          if(result) {
+            console.log("subscribeMany : "+result);
+            //unsubscribe previous exist subscription
+            return unsubscribeMany(req.session.views,exist);
+          }
+        })
+        .then(result => {
+          res.json({msg:"success"});
+          console.log(result);
+        })
+        .catch(err => {
+          throw new Error(err);
+          console.log(err);
+        });
+    })
+    .catch(err => {
+      res.status(400).json({msg:err.message});
+      console.log(err);
+    });
 });
 //user unsubscribe
 router.post('/unsubscribe', (req, res, next) => {

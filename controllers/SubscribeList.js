@@ -5,7 +5,7 @@ var mongoose = require('mongoose');
 var express = require('express');
 var ObjectId = require('mongodb').ObjectID;
 var moment = require('moment');
-
+const {convertCondition} = require('../server/utils/convert');
 // find all subscriber subscribe this sensor
 var searchSubscribeList_withSensorID = (sensorID,callback) => {
   console.log("DB : "+sensorID);
@@ -166,12 +166,58 @@ var subscribeOne = (name,userID,sensorID,option,condition,callback) => {
     });
     return;
 }
+
+
 var unsubscribeOne = (subscribeListID,callback) => {
   SubscribeListData.remove({_id:ObjectId(subscribeListID)}, (err) => {
     if (err) return callback(err);
     return callback("success");
     console.log('the subdocs were removed');
   });
+}
+//no callback style
+var subscribeMany = (name,userID,subscription) => {
+  var insertData = subscription.map(doc => {
+    return {
+      option: doc.option,
+      _subscriber : userID,
+      _sensorID : ObjectId(doc._sensorID),
+      subscriberName : name,
+      condition: convertCondition(doc.condition)
+    };
+  });
+  return new Promise((resolve, reject) => {
+    SubscribeListData.insertMany(insertData,(err,result) => {
+      if(err)
+      {
+        reject(err);
+      }
+      resolve(result);
+    });
+  })
+  // return SubscribeListData.insertMany(insertData,(err,result) => {
+  //   return new Promise((resolve, reject) => {
+  //     if(err)
+  //     {
+  //       reject(err);
+  //     }
+  //     resolve(result);
+  //   })
+  //
+  // });
+}
+var unsubscribeMany = (userName,sensorID) => {
+  return SubscribeListData.deleteMany({
+    subscriberName:userName,
+    _id: {$in:sensorID}
+  }).exec();
+}
+var findExist = (userName,subscription) => {
+  sensorIDArray = subscription.map(doc => ObjectId(doc._sensorID));
+  return SubscribeListData.find({
+    subscriberName:userName,
+    _sensorID: {$in:sensorIDArray}
+  }).select("_id").exec();
 }
 var notificationList = (sensorID,temp,callback) => {
   SubscribeListData.find({
@@ -231,6 +277,9 @@ module.exports = {
   searchSubscribeList_withSensorID,
   searchSubList_withSubName,
   subscribeOne,
+  subscribeMany,
   unsubscribeOne,
-  notificationList
+  unsubscribeMany,
+  notificationList,
+  findExist
 };
