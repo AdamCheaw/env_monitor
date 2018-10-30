@@ -3,7 +3,7 @@ var convertCondition = (data) => {
   if (data) {
     data.forEach(item => {
       if(item.type == "max" || item.type == "min"){
-        result.push({type:item.type, value:parseInt(item.value)});
+        result.push({type:item.type, value:Number(item.value)});
       }
       else {
         result.push({type:item.type, value:item.value});

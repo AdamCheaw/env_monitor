@@ -12,62 +12,62 @@ var ObjectId = require('mongodb').ObjectID;
 var testing = (callback) => {
   return callback("123");
 };
-var userName = "cheaw";
-var sensorIDArray = [ObjectId("5b9390b05c74d041e2f2ecaa"),ObjectId("5b8264ef8f83e53b726fdeda"),ObjectId("5b8264ef8f83e53b726fdedb"),ObjectId("5b8264ef8f83e53b726fdedc")];
-var subscription = [{
-    _sensorID: "5ba7394a3405d424dad7d5ad",
-    name: "asfsd",
-    option: "advanced",
-    condition: [
-        {
-            "type" : "max",
-            "value" : "30"
-        },
-        {
-            "type" : "min",
-            "value" : "30"
-        }
-    ]
-  },
-  {
-      _sensorID: "5b9390b05c74d041e2f2ecaa",
-      name: "ddddd",
-      option: "default",
-      condition: []
-    }
-];
-
-findExist(userName,subscription)//find exist subscription
-  .then(exist => {
-    console.log("exist : "+exist);
-    findUserID(userName)//find user ID
-      .then(userID => {
-        if(!userID)
-        {
-          console.log("did not found userID");
-          throw new Error("did not found userID");
-        }
-        //subscribe new
-        return subscribeMany(userName,userID,subscription);
-      })
-      .then(result => {
-        if(result) {
-          console.log("subscribeMany : "+result);
-          //unsubscribe previous exist subscription
-          return unsubscribeMany(userName,exist);
-        }
-      })
-      .then(result => {
-        console.log(result);
-      })
-      .catch(err => {
-        console.log(err);
-      });
-
-  })
-  .catch(err => {
-    console.log(err);
-  });
+// var userName = "cheaw";
+// var sensorIDArray = [ObjectId("5b9390b05c74d041e2f2ecaa"),ObjectId("5b8264ef8f83e53b726fdeda"),ObjectId("5b8264ef8f83e53b726fdedb"),ObjectId("5b8264ef8f83e53b726fdedc")];
+// var subscription = [{
+//     _sensorID: "5ba7394a3405d424dad7d5ad",
+//     name: "asfsd",
+//     option: "advanced",
+//     condition: [
+//         {
+//             "type" : "max",
+//             "value" : "30"
+//         },
+//         {
+//             "type" : "min",
+//             "value" : "30"
+//         }
+//     ]
+//   },
+//   {
+//       _sensorID: "5b9390b05c74d041e2f2ecaa",
+//       name: "ddddd",
+//       option: "default",
+//       condition: []
+//     }
+// ];
+//
+// findExist(userName,subscription)//find exist subscription
+//   .then(exist => {
+//     console.log("exist : "+exist);
+//     findUserID(userName)//find user ID
+//       .then(userID => {
+//         if(!userID)
+//         {
+//           console.log("did not found userID");
+//           throw new Error("did not found userID");
+//         }
+//         //subscribe new
+//         return subscribeMany(userName,userID,subscription);
+//       })
+//       .then(result => {
+//         if(result) {
+//           console.log("subscribeMany : "+result);
+//           //unsubscribe previous exist subscription
+//           return unsubscribeMany(userName,exist);
+//         }
+//       })
+//       .then(result => {
+//         console.log(result);
+//       })
+//       .catch(err => {
+//         console.log(err);
+//       });
+//
+//   })
+//   .catch(err => {
+//     console.log(err);
+//   });
 // unsubscribeMany(userName,sensorIDArray)
 //   .then(result => {
 //     console.log(result);

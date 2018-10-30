@@ -45,12 +45,14 @@ io.on('connection', (socket) => {
     //     console.log("socket: no user subscribe this sensor or subscriber not online");
     //   }
     // })
-    notificationList(SensorData._id,parseInt(SensorData.temp),(results) => {
+    notificationList(SensorData._id,Number(SensorData.temp),(results) => {
       if(results!= "") {
         for(var i = 0;i < results.length;i++) {
           if (io.sockets.connected[results[i].socketID]) {
             io.to(results[i].socketID).emit('notification', generateSensorData(SensorData,results[i]));
             console.log("socket: emit update msg to socket " + results[i].socketID);
+
+            //adding the notification value in the current subscribeList
           }
         }
       }

@@ -82,14 +82,14 @@ $(document).ready(function(){
          if($("#input1").val()) {
            var data = {
              "type": "max",
-             "value": parseInt($("#input1").val())
+             "value": Number($("#input1").val())
            };
            condition.push(data);
          }
          if($("#input2").val()) {
            var data = {
              "type": "min",
-             "value": parseInt($("#input2").val())
+             "value": Number($("#input2").val())
            };
            condition.push(data);
          }
@@ -227,14 +227,14 @@ $(document).ready(function(){
         if($("#form1_maxValue").val()) {
           var data = {
             type: "max",
-            value: parseInt($("#form1_maxValue").val())
+            value: Number($("#form1_maxValue").val())
           };
           condition.push(data);
         }
         if($("#form1_minValue").val()) {
           var data = {
             type: "min",
-            value: parseInt($("#form1_minValue").val())
+            value: Number($("#form1_minValue").val())
           };
           condition.push(data);
         }

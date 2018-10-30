@@ -5,7 +5,7 @@
   <div class="container">
     <div class="row">
 
-      <div class="span3">
+      {{!-- <div class="span3">
         <div class="sidebar">
             <ul class="widget widget-menu unstyled">
               <li class="active"><a href="/getData"><i class="menu-icon icon-list-alt"></i>Sensors
@@ -25,8 +25,8 @@
         </div>
         <!--/.sidebar-->
       </div>
-      <!--/.span3-->
-      <div class="span9">
+      <!--/.span3--> --}}
+      <div class="span12">
           <div class="content">
             <!--/.module-->
             <div class="module hide">
@@ -162,6 +162,7 @@
                         <tr >
                           <th>#</th>
                           <th>Name</th>
+                          <th>Type</th>
                           <th>Descrition</th>
                           <th>Status</th>
                           <th>Action</th>
@@ -173,7 +174,8 @@
                             <tr id="{{this._id}}">
                               <td>{{@index}}</td>
                               <td class="sensor-name">{{this.name}}</td>
-                              <td>...</td>
+                              <td>{{{findIcon this.type}}}</td>
+                              <td>{{limitStr "Lorem ipsum dolor sit amet, consectetur adipisicing elit," 0 50}}</td>
                               <td><b class="online" >online</b></td>
 
                               <td class="setting">
@@ -186,7 +188,8 @@
                             <tr id="{{this._id}}">
                               <td>{{@index}}</td>
                               <td class="sensor-name">{{this.name}}</td>
-                              <td>...</td>
+                              <td>{{{findIcon this.type}}}</td>
+                              <td>{{limitStr "Lorem ipsum dolor sit amet, consectetur adipisicing elit," 0 50}}</td>
                               <td><b class="offline" >offline</b></td>
 
                               <td class="setting">

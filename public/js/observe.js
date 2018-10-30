@@ -42,7 +42,7 @@ $('#sub-table').on('click', '.unsubBtn', function(e) {
 });
 
 $(document).ready(function() {
-  
+
 });
 socket.on('connect', function () {
   console.log('Connected to server');
@@ -60,10 +60,11 @@ socket.on('notification', function(SensorData) {
   }
   else {
     SensorData.condition.forEach(thisCondition => {
-      if(thisCondition.type == "max" && parseInt(SensorData.temp) > parseInt(thisCondition.value)) {
+      if(thisCondition.type == "max" && Number(SensorData.temp) > Number(thisCondition.value)) {
         value = '<span class="font-warning"><i class="icon-warning-sign"></i> '+SensorData.temp+'</span>';
+        console.log(thisCondition.value);
       }
-      else if (thisCondition.type == "min" && parseInt(SensorData.temp) < parseInt(thisCondition.value)) {
+      else if (thisCondition.type == "min" && Number(SensorData.temp) < Number(thisCondition.value)) {
         value = '<span class="font-warning"><i class="icon-warning-sign"></i> '+SensorData.temp+'</span>';
       }
       else if(thisCondition.type == "precision")

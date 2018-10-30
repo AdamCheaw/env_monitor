@@ -8,7 +8,7 @@ var moment = require('moment');
 const {convertCondition} = require('../server/utils/convert');
 // find all subscriber subscribe this sensor
 var searchSubscribeList_withSensorID = (sensorID,callback) => {
-  console.log("DB : "+sensorID);
+  //console.log("DB : "+sensorID);
   SubscribeListData.find({ _sensorID:ObjectId(sensorID) })
     // .populate({
     //   path:'_sensorID',
@@ -58,7 +58,7 @@ var searchSubList_withSubName = (name, callback) => {
   SubscribeListData.find({subscriberName:name})
     .populate({
       path:'_sensorID',
-      select:'_id name temp date onConnect'
+      select:'_id name temp date onConnect type'
     })
     .select('subscriberName option condition')
     .exec()
@@ -73,7 +73,8 @@ var searchSubList_withSubName = (name, callback) => {
                name: doc._sensorID.name,
                temp: doc._sensorID.temp,
                date: moment.parseZone(doc._sensorID.date).local().format('YYYY MMM Do, h:mm:ssa'),
-               onConnect: doc._sensorID.onConnect
+               onConnect: doc._sensorID.onConnect,
+               type: doc._sensorID.type
              },
              subscriberName: doc.subscriberName,
              option: doc.option,
@@ -219,7 +220,8 @@ var findExist = (userName,subscription) => {
     _sensorID: {$in:sensorIDArray}
   }).select("_id").exec();
 }
-var notificationList = (sensorID,temp,callback) => {
+
+var notificationList = (sensorID,currentValue,callback) => {
   SubscribeListData.find({
     $and: [
       {_sensorID:ObjectId(sensorID)},
@@ -229,15 +231,33 @@ var notificationList = (sensorID,temp,callback) => {
           option: "advanced",
           $or : [
             {
-              condition: {
-                $elemMatch: {type:"max",value:{$lt: temp }}
+              condition: {//when currentValue > condition.value
+                $elemMatch: {type:"max",value:{$lt: currentValue }}
               }
             },
             {
-              condition: {
-                $elemMatch: {type:"min",value:{$gte: temp }}
+              condition: {//when currentValue < condition.value
+                $elemMatch: {type:"min",value:{$gte: currentValue }}
               }
-            }
+            },
+            //when the sensor value back to safety also need to be report
+            {
+              condition: {//when previousValue > condition.value
+                $elemMatch: {type:"max"}
+              },
+              $where:function() {
+                return Number(this.previousValue) > this.condition.value;
+              }
+            },
+            //when the sensor value back to safety also need to be report
+            {
+              condition: {//when previousValue < condition.value
+                $elemMatch: {type:"min"}
+              },
+              $where:function() {
+                return Number(this.previousValue) < this.condition.value;
+              }
+            },
           ]
         }
       ]}

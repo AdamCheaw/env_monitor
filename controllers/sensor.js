@@ -70,7 +70,7 @@ var checkDisconnect = () => {
 }
 var searchAllSensor = (callback) => {
   SensorData.find()
-    .select("name date _id temp expireTime")
+    .select("name date _id temp expireTime type")
     .exec()
     .then(docs => {
       //console.log(docs);
@@ -88,6 +88,7 @@ var searchAllSensor = (callback) => {
             temp: doc.temp,
             onConnect: checkExpire(doc.date, parseInt(doc.expireTime)),
             expireTime: doc.expireTime,
+            type: doc.type
             //line: countLine(number+=1)
           };
         })

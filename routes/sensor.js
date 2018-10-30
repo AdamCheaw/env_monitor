@@ -19,7 +19,8 @@ router.post('/insert', (req, res, next) => {
         date: currentDate,
         //expireTime : 30
         onConnect:true,
-        expireDate:moment(currentDate).add(30, 's')
+        expireDate:moment(currentDate).add(30, 's'),
+        previousValue: ""
       };
       var data = new SensorData(item);
       data.save()
@@ -43,7 +44,8 @@ router.post('/insert', (req, res, next) => {
         });
     }
     else {//if the sensor already insert before , update and responce sensorId
-      doc.temp = doc.temp;
+      doc.previousValue = doc.temp;
+      doc.temp = req.body.temp;
       doc.date = new Date();
       doc.onConnect = true;
       doc.expireDate = moment(currentDate).add(30, 's');
@@ -76,6 +78,7 @@ router.patch('/update', (req, res, next) => {
       });
     }
     //doc.title = req.body.title;
+    doc.previousValue = doc.temp;
     doc.temp = req.body.temp;
     doc.date = currentDate;
     doc.onConnect = true;
