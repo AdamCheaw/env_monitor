@@ -1,8 +1,10 @@
 var express = require('express');
 var router = express.Router();
 var mongoose = require('mongoose');
+var ObjectId = require('mongodb').ObjectID;
 var bodyParser = require('body-parser');
 var SensorData = require('../model/sensor');
+var sensorHistory = require('../model/sensorHistory');
 var moment = require('moment');
 // var emitter = require('socket.io-emitter')({ host: 'localhost', port: '6379' });
 var io = require('socket.io-client');
@@ -17,9 +19,10 @@ router.post('/insert', (req, res, next) => {
         name: req.body.name,
         temp: req.body.temp,
         date: currentDate,
+        type: req.body.type,
         //expireTime : 30
         onConnect:true,
-        expireDate:moment(currentDate).add(30, 's'),
+        expireDate:moment(currentDate).add(210, 's'),
         previousValue: ""
       };
       var data = new SensorData(item);
@@ -29,6 +32,18 @@ router.post('/insert', (req, res, next) => {
             message: "receive request packet!",
             sensorId: data._id
           });
+          //save a history data
+          var record = new sensorHistory({
+            name: req.body.name,
+            value: req.body.temp,
+            date: currentDate,
+            _sensorID : ObjectId(data._id),
+          });
+          record.save()
+          .catch(err => {
+            console.log(err);
+          });
+
           console.log("new sensor!");
           console.log("receive advertisement request packet from "+req.body.name);
           console.log("ID : "+data._id);
@@ -48,19 +63,32 @@ router.post('/insert', (req, res, next) => {
       doc.temp = req.body.temp;
       doc.date = new Date();
       doc.onConnect = true;
-      doc.expireDate = moment(currentDate).add(30, 's');
+      doc.expireDate = moment(currentDate).add(210, 's');
+      previousValue: "";
       //doc.onConnect = true;
       doc.save();
       res.status(200).json({
         message: "receive request packet!",
         sensorId: doc._id
       });
+
       console.log("sensor already find in the document");
       console.log("receive advertisement request packet from "+req.body.name);
       console.log("ID : "+doc._id);
       console.log("Temp : "+doc.temp);
       console.log("Date : "+moment.parseZone(doc.date).local().format('YYYY MMM Do h:mm:ss a'));
       console.log("...................................................................");
+      //save a history data
+      var record = new sensorHistory({
+        name: req.body.name,
+        value: req.body.temp,
+        date: currentDate,
+        _sensorID : ObjectId(doc._id),
+      });
+      record.save()
+      .catch(err => {
+        console.log(err);
+      });
     }
   });
 
@@ -76,13 +104,26 @@ router.patch('/update', (req, res, next) => {
       res.status(404).json({
         error: err
       });
+      return;
     }
-    //doc.title = req.body.title;
+    //save in history data
+    var record = new sensorHistory({
+      name: doc.name,
+      value: req.body.temp,
+      date: currentDate,
+      _sensorID : ObjectId(doc._id),
+    });
+    record.save()
+    .catch(err => {
+      console.log(err);
+    });
+
+    //update the sensor Data
     doc.previousValue = doc.temp;
     doc.temp = req.body.temp;
     doc.date = currentDate;
     doc.onConnect = true;
-    doc.expireDate = moment(currentDate).add(30, 's');
+    doc.expireDate = moment(currentDate).add(210, 's');
     //doc.onConnect = true;
     doc.save();
      console.log(doc.name+" updated data");

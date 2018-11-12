@@ -1,7 +1,7 @@
 var SensorData = require('../model/sensor');
 var moment = require('moment');
 const {checkExpire} = require('../server/utils/checkExpire');
-const {countLine} = require('../server/utils/countLine');
+// const {countLine} = require('../server/utils/countLine');
 var io = require('socket.io-client');
 var expireDate;
 var checkDisconnect = () => {

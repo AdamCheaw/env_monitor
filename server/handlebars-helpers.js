@@ -21,7 +21,7 @@ module.exports = {
             + '</span>');
           break;
         }
-        else if (condition[i].type == "min" && Number(sensorValue) < number(condition[i].value)) {
+        else if (condition[i].type == "min" && Number(sensorValue) < Number(condition[i].value)) {
           value = new hbs.SafeString(
             '<span class="font-warning"><i class="icon-warning-sign"></i> '
             + sensorValue

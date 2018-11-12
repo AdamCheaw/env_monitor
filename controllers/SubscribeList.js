@@ -176,7 +176,7 @@ var unsubscribeOne = (subscribeListID,callback) => {
     console.log('the subdocs were removed');
   });
 }
-//no callback style
+//no callback style 
 var subscribeMany = (name,userID,subscription) => {
   var insertData = subscription.map(doc => {
     return {
@@ -213,6 +213,7 @@ var unsubscribeMany = (userName,sensorID) => {
     _id: {$in:sensorID}
   }).exec();
 }
+//find the sensor already subscribe by user before
 var findExist = (userName,subscription) => {
   sensorIDArray = subscription.map(doc => ObjectId(doc._sensorID));
   return SubscribeListData.find({
@@ -220,76 +221,93 @@ var findExist = (userName,subscription) => {
     _sensorID: {$in:sensorIDArray}
   }).select("_id").exec();
 }
+// update the subscribeList 's previous value
+// for the next time can compare new value with this previous value
+var updateSubList_PreviousValue = (idArray,newValue) => {
+  console.log(idArray);
+  SubscribeListData.updateMany(
+    { _id: {$in:idArray} },
+    { $set: { previousValue : newValue } },
+    { multi:true }, (err,res) => {
+      if(err) {
+        console.log(err);
+      }
+      else {
+        console.log(`DB: updateSubList_PreviousValue to newValue : ${newValue}`);
+      }
+    });
+}
 
+//generate the notificationList to user when a sensor notifify a new value
 var notificationList = (sensorID,currentValue,callback) => {
-  SubscribeListData.find({
-    $and: [
-      {_sensorID:ObjectId(sensorID)},
-      {$or : [
-        { option: "default" },
-        {
-          option: "advanced",
-          $or : [
-            {
-              condition: {//when currentValue > condition.value
-                $elemMatch: {type:"max",value:{$lt: currentValue }}
-              }
-            },
-            {
-              condition: {//when currentValue < condition.value
-                $elemMatch: {type:"min",value:{$gte: currentValue }}
-              }
-            },
-            //when the sensor value back to safety also need to be report
-            {
-              condition: {//when previousValue > condition.value
-                $elemMatch: {type:"max"}
-              },
-              $where:function() {
-                return Number(this.previousValue) > this.condition.value;
-              }
-            },
-            //when the sensor value back to safety also need to be report
-            {
-              condition: {//when previousValue < condition.value
-                $elemMatch: {type:"min"}
-              },
-              $where:function() {
-                return Number(this.previousValue) < this.condition.value;
-              }
-            },
-          ]
-        }
-      ]}
-    ]
-  })
+  SubscribeListData.find({ _sensorID: ObjectId(sensorID) })
   .populate({
     path:'_subscriber',
-    match:{onConnect:true},
-    select:'socketID'
+    select:'_id socketID onConnect'
   })
-  .select('_id _subscriber option condition')
-  .exec((err,subscribers) =>{
-    if(err){
+  .select('_id _subscriber option condition previousValue')
+  .exec((err,results) => {
+    var data = [];
+    if(err) {
       console.log(err);
       return;
     }
     else {
-      //console.log("DB searching match subscriber :"+subscribers);
-      var items = [];
-      subscribers.forEach(item => {
-        if(item._subscriber){//if !null push to the items
-          var result = {
-            socketID : item._subscriber.socketID,
-            option : item.option,
-            condition : item.condition
-          }
-          items.push(result);
-          //console.log("items.push(item._subscriber.socketID)"+item._subscriber.socketID);
+      results.forEach(result => {
+        var doc = {};
+        if(result.option == "default") {
+          doc = {
+            _id: result._id,
+            socketID : result._subscriber.socketID,
+            onConnect : result._subscriber.onConnect,
+            option : result.option,
+            condition : result.condition
+          };
+
         }
+        else if(result.option == "advanced")
+        {
+          var match = false;
+          //var match = result.condition.some()
+          for(var i = 0;i < result.condition.length;i++)
+          {
+            var type = result.condition[i].type;
+            var conditionValue = result.condition[i].value;
+
+            if( type == "max" && (currentValue > conditionValue || result.previousValue > conditionValue) ) {
+              match = true;
+              break;
+            }
+            else if( type == "min" && (currentValue < conditionValue || result.previousValue < conditionValue) ) {
+              match = true;
+              break;
+            }
+            else if( type == "precision" ) {
+              match = true;
+              break;
+            }
+
+          }
+          if(match)
+          {
+            doc = {
+              _id: result._id,
+              socketID : result._subscriber.socketID,
+              onConnect : result._subscriber.onConnect,
+              option : result.option,
+              condition : result.condition
+            };
+          }
+        }
+        if(doc._id)
+        {
+          data.push(doc);
+        }
+
       });
-      return callback(items);
-      //console.log(items);
+      //console.log(data);
+      return callback(data);
+
     }
   });
 }
@@ -301,5 +319,6 @@ module.exports = {
   unsubscribeOne,
   unsubscribeMany,
   notificationList,
-  findExist
+  findExist,
+  updateSubList_PreviousValue
 };

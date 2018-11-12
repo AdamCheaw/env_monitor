@@ -4,6 +4,7 @@ var mongoose = require('mongoose');
 var bodyParser = require('body-parser');
 var expressSession = require('express-session');
 var SensorData = require('../model/sensor');
+const {searchSensorHistory} = require('../controllers/sensorHistory');
 var moment = require('moment');
 const {findUserID} = require('../controllers/user');
 const {searchAllSensor} = require('../controllers/sensor');
@@ -12,6 +13,7 @@ const { subscribeOne,unsubscribeOne,searchSubList_withSubName,
 const {subscribe,unsubscribe_with_socketID,unsubscribe_with_name} = require('../server/utils/subscribe_event');
 // const {countLine} = require('../server/utils/countLine');
 const {convertCondition} = require('../server/utils/convert');
+const {getStartAndEnd,avgInInterval} = require('../server/utils/DateAndTime')
 router.get('/',(req, res, next) => {
   if (!req.session.views) {
     res.render('login');
@@ -40,28 +42,45 @@ router.get('/:sensorId', (req, res, next) => {
     res.render('login');
     return;
   }
-  var sensorId = req.params.sensorId;
-  console.log(sensorId);
-  SensorData.findById(sensorId)
-    .select("name date _id temp")
-    .exec()
-    .then(doc => {
-      //console.log("From database", doc);
-      if (doc) {
-        res.render('get_by_id', {
-          id:doc._id,
-          date:moment.parseZone(doc.date).local().format('YYYY MMM Do h:mm:ss a'),
-          name: doc.name,
-          temp: doc.temp
-        });
-      } else {
-        res.status(404).json({ message: "No valid entry found for provided ID" });
-      }
-    })
-    .catch(err => {
-      console.log(err);
-      res.status(500).json({ error: err });
-    });
+  var time = getStartAndEnd(moment("2018-11-10T05:10:10.083Z"));
+  //searching sensor history with and sensorID
+  searchSensorHistory(req.params.sensorId,time.startOfTime,time.endOfTime)
+  .then(result => {
+    if(!result)
+    {
+      console.log("did not found any result");
+      res.render('sensorInfo',{foundIt:false,session:req.session.views});
+      return;
+    }
+    //reduce multiple data into different interval of data
+    var afterAvg = avgInInterval(result,5,time.startOfTime,time.endOfTime);//avg the result in every 5 min
+    res.render('sensorInfo',{items:JSON.stringify(afterAvg),foundIt:true,session:req.session.views});
+  })
+  .catch(err => {
+    res.send({msg:err.message});
+    console.log(err);
+  });
+
+  // SensorData.findById(sensorId)
+  //   .select("name date _id temp")
+  //   .exec()
+  //   .then(doc => {
+  //     //console.log("From database", doc);
+  //     if (doc) {
+  //       res.render('get_by_id', {
+  //         id:doc._id,
+  //         date:moment.parseZone(doc.date).local().format('YYYY MMM Do h:mm:ss a'),
+  //         name: doc.name,
+  //         temp: doc.temp
+  //       });
+  //     } else {
+  //       res.status(404).json({ message: "No valid entry found for provided ID" });
+  //     }
+  //   })
+  //   .catch(err => {
+  //     console.log(err);
+  //     res.status(500).json({ error: err });
+  //   });
 });
 //handle user login
 router.post('/submit', (req, res, next) => {

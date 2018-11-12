@@ -29,7 +29,7 @@ String response;
 int statusCode = 0;
 
 unsigned long current_time;
-unsigned long timer = 20000;
+unsigned long timer = 180000;//3 min
 unsigned long start_time = 0;
 
 const char* sensorId;
@@ -44,8 +44,12 @@ void advertisement(float temp) {
   JsonObject& roots = jsonBuffer.createObject();
   
   roots["name"] = n;
-  //temp = (int)dht.readTemperature();
   roots["temp"] = temp;
+  roots["type"] = "temperature";
+  //temp = (int)dht.readTemperature();
+  
+  
+  
   String jsonStr;
   roots.printTo(jsonStr);
   Serial.print("Temp : ");
@@ -153,14 +157,13 @@ void loop() {
     temp = dht.readTemperature();
     notification(temp,SID);
     start_time = current_time;
-    delay(3000);
+    delay(5000);
   }
   else if(current_time - start_time > timer)
   {
     temp = dht.readTemperature();
     notification(temp,SID);
-    start_time = current_time;
-    
+    start_time = current_time;   
   }
 //  
 //  delay(5000);

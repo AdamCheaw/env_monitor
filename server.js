@@ -8,7 +8,7 @@ const io = socketIO(server);
 const {generateSensorData} = require('./server/utils/generate');
 const {subscribe,unsubscribe} = require('./server/utils/subscribe_event');
 const {userOnConnect,userDisconnect} = require('./controllers/user');
-const {searchSubscribeList_withSensorID,notificationList} = require('./controllers/SubscribeList');
+const {searchSubscribeList_withSensorID,notificationList,updateSubList_PreviousValue} = require('./controllers/SubscribeList');
 io.on('connection', (socket) => {
   socket.on('auth',(data) => {
     console.log(data.name+' have connected, socket id: '+socket.id);
@@ -47,14 +47,19 @@ io.on('connection', (socket) => {
     // })
     notificationList(SensorData._id,Number(SensorData.temp),(results) => {
       if(results!= "") {
+        var idArray = [];
         for(var i = 0;i < results.length;i++) {
           if (io.sockets.connected[results[i].socketID]) {
             io.to(results[i].socketID).emit('notification', generateSensorData(SensorData,results[i]));
             console.log("socket: emit update msg to socket " + results[i].socketID);
-
-            //adding the notification value in the current subscribeList
+            idArray.push(results[i]._id);//save the user id when notification success
           }
         }
+        if (idArray && idArray.length) {
+          //adding the notification value in the current subscribeList
+          updateSubList_PreviousValue(idArray,Number(SensorData.temp));
+        }
+
       }
     })
 

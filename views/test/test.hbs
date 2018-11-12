@@ -1,75 +1,27 @@
 
 {{>header}}
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.4.0/Chart.min.js"></script>
 <div class="wrapper">
   <div class="container">
     <div class="row">
 
-      {{>sidebar}}
-      <!-- Trigger the modal with a button -->
-      <button type="button" class="btn btn-default" id="myBtn"> Login </button>
-      {{!-- <button type="button" class="btn btn-info btn-lg" data-toggle="modal" data-target="#myModal" data-backdrop="true">Open Modal</button> --}}
-      <!-- Modal -->
-      <div style="color:red">{{SensorData}}</div>
-      <div style="color:blue">{{subscribe_sensor}}</div>
-      <div class="modal fade" id="myModal" role="dialog">
-        <div class="modal-dialog">
-          <!-- Modal content-->
-          <div class="modal-content">
-          <div class="modal-header">
-            <button type="button" class="close" data-dismiss="modal">&times;</button>
-            <h4 class="modal-title">Subscribe sensor1 ?</h4>
+      <div class="span12">
+        <div class="content">
+          <div class="module">
+              <div class="module-head">
+                  <h3>Chart</h3>
+              </div>
+              <div class="module-body">
+                  <canvas id="myChart"></canvas>
+
+                  {{!-- <div class="" id="myChart">
+
+                  </div> --}}
+              </div>
           </div>
-          <div class="modal-body">
-            <form class="form-horizontal row-fluid">
-
-                <div class="control-group">
-  								<label class="control-label">Option</label>
-  								<div class="controls">
-  									<label class="radio inline">
-  										<input type="radio" name="optionsRadios" id="optionsRadios1" value="default" checked="">
-  										Default
-  									</label>
-  									<label class="radio inline">
-  										<input type="radio" name="optionsRadios" id="optionsRadios2" value="advanced">
-  										Advanced
-  									</label>
-  								</div>
-  							</div>
-
-                <div class="control-group">
-									<label class="control-label" for="basicinput1">Maximum value</label>
-									<div class="controls" id="i1">
-										<input type="text" id="input1" placeholder="You can't type something here..." class="span8" disabled>
-									</div>
-                  <br/>
-                  <label class="control-label" for="basicinput2">Minimum value</label>
-									<div class="controls" id="i2">
-										<input type="text" id="input2" placeholder="You can't type something here..." class="span8" disabled>
-									</div>
-                  <br/>
-                  <label class="control-label" for="selectOption1">Precision</label>
-                  <div class="controls" id="o1">
-                    <select tabindex="1" id="selectOption1" data-placeholder="Select here.." class="span8" disabled>
-                      <option value="">You can't Select here..</option>
-                      <option value="0">0</option>
-                      <option value="1">1</option>
-
-                    </select>
-                  </div>
-								</div>
-                <div class="control-group">
-
-                  <button type="submit" class="btn btn-large btn-success btn-block "> Submit</button>
-
-                </div>
-            </form>
-          </div>
-          <div class="modal-footer">
-            <button type="button" class="btn btn-danger " data-dismiss="modal">Close</button>
-          </div>
-        </div>
         </div>
       </div>
+
     </div>
   </div>
 </div>
@@ -77,102 +29,44 @@
 {{>footer}}
 
 <script>
-$(document).ready(function(){
-    var result = "{{subscribe_sensor}}";
-    log
-    $("#myBtn").click(function(){
-        $("#myModal").modal("show");
-    });
-    $('form').submit(function(event) {
-       // get the form data
-       var optionValue = $("input[name='optionsRadios']:checked").val();
-       if(optionValue == "default")
-       {
-         var formData = {
-             "data" : optionValue
-         };
-       }
-       else {
-         var formData = {
-             "data" : "nothing"
-         };
-       }
-       // there are many ways to get this data using jQuery (you can use the class or id also)
+var ctx = document.getElementById('myChart').getContext('2d');
+var chart = new Chart(ctx, {
+  // The type of chart we want to create
+  type: 'line',
 
-       // process the form
-       $.ajax({
-           type        : 'POST', // define the type of HTTP verb we want to use (POST for our form)
-           url         : '/test/form', // the url where we want to POST
-           data        : formData, // our data object
-           dataType    : 'json', // what type of data do we expect back from the server
-           encode          : true,
-           beforeSend: function(){
-             $.LoadingOverlay("show", {
-               image       : "",
-               fontawesome : "fa fa-cog fa-spin"
-             });
-           },
-           complete: function(){
-              $.LoadingOverlay("hide");
-              console.log("ajax send finish");
-              $("#myModal").modal("hide");
-           },
-           success: function(data){
-             console.log(data);
-           }
-       })
+  // The data for our dataset
+  data: {
+      labels: ["January", "February", "March", "April", "May", "June", "July","January", "February", "March", "April", "May", "June", "July","January", "February", "March", "April", "May", "June", "January", "February", "March", "April", "May", "June", "July","January", "February", "March", "April", "May", "June", "July","January", "February", "March", "April", "May", "June" ],
+      datasets: [{
+          label: "My First dataset",
+          backgroundColor: '#9ee0c8',
+          borderColor: '#319b74',
+          data: [0, 10, 5, 2, 20, 30, 45,0, 10, 5, 2, 20, 30, 45,0, 10, 5, 2, 20, 30,0, 10, 5, 2, 20, 30, 45,0, 10, 5, 2, 20, 30, 45,0, 10, 5, 2, 20, 30],
+      }]
+  },
 
-       // stop the form from submitting the normal way and refreshing the page
-       event.preventDefault();
-    });
-
-
-
-    $("#optionsRadios2").click(function(){
-      var html;
-      html = '<input type="text" id="input1" class="span8">';
-      $("#i1").html(html);
-      html = '<input type="text" id="input2" class="span8">';
-      $("#i2").html(html);
-      html = '<select tabindex="1" id="selectOption1" data-placeholder="Select here.." class="span8" >';
-      html += '<option value="">Select here..</option>';
-      html += '<option value="0">0</option>';
-      html += '<option value="1">1</option></select>';
-      $("#o1").html(html);
-    });
-    $("#optionsRadios1").click(function(){
-      var html;
-      html = '<input type="text" id="input1" placeholder="You can\'t type something here..." class="span8" disabled>';
-      $("#i1").html(html);
-      html = '<input type="text" id="input2" placeholder="You can\'t type something here..." class="span8" disabled>';
-      $("#i2").html(html);
-      html = '<select tabindex="1" id="selectOption1" data-placeholder="You can\'t select here.." class="span8" disabled>';
-      html += '<option value="">You can\'t select here..</option>';
-      html += '</select>';
-      $("#o1").html(html);
-    });
-
-
-
+  // Configuration options go here
+  options: {}
 });
+// setInterval(function() {
+//   var chart = new Chart(ctx, {
+//     // The type of chart we want to create
+//     type: 'line',
+//
+//     // The data for our dataset
+//     data: {
+//         labels: ["January", "February", "March", "April", "May", "June", "July","January", "February", "March", "April", "May", "June", "July","January", "February", "March", "April", "May", "June", "January", "February", "March", "April", "May", "June", "July","January", "February", "March", "April", "May", "June", "July","January", "February", "March", "April", "May", "June" ],
+//         datasets: [{
+//             label: "My First dataset",
+//             backgroundColor: 'red',
+//             borderColor: 'red',
+//             data: [0, 10, 5, 2, 20, 30, 45,0, 10, 5, 2, 20, 30, 45,0, 10, 5, 2, 20, 30,0, 10, 5, 2, 20, 30, 45,0, 10, 5, 2, 20, 30, 45,0, 10, 5, 2, 20, 30],
+//         }]
+//     },
+//
+//     // Configuration options go here
+//     options: {}
+//   });
+// }, 10000);
+
 </script>
-{{!-- {{# if name }}
-
-<section>
-  <h2>Successful login!</h2>
-  <p>{{ name }}</p>
-  <p>{{ sessionID }}</p>
-</section>
-
-{{ else}}
-<section class="login">
-    <h3>User login</h3>
-    <form action="/test/insert" method="post">
-        <div class="input">
-            <label for="title">name</label>
-            <input type="text" id="name" name="name">
-        </div>
-        <button type="submit">Login</button>
-    </form>
-</section>
-{{/if}} --}}

@@ -12,110 +12,72 @@ var ObjectId = require('mongodb').ObjectID;
 var testing = (callback) => {
   return callback("123");
 };
-// var userName = "cheaw";
-// var sensorIDArray = [ObjectId("5b9390b05c74d041e2f2ecaa"),ObjectId("5b8264ef8f83e53b726fdeda"),ObjectId("5b8264ef8f83e53b726fdedb"),ObjectId("5b8264ef8f83e53b726fdedc")];
-// var subscription = [{
-//     _sensorID: "5ba7394a3405d424dad7d5ad",
-//     name: "asfsd",
-//     option: "advanced",
-//     condition: [
-//         {
-//             "type" : "max",
-//             "value" : "30"
-//         },
-//         {
-//             "type" : "min",
-//             "value" : "30"
-//         }
-//     ]
-//   },
-//   {
-//       _sensorID: "5b9390b05c74d041e2f2ecaa",
-//       name: "ddddd",
-//       option: "default",
-//       condition: []
-//     }
-// ];
-//
-// findExist(userName,subscription)//find exist subscription
-//   .then(exist => {
-//     console.log("exist : "+exist);
-//     findUserID(userName)//find user ID
-//       .then(userID => {
-//         if(!userID)
-//         {
-//           console.log("did not found userID");
-//           throw new Error("did not found userID");
-//         }
-//         //subscribe new
-//         return subscribeMany(userName,userID,subscription);
-//       })
-//       .then(result => {
-//         if(result) {
-//           console.log("subscribeMany : "+result);
-//           //unsubscribe previous exist subscription
-//           return unsubscribeMany(userName,exist);
-//         }
-//       })
-//       .then(result => {
-//         console.log(result);
-//       })
-//       .catch(err => {
-//         console.log(err);
-//       });
-//
-//   })
-//   .catch(err => {
-//     console.log(err);
-//   });
-// unsubscribeMany(userName,sensorIDArray)
-//   .then(result => {
-//     console.log(result);
-//     return findUserID(userName);
-//   })
-//   .then(userID => {
-//     if(!userID)
+
+
+// router.get('/', (req, res) => {
+//   res.render('test/test');
+//   //console.log(req.body);
+// });
+// var data = [
 //     {
-//       console.log("did not found userID");
-//       throw new Error("did not found userID");
+//       _id : ObjectId("5be5380a2bb77833fe53e2b7"),
+//       name : "sensor1",
+//       value : 28.6,
+//       date: ISODate("2018-11-09T07:32:26.689Z"),
+//       _sensorID : ObjectId("5b8264ef8f83e53b726fdeda"),
+//       __v: 0
+//     },
+//     {
+//       _id : ObjectId("5be538122bb77833fe53e2b8"),
+//       name : "sensor1",
+//       value : 28.5,
+//       date : ISODate("2018-11-09T07:32:34.969Z"),
+//       _sensorID: ObjectId("5b8264ef8f83e53b726fdeda"),
+//       __v : 0
+//     },
+//     {
+//       _id : ObjectId("5be538192bb77833fe53e2b9"),
+//       name : "sensor1",
+//       value : 28.6,
+//       date : ISODate("2018-11-09T07:32:41.252Z"),
+//       _sensorID : ObjectId("5b8264ef8f83e53b726fdeda"),
+//       __v : 0
 //     }
-//     return subscribeMany(userName,userID,subscription);
+// ]
+// var results = [];
+// var currentTime = moment()
+// var left = moment(currentTime).minutes() % 5;
+// var startOfTime = moment(currentTime).subtract(1, 'hours').subtract(left,'minutes');
+// var endOfTime = moment(currentTime).subtract(left,'minutes');
+//
+// var endInInterval = moment(startOfTime).add(5, 'minutes');
+// for(let i = 0;i < 12;i++) {
+//   results.push({
+//     value : null,
+//     date : endInInterval
 //   })
-//   .then(result => {
-//     console.log("subscribeMany : "+result);
-//   })
-//   .catch(err => {
-//     console.log(err);
-//   });
-
-// function getUser(username) {
-//     return UserData.findOne({name: username})
-//       .then(function(user) {
-//           return user;
-//       })
-//       .catch(function(err) {
-//         //console.log(err);
-//         return err;
-//       });
+//   endInInterval = moment(endInInterval).add(5, 'minutes');
 // }
-// function doSomething(input) {
-//   return input._id;
+// endInInterval = moment(startOfTime).add(5, 'minutes');
+// while(startOfTime <= endOfTime)
+// {
+//   if(data[0].date > startOfTime && data[0].date <= endInInterval)
+//   {
+//     sum += data[0].value;
+//     count += 1;
+//     data.splice(0,1);
+//   }
+//
 // }
-// getUser('cheaw').then(function(result) {
-//
-//   return doSomething(result);
-//   console.log("result : "+result);
-// })
-// .then((result2) => {
-//   console.log("result2 : "+result2);
+// data.forEach(doc => {
+//   let min = (moment(doc.date).minutes)/5;
+//   let hour = (moment(doc.date).hours)-(moment.(currentTime).hours);
+//   if(hour > 0)
+//   {
+//     results[min+left]
+//   }
 // });
-
-
-// router.post('/', (req, res, next) => {
-//   res.json({msg:"ok"});
-//   console.log(req.body);
+// console.log(results);
 //
-//
-// });
 
 module.exports = router;
