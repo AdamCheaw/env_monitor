@@ -14,10 +14,10 @@ var testing = (callback) => {
 };
 
 
-// router.get('/', (req, res) => {
-//   res.render('test/test');
-//   //console.log(req.body);
-// });
+router.get('/viewLog', (req, res) => {
+  res.render('viewLog',{session:req.session.views});
+  //console.log(req.body);
+});
 // var data = [
 //     {
 //       _id : ObjectId("5be5380a2bb77833fe53e2b7"),

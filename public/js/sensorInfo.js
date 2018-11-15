@@ -25,10 +25,7 @@ const timeArray = [
     ]
   }
 ];
-
-
-
-if(results &&  results.length) {
+function drawGraph(results) {
   var labelArray = [];
   var dataArray = [];
   results.forEach(doc => {
@@ -76,6 +73,11 @@ if(results &&  results.length) {
 					}
 				}
   });
+}
+
+
+if(results &&  results.length) {
+  drawGraph(results);
 }
 else {
   $('#subtitle').text("No data available with this sensor");
@@ -154,7 +156,8 @@ $(document).ready(function() {
            // $("#myModal").modal("hide");
         },
         success: function(data){
-          console.log(data);
+          drawGraph(data);
+          //console.log(data);
         },
         error: function(err){
           console.log(err);

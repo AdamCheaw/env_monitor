@@ -1738,7 +1738,7 @@ filter:progid:DXImageTransform.Microsoft.gradient(startColorstr='#fff5f5f5', end
 .docs-example .pre .atn {
 	color: teal
 }
-.docs-example .pre .atv {
+.docs-example .pre .atv ,.font-value{
 	color: #d14
 }
 .docs-example:after {
@@ -3162,4 +3162,8 @@ table td .online {
 .vertical-menu a.active {
     background-color: #3cbc8d;
     color: white;
+}
+.font-value{
+	color: #d14;
+	font-weight: bold;
 }

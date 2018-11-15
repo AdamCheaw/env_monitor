@@ -63,48 +63,35 @@ var searchSubList_withSubName = (name, callback) => {
     .select('subscriberName option condition')
     .exec()
     .then(docs => {
-      if(docs){
+      if(docs && docs.length){
         var result = [];
         docs.forEach(doc => {
-          var item = {
-             _id: doc._id,
-             _sensorID: {
-               _id: doc._sensorID._id,
-               name: doc._sensorID.name,
-               temp: doc._sensorID.temp,
-               date: moment.parseZone(doc._sensorID.date).local().format('YYYY MMM Do, h:mm:ssa'),
-               onConnect: doc._sensorID.onConnect,
-               type: doc._sensorID.type
-             },
-             subscriberName: doc.subscriberName,
-             option: doc.option,
-             condition: doc.condition
-          };
-          result.push(item);
+          if(doc._sensorID._id) {
+            var item = {
+               _id: doc._id,
+               _sensorID: {
+                 _id: doc._sensorID._id,
+                 name: doc._sensorID.name,
+                 temp: doc._sensorID.temp,
+                 date: moment.parseZone(doc._sensorID.date).local().format('YYYY MMM Do, h:mm:ssa'),
+                 onConnect: doc._sensorID.onConnect,
+                 type: doc._sensorID.type
+               },
+               subscriberName: doc.subscriberName,
+               option: doc.option,
+               condition: doc.condition
+            };
+            result.push(item);
+          }
         })
-        // var result = docs.map(doc => {
-        //   return {
-        //     _id: doc._id,
-        //     _sensorID: {
-        //       _id: doc._sensorID._id,
-        //       name: doc._sensorID.name,
-        //       temp: doc._sensorID.temp,
-        //       date: moment.parseZone(doc._sensorID.date).local().format('YYYY MMM Do, h:mm:ssa'),
-        //       onConnect: doc._sensorID.onConnect
-        //     },
-        //     subscriberName: doc.subscriberName,
-        //     option: doc.option,
-        //     condition: doc.condition
-        //   }
-        // });
-        //doc = docs
+
         callback(result);
         //console.log("searchSubscribeList_withSubscriberName: "+docs);
         return;
 
       }
       else {
-        //callback(null);
+        callback(null);
         return;
       }
     })
@@ -176,7 +163,7 @@ var unsubscribeOne = (subscribeListID,callback) => {
     console.log('the subdocs were removed');
   });
 }
-//no callback style 
+//no callback style
 var subscribeMany = (name,userID,subscription) => {
   var insertData = subscription.map(doc => {
     return {

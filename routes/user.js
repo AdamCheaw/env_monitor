@@ -23,15 +23,18 @@ router.get('/',(req, res, next) => {
     //searching the sensor subscribe by this user
     searchSubList_withSubName(req.session.views,(sub_result) => {
       //console.log("sub_result : "+sub_result);
-      if(sub_result != "" || sub_result !== undefined) {
+      if(sub_result != "" && sub_result !== undefined && sub_result !== null) {
         var subscribe_sensor = sub_result.map(data => {
           return {
             sensorID: data._sensorID._id,
             subscribeID: data._id
           };
         });
+        res.render('getAll',{items:sensorData_result, session:req.session.views, subscribe_sensor:JSON.stringify(subscribe_sensor)});
       }
-      res.render('getAll',{items:sensorData_result, session:req.session.views, subscribe_sensor:JSON.stringify(subscribe_sensor)});
+      else {
+        res.render('getAll',{items:sensorData_result, session:req.session.views, subscribe_sensor:JSON.stringify({})});
+      }
     });
   });
 });
