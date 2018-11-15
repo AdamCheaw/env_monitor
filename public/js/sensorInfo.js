@@ -128,12 +128,38 @@ $(document).ready(function() {
     var dayValue = $("#day option:selected").val();
     var timeIntervalValue = $("#interval option:selected").val();
     var periodValue = parseInt($("#period option:selected").val());
-    console.log(periodValue);
+    //console.log(periodValue);
     var queryDate =  moment()
       .set({'hour': (periodValue),'minute': 0, "second": 0})
       .subtract(dayValue,'d');
-
     console.log(`${queryDate}`);
     console.log(`${moment.parseZone(queryDate).toISOString()}`);
+    var data = {
+      "sensorID":sensorID,
+      "queryDate":moment.parseZone(queryDate).toISOString(),
+      "interval":timeIntervalValue
+    };
+    $.ajax({
+        type        : 'POST', // define the type of HTTP verb we want to use (POST for our form)
+        url         : '/getData/getHistoryData', // the url where we want to POST
+        data        : data, // our data object
+        dataType    : 'json', // what type of data do we expect back from the server
+        encode          : true,
+        beforeSend: function(){
+          console.log("sending ajax");
+        },
+        complete: function(){
+           // $.LoadingOverlay("hide");
+           // console.log("ajax send finish");
+           // $("#myModal").modal("hide");
+        },
+        success: function(data){
+          console.log(data);
+        },
+        error: function(err){
+          console.log(err);
+        }
+    });
+
   });
 });

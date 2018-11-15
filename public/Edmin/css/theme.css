@@ -787,9 +787,15 @@ filter:progid:DXImageTransform.Microsoft.gradient(startColorstr='@topColor', end
 	margin: 5px
 }
 .media .media-title {
-	font-size: 14px;
+	font-size: 18px;
 	line-height: 16px;
 	margin: 15px 0 0
+}
+.media .media-subtitle {
+	font-size: 14px;
+	line-height: 16px;
+	margin: 15px 0 5px;
+	color:#737373;
 }
 .media.user {
 	padding: 15px;
@@ -816,6 +822,19 @@ filter:progid:DXImageTransform.Microsoft.gradient(startColorstr='@topColor', end
 .media.user.offline {
 	pointer-events: none;
 	opacity: 0.4;
+}
+.media.user .ac-online
+{
+	background-color:#47d147;
+	padding:1px 5px;
+	border:1px solid #47d147;
+	color:white;
+	-webkit-border-radius: 3px;
+	-moz-border-radius: 3px;
+	border-radius: 3px;
+}
+.media {
+	border: 1px solid black;
 }
 
 .progress {

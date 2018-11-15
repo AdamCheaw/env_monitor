@@ -13,7 +13,7 @@ const { subscribeOne,unsubscribeOne,searchSubList_withSubName,
 const {subscribe,unsubscribe_with_socketID,unsubscribe_with_name} = require('../server/utils/subscribe_event');
 // const {countLine} = require('../server/utils/countLine');
 const {convertCondition} = require('../server/utils/convert');
-const {getStartAndEnd,avgInInterval} = require('../server/utils/DateAndTime')
+const {getStartAndEnd,avgInInterval,findInterval} = require('../server/utils/DateAndTime')
 router.get('/',(req, res, next) => {
   if (!req.session.views) {
     res.render('login');
@@ -42,7 +42,7 @@ router.get('/:sensorId', (req, res, next) => {
     res.render('login');
     return;
   }
-  var time = getStartAndEnd(moment("2018-11-10T05:10:10.083Z"));
+  var time = getStartAndEnd(moment("2018-11-10T05:10:10.083Z"),5,"minutes",1,"hours");
   //searching sensor history with and sensorID
   searchSensorHistory(req.params.sensorId,time.startOfTime,time.endOfTime)
   .then(result => {
@@ -53,34 +53,54 @@ router.get('/:sensorId', (req, res, next) => {
       return;
     }
     //reduce multiple data into different interval of data
-    var afterAvg = avgInInterval(result,5,time.startOfTime,time.endOfTime);//avg the result in every 5 min
-    res.render('sensorInfo',{items:JSON.stringify(afterAvg),foundIt:true,session:req.session.views});
+    var afterAvg = avgInInterval(result,5,"minutes",time.startOfTime,time.endOfTime);//avg the result in every 5 min
+    res.render('sensorInfo',{
+      items:JSON.stringify(afterAvg),
+      foundIt:true,
+      session:req.session.views,
+      sensorID:req.params.sensorId
+    });
   })
   .catch(err => {
     res.send({msg:err.message});
     console.log(err);
   });
+});
+//handle ajax call for HistoryData
+router.post('/getHistoryData', (req, res, next) => {
+  console.log(`${req.body.sensorID} & ${req.body.queryDate} & ${req.body.interval}`);
+  var timeInterval = findInterval(req.body.interval);
 
-  // SensorData.findById(sensorId)
-  //   .select("name date _id temp")
-  //   .exec()
-  //   .then(doc => {
-  //     //console.log("From database", doc);
-  //     if (doc) {
-  //       res.render('get_by_id', {
-  //         id:doc._id,
-  //         date:moment.parseZone(doc.date).local().format('YYYY MMM Do h:mm:ss a'),
-  //         name: doc.name,
-  //         temp: doc.temp
-  //       });
-  //     } else {
-  //       res.status(404).json({ message: "No valid entry found for provided ID" });
-  //     }
-  //   })
-  //   .catch(err => {
-  //     console.log(err);
-  //     res.status(500).json({ error: err });
-  //   });
+  var time = getStartAndEnd(
+    req.body.queryDate,
+    timeInterval.intervalNum,
+    timeInterval.intervalUnit,
+    timeInterval.startTimeNum,
+    timeInterval.startTimeUnit
+  );
+  searchSensorHistory(req.body.sensorID,time.startOfTime,time.endOfTime)
+  .then(result => {
+    if(!result)
+    {
+      console.log("did not found any result");
+      res.json({msg:"no data found"});
+      return;
+    }
+    //reduce multiple data into different interval of data
+    var afterAvgResult = avgInInterval(
+      result,
+      timeInterval.intervalNum,
+      timeInterval.intervalUnit,
+      time.startOfTime,
+      time.endOfTime
+    );//avg the result in every 5 min
+    res.json(afterAvgResult);
+  })
+  .catch(err => {
+    res.status(500).json({msg:err.message});
+    console.log(err);
+  });
+  //res.json({msg:"ok"});
 });
 //handle user login
 router.post('/submit', (req, res, next) => {

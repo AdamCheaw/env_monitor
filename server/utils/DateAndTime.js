@@ -1,24 +1,30 @@
 var moment = require('moment');
 
 //calculate the starting time and ending time with currentTime
-var getStartAndEnd = (currentTime) => {
-  var left = currentTime.minutes() % 5;
-  var endOfTime = moment(currentTime).subtract(left, 'minutes');
-  var startOfTime = moment(endOfTime).subtract(1, 'hours').subtract(5, "minutes");
-  console.log(`${moment.parseZone(startOfTime).local()} ~~ ${moment.parseZone(endOfTime).local()}`);
-  return {
-    startOfTime,
-    endOfTime
+var getStartAndEnd = (currentTime,intervalNum,intervalUnit,startTimeNum,startTimeUnit) => {
+  if(intervalUnit == "minutes") {
+    var left = moment(currentTime).minutes() % intervalNum;
+    var endOfTime = moment(currentTime).subtract(left, intervalUnit);
+    var startOfTime = moment(endOfTime).subtract(startTimeNum, startTimeUnit);
+    console.log(`${moment.parseZone(startOfTime).local()} ~~ ${moment.parseZone(endOfTime).local()}`);
   }
+  else if(intervalUnit == "hours") {
+    var left = moment(currentTime).minutes();
+    var endOfTime = moment(currentTime).subtract(left, "minutes");
+    var startOfTime = moment(endOfTime).subtract(startTimeNum, startTimeUnit);
+    console.log(`${moment.parseZone(startOfTime).local()} ~~ ${moment.parseZone(endOfTime).local()}`);
+  }
+
+  return { startOfTime,endOfTime }
 };
 
 //reduce multiple data into different interval of data
-var avgInInterval = (data,interval,startOfTime,endOfTime) => {
+var avgInInterval = (data,interval,unit,startOfTime,endOfTime) => {
   var sum = 0,count = 0;
   var results = [];
   //set interval in 5 min
   //plus the interval time ex:1.00am + 5min = 1.05am
-  var endInInterval = moment(startOfTime).add(interval, 'minutes');
+  var endInInterval = moment(startOfTime).add(interval, unit);
   //starting to reduce the data
   while(startOfTime <= endOfTime )
   {
@@ -44,8 +50,8 @@ var avgInInterval = (data,interval,startOfTime,endOfTime) => {
         });
       }
       startOfTime = endInInterval;//changing the end of a interval
-      endInInterval = moment(endInInterval).add(interval, 'minutes');
-      console.log("data is empty");
+      endInInterval = moment(endInInterval).add(interval, unit);
+      //console.log("data is empty");
       continue;
     }
     //the first data.date is greater than the end of a interval
@@ -66,7 +72,7 @@ var avgInInterval = (data,interval,startOfTime,endOfTime) => {
         count = 0;
       }
       startOfTime = endInInterval;//changing the end of a interval
-      endInInterval = moment(endInInterval).add(interval, 'minutes');
+      endInInterval = moment(endInInterval).add(interval, unit);
     }//adding the data to this interval
     else if(data[0].date <= endInInterval){
       sum += data[0].value;
@@ -77,4 +83,34 @@ var avgInInterval = (data,interval,startOfTime,endOfTime) => {
   //console.log("results : "+results);
   return results;
 };
-module.exports = {getStartAndEnd , avgInInterval};
+var findInterval = (timeInterval) => {
+  var res;
+  switch (timeInterval) {
+    case "5m":
+      res =  {
+        intervalNum: 5,
+        intervalUnit: "minutes",
+        startTimeNum : 1,
+        startTimeUnit : "hours"
+      };
+      break;
+    case "30m":
+      res = {
+        intervalNum: 30,
+        intervalUnit: "minutes",
+        startTimeNum : 6,
+        startTimeUnit : "hours"
+      };
+      break;
+    case "1h":
+      res = {
+        intervalNum: 1,
+        intervalUnit: "hours",
+        startTimeNum : 12,
+        startTimeUnit : "hours"
+      };
+      break;
+  }
+  return res;
+}
+module.exports = {getStartAndEnd , avgInInterval ,findInterval};
