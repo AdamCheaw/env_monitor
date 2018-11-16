@@ -12,7 +12,15 @@ const {searchSubscribeList_withSensorID,notificationList,updateSubList_PreviousV
 io.on('connection', (socket) => {
   socket.on('auth',(data) => {
     console.log(data.name+' have connected, socket id: '+socket.id);
-    userOnConnect(data.name,socket.id);
+    userOnConnect(data.name,socket.id)
+      .then(result => {
+        if(result) {
+          console.log(result);
+        }
+      })
+      .catch(err => {
+        console.log(err);
+      })
   });
   //console.log('a user connected, id: '+socket.id);
   //testing
@@ -31,20 +39,6 @@ io.on('connection', (socket) => {
   //sensor notification
   socket.on('update', (SensorData) => {
     console.log(`socket: listening a updated event from sensor ${SensorData._id}` );
-    //searching subscriber current connect 's socket id
-    // searchSubscribeList_withSensorID(SensorData._id, (socketID,sensorID) =>{
-    //   if(socketID!= "") {
-    //     for(var i = 0;i < socketID.length;i++) {
-    //       if (io.sockets.connected[socketID[i]]) {
-    //         io.to(socketID[i]).emit('notification', generateSensorData(SensorData));
-    //         console.log("socket: emit update msg to socket " + socketID[i]);
-    //       }
-    //     }
-    //   }
-    //   else {
-    //     console.log("socket: no user subscribe this sensor or subscriber not online");
-    //   }
-    // })
     notificationList(SensorData._id,Number(SensorData.temp),(results) => {
       if(results!= "") {
         var idArray = [];

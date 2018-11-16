@@ -7,7 +7,7 @@ $('#sub-table').on('click', '.unsubBtn', function(e) {
   {
     var data = {
         "subscribeListID" : idClicked
-    };
+    }; 
     $.ajax({
         type        : 'POST', // define the type of HTTP verb we want to use (POST for our form)
         url         : '/getData/unsubscribe', // the url where we want to POST

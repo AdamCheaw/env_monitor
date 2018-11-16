@@ -22,7 +22,7 @@ router.get('/', (req, res, next) => {
     else {
       res.render('observe',{items:result, session:req.session.views});
     }
-    console.log(result);
+    //console.log(result);
   });
 });
 
