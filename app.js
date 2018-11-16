@@ -33,7 +33,9 @@ app.use(bodyParser.urlencoded({ extended: true }));
 app.use(expressValidator());
 app.use(cookieParser());
 app.use(expressSession({secret: 'little cat', saveUninitialized: false, resave: false}));
-
+app.get("/", (req,res,next) => {
+  res.redirect('/getData');
+});
 app.use("/sensors", sensor);
 app.use("/getData", user);
 app.use("/observe", observer);

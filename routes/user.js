@@ -45,7 +45,7 @@ router.get('/:sensorId', (req, res, next) => {
     res.render('login');
     return;
   }
-  var time = getStartAndEnd(moment("2018-11-10T05:10:10.083Z"),5,"minutes",1,"hours");
+  var time = getStartAndEnd(moment(),5,"minutes",1,"hours");
   //searching sensor history with and sensorID
   searchSensorHistory(req.params.sensorId,time.startOfTime,time.endOfTime)
   .then(result => {
