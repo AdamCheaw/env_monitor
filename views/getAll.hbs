@@ -27,166 +27,166 @@
       </div>
       <!--/.span3--> --}}
       <div class="span12">
-          <div class="content">
-            <!--/.module-->
+        <div class="content">
+          <!--/.module-->
 
-              <div class="module">
-                <div class="module-head">
-                    <h3>
-                        Subscribe Form</h3>
-                </div>
-                <div class="module-body">
+          <div class="module">
+            <div class="module-head">
+                <h3>
+                    Subscribe Form</h3>
+            </div>
+            <div class="module-body">
 
-                  <div class="row-fluid">
-                    {{!-- form --}}
+              <div class="row-fluid">
+                {{!-- form --}}
 
-                      <div class="span3">
-                        <div class="control-group" >
-                          <label class="control-label" style="margin-left:5px;">Sensors</label>
-                          <div class="vertical-menu span12" id="vertical-menu1">
-                            {{#each items.data }}
-                              <a href="#">{{this.name}}</a>
-                            {{/each}}
-                          </div>
-                        </div>
-                      <div class="controls" id="">
-                      </div>
-                    </div>
-
-                    <div class="span4">
-                      <div id="form1" class="form-vertical">
-                          <div class="control-group" >
-                            <label class="control-label">Name</label>
-                            <div class="controls" id="">
-
-                              <input type="text" name="" id="autocomplete-dynamic" class="span12"/>
-                            </div>
-                            <br/>
-                            <label class="control-label">Option</label>
-      											<div class="controls">
-      												<label class="radio inline">
-      													<input type="radio" name="form1-optionsRadios" id="Radios1" value="default" checked="">
-      													Default
-      												</label>
-      												<label class="radio inline">
-      													<input type="radio" name="form1-optionsRadios" id="Radios2" value="advanced">
-      													Advanced
-      												</label>
-      											</div>
-                            <br/>
-                            <div id="advanced-block" class="enabled">
-                              <label class="control-label" for="basicinput1">Greater than <input type="checkbox" value=""></label>
-                              <div class="controls" id="i1-1">
-                                <input type="text" id="form1_maxValue" placeholder="" class="span12" >
-                              </div>
-
-                              <br/>
-                              <label class="control-label" for="basicinput2">Lower than <input type="checkbox" value=""></label>
-                              <div class="controls" id="i1-2">
-                                <input type="text" id="form1_minValue" placeholder="" class="span12">
-                              </div>
-                              <br/>
-                              <label class="control-label" for="selectOption1">Precision</label>
-                              <div class="controls" id="o1-1">
-                                <select tabindex="1" id="form1_precisionValue" data-placeholder="Select here.." class="span12" >
-                                  <option value="">Select here..</option>
-                                  <option value="0">0</option>
-                                  <option value="1">1</option>
-                                </select>
-                              </div>
-                            </div>
-
-                          </div>
-
-                          <div class="control-group pull-right">
-
-      												<button type="button" class="btn btn-success " id="form1-add"> ADD <i class="icon-plus-sign"></i></button>
-      										</div>
-                      </div>
-                    </div>
-
-                    <div class="span5">
-                      <form id="form2" class="form-vertical">
-                        <div class="control-group" >
-                          <div class="controls" id="" >
-                            <label class="control-label">Subscription </label>
-                            <textarea class="span12" id="form2-subscription"rows="17" style="" spellCheck="false" disabled></textarea>
-                          </div>
-                        </div>
-                        <div class="control-group">
-                          <div class="controls pull-right">
-                            <button type="button" class="btn btn-danger" id="form2-clearBtn">Clear</button>
-                            <button type="button" class="btn btn-info" id="form2-submitBtn">Submit</button>
-                          </div>
-                        </div>
-                      </form>
-                    </div>
-                  </div>
-
-                </div>
-              </div>
-
-              <div class="module">
-                  <div class="module-head">
-                      <h3>
-                          All Sensors</h3>
-                  </div>
-                  <div class="module-option clearfix">
-
-                      <div class="pull-left">
-									       <button type="button" class="btn btn-primary">Submit</button>
-                         <a href="/observe" class="btn btn-info">Observe Window</a>
-								      </div>
-                  </div>
-                  <div class="module-body">
-
-                      <table class="table table-condensed table-striped datatable-1" id="sub-table">
-                        <thead>
-                        <tr >
-                          <th>#</th>
-                          <th>Name</th>
-                          <th>Type</th>
-                          <th>Descrition</th>
-                          <th>Status</th>
-                          <th>Action</th>
-                        </tr>
-                        </thead>
-                        <tbody>
+                  <div class="span3">
+                    <div class="control-group" >
+                      <label class="control-label" style="margin-left:5px;">Sensors</label>
+                      <div class="vertical-menu span12" id="vertical-menu1">
                         {{#each items.data }}
-                            {{#if this.onConnect }}
-                            <tr id="{{this._id}}">
-                              <td>{{@index}}</td>
-                              <td class="sensor-name">{{this.name}}</td>
-                              <td>{{{findIcon this.type}}}</td>
-                              <td>{{limitStr "Lorem ipsum dolor sit amet, consectetur adipisicing elit," 0 50}}</td>
-                              <td><b class="online" >online</b></td>
-
-                              <td class="setting">
-                                <a class="btn-icon btn-success sub-btn" id="btn-{{ this._id }}"><i class="icon-eye-open "></i></a>
-                                {{!-- <i class="icon-eye-open sub-btn" id="btn-{{ this._id }}"></i> --}}
-
-                              </td>
-                            </tr>
-                            {{else}}
-                            <tr id="{{this._id}}">
-                              <td>{{@index}}</td>
-                              <td class="sensor-name">{{this.name}}</td>
-                              <td>{{{findIcon this.type}}}</td>
-                              <td>{{limitStr "Lorem ipsum dolor sit amet, consectetur adipisicing elit," 0 50}}</td>
-                              <td><b class="offline" >offline</b></td>
-
-                              <td class="setting">
-                                <a class="enabled btn-icon btn-success sub-btn" id="btn-{{ this._id }}"><i class="icon-eye-open"></i></a>
-                              </td>
-                            </tr>
-                            {{/if}}
+                          <a href="#">{{this.name}}</a>
                         {{/each}}
-                        </tbody>
-                      </table>
+                      </div>
+                    </div>
+                  <div class="controls" id="">
                   </div>
+                </div>
 
+                <div class="span4">
+                  <div id="form1" class="form-vertical">
+                      <div class="control-group" >
+                        <label class="control-label">Name</label>
+                        <div class="controls" id="">
+
+                          <input type="text" name="" id="autocomplete-dynamic" class="span12"/>
+                        </div>
+                        <br/>
+                        <label class="control-label">Option</label>
+  											<div class="controls">
+  												<label class="radio inline">
+  													<input type="radio" name="form1-optionsRadios" id="Radios1" value="default" checked="">
+  													Default
+  												</label>
+  												<label class="radio inline">
+  													<input type="radio" name="form1-optionsRadios" id="Radios2" value="advanced">
+  													Advanced
+  												</label>
+  											</div>
+                        <br/>
+                        <div id="advanced-block" class="enabled">
+                          <label class="control-label" for="basicinput1">Greater than <input type="checkbox" value=""></label>
+                          <div class="controls" id="i1-1">
+                            <input type="text" id="form1_maxValue" placeholder="" class="span12" >
+                          </div>
+
+                          <br/>
+                          <label class="control-label" for="basicinput2">Lower than <input type="checkbox" value=""></label>
+                          <div class="controls" id="i1-2">
+                            <input type="text" id="form1_minValue" placeholder="" class="span12">
+                          </div>
+                          <br/>
+                          <label class="control-label" for="selectOption1">Precision</label>
+                          <div class="controls" id="o1-1">
+                            <select tabindex="1" id="form1_precisionValue" data-placeholder="Select here.." class="span12" >
+                              <option value="">Select here..</option>
+                              <option value="0">0</option>
+                              <option value="1">1</option>
+                            </select>
+                          </div>
+                        </div>
+
+                      </div>
+
+                      <div class="control-group pull-right">
+
+  												<button type="button" class="btn btn-success " id="form1-add"> ADD <i class="icon-plus-sign"></i></button>
+  										</div>
+                  </div>
+                </div>
+
+                <div class="span5">
+                  <form id="form2" class="form-vertical">
+                    <div class="control-group" >
+                      <div class="controls" id="" >
+                        <label class="control-label">Subscription </label>
+                        <textarea class="span12" id="form2-subscription"rows="17" style="" spellCheck="false" disabled></textarea>
+                      </div>
+                    </div>
+                    <div class="control-group">
+                      <div class="controls pull-right">
+                        <button type="button" class="btn btn-danger" id="form2-clearBtn">Clear</button>
+                        <button type="button" class="btn btn-info" id="form2-submitBtn">Submit</button>
+                      </div>
+                    </div>
+                  </form>
+                </div>
               </div>
+
+            </div>
           </div>
+
+          <div class="module">
+              <div class="module-head">
+                  <h3>
+                      All Sensors</h3>
+              </div>
+              <div class="module-option clearfix">
+
+                  <div class="pull-left">
+							       <button type="button" class="btn btn-primary">Submit</button>
+                     <a href="/observe" class="btn btn-info">Observe Window</a>
+						      </div>
+              </div>
+              <div class="module-body">
+
+                  <table class="table table-condensed table-striped datatable-1" id="sub-table">
+                    <thead>
+                    <tr >
+                      <th>#</th>
+                      <th>Name</th>
+                      <th>Type</th>
+                      <th>Descrition</th>
+                      <th>Status</th>
+                      <th>Action</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    {{#each items.data }}
+                        {{#if this.onConnect }}
+                        <tr id="{{this._id}}">
+                          <td>{{@index}}</td>
+                          <td class="sensor-name"><a href="getData/{{this._id}}">{{this.name}}</a></td>
+                          <td>{{{findIcon this.type}}}</td>
+                          <td>{{limitStr "Lorem ipsum dolor sit amet, consectetur adipisicing elit," 0 50}}</td>
+                          <td><b class="online" >online</b></td>
+
+                          <td class="setting">
+                            <a class="btn-icon btn-success sub-btn" id="btn-{{ this._id }}"><i class="icon-eye-open "></i></a>
+                            {{!-- <i class="icon-eye-open sub-btn" id="btn-{{ this._id }}"></i> --}}
+
+                          </td>
+                        </tr>
+                        {{else}}
+                        <tr id="{{this._id}}">
+                          <td>{{@index}}</td>
+                          <td class="sensor-name"><a href="getData/{{this._id}}">{{this.name}}</a></td>
+                          <td>{{{findIcon this.type}}}</td>
+                          <td>{{limitStr "Lorem ipsum dolor sit amet, consectetur adipisicing elit," 0 50}}</td>
+                          <td><b class="offline" >offline</b></td>
+
+                          <td class="setting">
+                            <a class="enabled btn-icon btn-success sub-btn" id="btn-{{ this._id }}"><i class="icon-eye-open"></i></a>
+                          </td>
+                        </tr>
+                        {{/if}}
+                    {{/each}}
+                    </tbody>
+                  </table>
+              </div>
+
+          </div>
+        </div>
           <!--/.content-->
       </div>
       <!--/.span9-->

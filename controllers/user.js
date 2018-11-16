@@ -93,9 +93,19 @@ var searchUser_withName = (name,callback) => {
 var findUserID = (name) => {
   return UserData.findOne({name:name}).select("_id").exec();
 }
+var createUser = (name) => {
+  var doc = {
+    name:name,
+    onConnect: false,
+    socketID: ""
+  };
+  var data = new UserData(doc);
+  return data.save();
+}
 module.exports = {
   userOnConnect,
   userDisconnect,
   searchUser_withName,
-  findUserID
+  findUserID,
+  createUser,
 };

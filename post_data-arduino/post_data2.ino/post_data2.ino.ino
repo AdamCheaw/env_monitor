@@ -19,7 +19,7 @@ char pass[] = "12345678";//type your password
 String n = "sensor1";
 //String jsonStr = "{\"name\":\"Sensor-1\",\"temp\":\"25.0\"}";// 定義JSON字串
 
-char serverAddress[] = "192.168.0.100";  // server address
+char serverAddress[] = "163.22.32.62";  // server address
 int port = 3000;
 
 WiFiClient wifi;

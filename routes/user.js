@@ -6,11 +6,11 @@ var expressSession = require('express-session');
 var SensorData = require('../model/sensor');
 const {searchSensorHistory} = require('../controllers/sensorHistory');
 var moment = require('moment');
-const {findUserID} = require('../controllers/user');
+const {findUserID,createUser} = require('../controllers/user');
 const {searchAllSensor} = require('../controllers/sensor');
 const { subscribeOne,unsubscribeOne,searchSubList_withSubName,
-        unsubscribeMany,subscribeMany,findExist} = require('../controllers/SubscribeList');
-const {subscribe,unsubscribe_with_socketID,unsubscribe_with_name} = require('../server/utils/subscribe_event');
+        unsubscribeMany,subscribeMany,findExist } = require('../controllers/SubscribeList');
+const { subscribe,unsubscribe_with_socketID,unsubscribe_with_name } = require('../server/utils/subscribe_event');
 // const {countLine} = require('../server/utils/countLine');
 const {convertCondition} = require('../server/utils/convert');
 const {getStartAndEnd,avgInInterval,findInterval} = require('../server/utils/DateAndTime')
@@ -110,9 +110,33 @@ router.post('/submit', (req, res, next) => {
 
   //session = user name
   req.session.views = req.body.name;
-  res.redirect('/getData');
+  findUserID(req.body.name)
+    .then(userID => {
+      if(!userID)
+      {
+        createUser(req.body.name)
+          .then(result => {
+            if(result)
+            {
+              console.log(result);
+              res.redirect('/getData');
+              return;
+            }
+          })
+          .catch(err => {
+            console.log(err);
+            res.send({err:err.message});
+            return;
+          });
+      }
+      else {
+        res.redirect('/getData');
+      }
+
+    })
+
   console.log(req.session);
-  console.log("sessionID: "+req.session.id);
+  //console.log("sessionID: "+req.session.id);
 });
 //user subscribe
 router.post('/subscribe', (req, res, next) => {
