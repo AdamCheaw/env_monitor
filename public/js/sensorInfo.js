@@ -25,6 +25,7 @@ const timeArray = [
     ]
   }
 ];
+var chart;
 function drawGraph(results) {
   var labelArray = [];
   var dataArray = [];
@@ -34,14 +35,14 @@ function drawGraph(results) {
     dataArray.push(doc.value);
   })
   var ctx = document.getElementById('myChart').getContext('2d');
-  var chart = new Chart(ctx, {
+  chart = new Chart(ctx, {
     // The type of chart we want to create
     type: 'line',
     // The data for our dataset
     data: {
         labels: labelArray,
         datasets: [{
-            label: "My First dataset",
+            label: "value",
             backgroundColor: '#9ee0c8',
             borderColor: '#319b74',
             data: dataArray
@@ -141,6 +142,7 @@ $(document).ready(function() {
       "queryDate":moment.parseZone(queryDate).toISOString(),
       "interval":timeIntervalValue
     };
+    //chart.destroy();
     $.ajax({
         type        : 'POST', // define the type of HTTP verb we want to use (POST for our form)
         url         : '/getData/getHistoryData', // the url where we want to POST
