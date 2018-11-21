@@ -156,6 +156,7 @@ $(document).ready(function() {
            // $("#myModal").modal("hide");
         },
         success: function(data){
+          chart.destroy();
           drawGraph(data);
           //console.log(data);
         },
