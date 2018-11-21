@@ -13,14 +13,18 @@
 
                 <div class="media-body">
                   <h3 class="media-title">
-                      Sensor1
+                      {{sensorInfo.name}}
                   </h3>
                   <h4 class="media-subtitle">
-                    <img src="../icon/warm.png" width="18px" height="18px"> temperature
+                    {{{findIcon sensorInfo.type}}}
                   </h4>
 
                   <p><small class="muted">Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse</small></p>
-                  <b class="ac-online" >online</b>
+                  {{#if sensorInfo.onConnect}}
+                    <b class="ac-online" >online</b>
+                  {{else}}
+                    <b class="ac-offline" >offline</b>
+                  {{/if}}
                   {{!-- <div class="media-option btn-group shaded-icon">
                       <button class="btn btn-small">
                           <i class="icon-envelope"></i>

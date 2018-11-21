@@ -50,7 +50,7 @@ io.on('connection', (socket) => {
           }
         }
         if (idArray && idArray.length) {
-          //adding the notification value in the current subscribeList
+          //update the current notification value to the subscribeList previousValue after emit to user
           updateSubList_PreviousValue(idArray,Number(SensorData.temp));
         }
 

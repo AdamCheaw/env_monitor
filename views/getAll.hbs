@@ -79,11 +79,15 @@
                           <div class="controls" id="i1-1">
                             <input type="text" id="form1_maxValue" placeholder="" class="span12" >
                           </div>
-
                           <br/>
                           <label class="control-label" for="basicinput2">Lower than <input type="checkbox" value=""></label>
                           <div class="controls" id="i1-2">
                             <input type="text" id="form1_minValue" placeholder="" class="span12">
+                          </div>
+                          <br/>
+                          <label class="control-label" for="basicinput2">Equal to <input type="checkbox" value=""></label>
+                          <div class="controls" id="i1-3">
+                            <input type="text" id="form1_equalValue" placeholder="" class="span12">
                           </div>
                           <br/>
                           <label class="control-label" for="selectOption1">Precision</label>
@@ -94,12 +98,35 @@
                               <option value="1">1</option>
                             </select>
                           </div>
+                          <br/>
+                          <label class="control-label" for="basicinput3">Between <input type="checkbox" value=""></label>
+
+                          <div class="row-fluid">
+                            <div class="span6">
+                              <div class="controls">
+                                <div class="input-prepend">
+        													<span class="add-on">min </span>
+                                  <input class="span9" type="text" id="form1_b_minValue">
+        												</div>
+                              </div>
+
+                            </div>
+                            <div class="span6">
+                              <div class="controls">
+                                <div class="input-prepend">
+        													<span class="add-on">max</span>
+                                  <input class="span9" type="text" id="form1_b_maxValue">
+        												</div>
+                              </div>
+
+                            </div>
+                          </div>
+                          {{!-- end row-fluid --}}
                         </div>
 
                       </div>
 
                       <div class="control-group pull-right">
-
   												<button type="button" class="btn btn-success " id="form1-add"> ADD <i class="icon-plus-sign"></i></button>
   										</div>
                   </div>

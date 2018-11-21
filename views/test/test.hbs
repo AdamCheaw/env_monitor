@@ -1,6 +1,7 @@
 
 {{>header}}
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.4.0/Chart.min.js"></script>
+<script src="http://www.chartjs.org/dist/master/Chart.bundle.min.js"></script>
 <div class="wrapper">
   <div class="container">
     <div class="row">
@@ -12,11 +13,13 @@
                   <h3>Chart</h3>
               </div>
               <div class="module-body">
+                  <button onclick="change(this)">change</button>
                   <canvas id="myChart"></canvas>
 
                   {{!-- <div class="" id="myChart">
 
                   </div> --}}
+
               </div>
           </div>
         </div>
@@ -36,37 +39,45 @@ var chart = new Chart(ctx, {
 
   // The data for our dataset
   data: {
-      labels: ["January", "February", "March", "April", "May", "June", "July","January", "February", "March", "April", "May", "June", "July","January", "February", "March", "April", "May", "June", "January", "February", "March", "April", "May", "June", "July","January", "February", "March", "April", "May", "June", "July","January", "February", "March", "April", "May", "June" ],
+      labels: ["January", "February", "March", "April", "May"],
       datasets: [{
           label: "My First dataset",
           backgroundColor: '#9ee0c8',
           borderColor: '#319b74',
-          data: [0, 10, 5, 2, 20, 30, 45,0, 10, 5, 2, 20, 30, 45,0, 10, 5, 2, 20, 30,0, 10, 5, 2, 20, 30, 45,0, 10, 5, 2, 20, 30, 45,0, 10, 5, 2, 20, 30],
+          data: [0, 10, 5, 2, 20],
       }]
   },
 
   // Configuration options go here
   options: {}
 });
-// setInterval(function() {
-//   var chart = new Chart(ctx, {
-//     // The type of chart we want to create
-//     type: 'line',
-//
-//     // The data for our dataset
-//     data: {
-//         labels: ["January", "February", "March", "April", "May", "June", "July","January", "February", "March", "April", "May", "June", "July","January", "February", "March", "April", "May", "June", "January", "February", "March", "April", "May", "June", "July","January", "February", "March", "April", "May", "June", "July","January", "February", "March", "April", "May", "June" ],
-//         datasets: [{
-//             label: "My First dataset",
-//             backgroundColor: 'red',
-//             borderColor: 'red',
-//             data: [0, 10, 5, 2, 20, 30, 45,0, 10, 5, 2, 20, 30, 45,0, 10, 5, 2, 20, 30,0, 10, 5, 2, 20, 30, 45,0, 10, 5, 2, 20, 30, 45,0, 10, 5, 2, 20, 30],
-//         }]
-//     },
-//
-//     // Configuration options go here
-//     options: {}
-//   });
-// }, 10000);
+setInterval(function() {
+
+}, 1000);
+function change()
+{
+  //chart.destroy();
+  chart.data.labels.push("hahah");
+  chart.data.datasets[0].data.push(40);
+  chart.update();
+  // chart = new Chart(ctx, {
+  //   // The type of chart we want to create
+  //   type: 'line',
+  //
+  //   // The data for our dataset
+  //   data: {
+  //       labels: ["January", "February", "March", "April", "May", "June", "July","January", "February", "March", "April", "May", "June", "July","January", "February", "March", "April", "May", "June", "January", "February", "March", "April", "May", "June", "July","January", "February", "March", "April", "May", "June", "July","January", "February", "March", "April", "May", "June" ],
+  //       datasets: [{
+  //           label: "My First dataset",
+  //           backgroundColor: 'red',
+  //           borderColor: 'red',
+  //           data: [0, 10, 5, 2, 20, 30, 45,0, 10, 5, 2, 20, 30, 45,0, 10, 5, 2, 20, 30,0, 10, 5, 2, 20, 30, 45,0, 10, 5, 2, 20, 30, 45,0, 10, 5, 2, 20, 30],
+  //       }]
+  //   },
+  //
+  //   // Configuration options go here
+  //   options: {}
+  // });
+}
 
 </script>

@@ -246,6 +246,22 @@ $(document).ready(function(){
           };
           condition.push(data);
         }
+        if($("#form1_b_minValue").val() && $("#form1_b_minValue").val()) {
+          var data = {
+            type: "between",
+            minValue: Number($("#form1_b_minValue").val()),
+            maxValue: Number($("#form1_b_maxValue").val()),
+          };
+          condition.push(data);
+        }
+        if($("#form1_equalValue").val()) {
+          var data = {
+            type: "equal",
+            value: Number($("#form1_equalValue").val())
+          };
+          condition.push(data);
+        }
+
         //advanced input field is empty
         if(condition.length == 0) {
           swal("something went wrong", "advanced condition can't be empty", "warning")

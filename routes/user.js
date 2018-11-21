@@ -7,7 +7,7 @@ var SensorData = require('../model/sensor');
 const {searchSensorHistory} = require('../controllers/sensorHistory');
 var moment = require('moment');
 const {findUserID,createUser} = require('../controllers/user');
-const {searchAllSensor} = require('../controllers/sensor');
+const {searchAllSensor,searchSensorByID} = require('../controllers/sensor');
 const { subscribeOne,unsubscribeOne,searchSubList_withSubName,
         unsubscribeMany,subscribeMany,findExist } = require('../controllers/SubscribeList');
 const { subscribe,unsubscribe_with_socketID,unsubscribe_with_name } = require('../server/utils/subscribe_event');
@@ -45,29 +45,45 @@ router.get('/:sensorId', (req, res, next) => {
     res.render('login');
     return;
   }
-  var time = getStartAndEnd(moment(),5,"minutes",1,"hours");
-  //searching sensor history with and sensorID
-  searchSensorHistory(req.params.sensorId,time.startOfTime,time.endOfTime)
-  .then(result => {
-    if(!result)
-    {
-      console.log("did not found any result");
-      res.render('sensorInfo',{foundIt:false,session:req.session.views});
-      return;
-    }
-    //reduce multiple data into different interval of data
-    var afterAvg = avgInInterval(result,5,"minutes",time.startOfTime,time.endOfTime);//avg the result in every 5 min
-    res.render('sensorInfo',{
-      items:JSON.stringify(afterAvg),
-      foundIt:true,
-      session:req.session.views,
-      sensorID:req.params.sensorId
+  searchSensorByID(req.params.sensorId)
+    .then(sensorInfo => {
+      if(!sensorInfo) {
+        console.log("did not found any result");
+        res.send("404 no found");
+        return;
+      }
+      var time = getStartAndEnd(moment(),5,"minutes",1,"hours");
+      //searching sensor history with and sensorID
+      searchSensorHistory(req.params.sensorId,time.startOfTime,time.endOfTime)
+      .then(result => {
+        if(!result)
+        {
+          console.log("did not found any result");
+          res.render('sensorInfo',{foundIt:false,session:req.session.views});
+          return;
+        }
+        console.log(sensorInfo);
+        //reduce multiple data into different interval of data
+        var afterAvg = avgInInterval(result,5,"minutes",time.startOfTime,time.endOfTime);//avg the result in every 5 min
+        res.render('sensorInfo',{
+          items:JSON.stringify(afterAvg),
+          foundIt:true,
+          session:req.session.views,
+          sensorID:req.params.sensorId,
+          sensorInfo:sensorInfo[0]
+        });
+      })
+      .catch(err => {
+        res.send({msg:err.message});
+        console.log(err);
+      });
+
+    })
+    .catch(err => {
+      res.send({msg:err.message});
+      console.log(err);
     });
-  })
-  .catch(err => {
-    res.send({msg:err.message});
-    console.log(err);
-  });
+
 });
 //handle ajax call for HistoryData
 router.post('/getHistoryData', (req, res, next) => {

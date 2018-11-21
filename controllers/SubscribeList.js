@@ -259,7 +259,16 @@ var notificationList = (sensorID,currentValue,callback) => {
           for(var i = 0;i < result.condition.length;i++)
           {
             var type = result.condition[i].type;
-            var conditionValue = result.condition[i].value;
+            if(result.condition[i].value) {
+              var conditionValue = result.condition[i].value;
+            }
+            else if(result.condition[i].minValue && result.condition[i].maxValue) {
+              var conditionValue = {
+                minValue : result.condition[i].minValue,
+                maxValue : result.condition[i].maxValue,
+              }
+            }
+
 
             if( type == "max" && (currentValue > conditionValue || result.previousValue > conditionValue) ) {
               match = true;
@@ -270,6 +279,21 @@ var notificationList = (sensorID,currentValue,callback) => {
               break;
             }
             else if( type == "precision" ) {
+              match = true;
+              break;
+            }
+            else if( type == "equal" && (currentValue == conditionValue || result.previousValue == conditionValue)) {
+              match = true;
+              break;
+            }
+            else if(
+              type == "between" &&
+              ((currentValue > conditionValue.minValue &&
+                currentValue < conditionValue.maxValue) ||
+                (result.previousValue > conditionValue.minValue &&
+                  result.previousValue < conditionValue.maxValue)
+              )
+            ) {
               match = true;
               break;
             }

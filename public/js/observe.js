@@ -7,7 +7,7 @@ $('#sub-table').on('click', '.unsubBtn', function(e) {
   {
     var data = {
         "subscribeListID" : idClicked
-    }; 
+    };
     $.ajax({
         type        : 'POST', // define the type of HTTP verb we want to use (POST for our form)
         url         : '/getData/unsubscribe', // the url where we want to POST
@@ -70,6 +70,17 @@ socket.on('notification', function(SensorData) {
       else if(thisCondition.type == "precision")
       {
         value = doc._sensorID.temp;
+      }
+      else if(thisCondition.type == "equal" && Number(SensorData.temp) == Number(thisCondition.value)) {
+        value = '<span class="font-warning"><i class="icon-warning-sign"></i> '+SensorData.temp+'</span>';
+      }
+      else if(
+        thisCondition.type == "between" && (
+           Number(SensorData.temp) > Number(thisCondition.minValue) &&
+           Number(SensorData.temp) < Number(thisCondition.maxValue)
+        )
+      ) {
+        value = '<span class="font-warning"><i class="icon-warning-sign"></i> '+SensorData.temp+'</span>';
       }
       else {
         value = '<span class="font-safe"><i class="icon-star"></i></span>';

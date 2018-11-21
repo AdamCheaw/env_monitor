@@ -36,6 +36,10 @@ app.use(expressSession({secret: 'little cat', saveUninitialized: false, resave: 
 app.get("/", (req,res,next) => {
   res.redirect('/getData');
 });
+app.get("/logout", (req,res,next) => {
+  req.session.destroy();
+  res.render('login');
+});
 app.use("/sensors", sensor);
 app.use("/getData", user);
 app.use("/observe", observer);

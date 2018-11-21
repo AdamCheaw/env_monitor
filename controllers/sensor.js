@@ -1,6 +1,7 @@
 var SensorData = require('../model/sensor');
 var moment = require('moment');
 const {checkExpire} = require('../server/utils/checkExpire');
+var ObjectId = require('mongodb').ObjectID;
 // const {countLine} = require('../server/utils/countLine');
 var io = require('socket.io-client');
 var expireDate;
@@ -95,11 +96,10 @@ var searchAllSensor = (callback) => {
       };
       callback(response);
       return;
-      //res.render('getAll',{items:response, session:req.session.views});
-
-      //res.status(200).json(response.data[0].date);
-      //console.log("From database", response);
     })
 }
+var searchSensorByID = (sensorID) => {
+  return SensorData.find({_id:ObjectId(sensorID)}).select('name type onConnect').exec();
+}
 
-module.exports = {checkDisconnect,searchAllSensor};
+module.exports = {checkDisconnect,searchAllSensor,searchSensorByID};
