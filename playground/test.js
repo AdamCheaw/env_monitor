@@ -40,8 +40,9 @@ var testing = (callback) => {
 //   console.log(result2);
 // }
 // findUser("Ada","cheaw");
-router.get('/', (req, res) => {
-  res.render('test/test');
+router.post('/', (req, res) => {
+  res.json({msg:"hihi"});
+  console.log(req.body);
   //console.log(req.body);
 });
 

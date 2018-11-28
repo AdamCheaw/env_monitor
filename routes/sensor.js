@@ -94,7 +94,7 @@ router.post('/insert', (req, res, next) => {
 
 });
 //receive a notification from sensor
-router.patch('/update', (req, res, next) => {
+router.post('/update', (req, res, next) => {
   var currentDate = new Date();
   var id = req.body.sensorId;
   console.log("received notification message from ("+id+")");
