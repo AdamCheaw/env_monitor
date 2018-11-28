@@ -66,17 +66,37 @@ var searchSubList_withSubName = (name, callback) => {
       if(docs && docs.length){
         var result = [];
         docs.forEach(doc => {
-          if(doc._sensorID._id) {
+          // if(doc._sensorID._id) {
+          //   var item = {
+          //      _id: doc._id,
+          //      _sensorID: {
+          //        _id: doc._sensorID._id,
+          //        name: doc._sensorID.name,
+          //        temp: doc._sensorID.temp,
+          //        date: moment.parseZone(doc._sensorID.date).local().format('YYYY MMM Do, h:mm:ssa'),
+          //        onConnect: doc._sensorID.onConnect,
+          //        type: doc._sensorID.type
+          //      },
+          //      subscriberName: doc.subscriberName,
+          //      option: doc.option,
+          //      condition: doc.condition
+          //   };
+          //   result.push(item);
+          // }
+          if(doc._sensorID && doc._sensorID.length) {
+            var sensors = doc._sensorID.map(thisSensor => {
+              return {
+                 _id: thisSensor._id,
+                 name: thisSensor.name,
+                 temp: thisSensor.temp,
+                 date: moment.parseZone(thisSensor.date).local().format('YYYY MMM Do, h:mm:ssa'),
+                 onConnect: thisSensor.onConnect,
+                 type: thisSensor.type
+              };
+            });
             var item = {
                _id: doc._id,
-               _sensorID: {
-                 _id: doc._sensorID._id,
-                 name: doc._sensorID.name,
-                 temp: doc._sensorID.temp,
-                 date: moment.parseZone(doc._sensorID.date).local().format('YYYY MMM Do, h:mm:ssa'),
-                 onConnect: doc._sensorID.onConnect,
-                 type: doc._sensorID.type
-               },
+               _sensorID: sensors,
                subscriberName: doc.subscriberName,
                option: doc.option,
                condition: doc.condition
@@ -169,7 +189,7 @@ var subscribeMany = (name,userID,subscription) => {
     return {
       option: doc.option,
       _subscriber : userID,
-      _sensorID : ObjectId(doc._sensorID),
+      _sensorID : doc._sensorID.map(sensorID => {return ObjectId(sensorID)}),//ObjectId(doc._sensorID),
       subscriberName : name,
       condition: convertCondition(doc.condition)
     };
