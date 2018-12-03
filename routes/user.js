@@ -6,10 +6,11 @@ var expressSession = require('express-session');
 var SensorData = require('../model/sensor');
 const {searchSensorHistory} = require('../controllers/sensorHistory');
 var moment = require('moment');
+var ObjectId = require('mongodb').ObjectID;
 const {findUserID,createUser} = require('../controllers/user');
 const {searchAllSensor,searchSensorByID} = require('../controllers/sensor');
 const { subscribeOne,unsubscribeOne,searchSubList_withSubName,
-        unsubscribeMany,subscribeMany,findExist } = require('../controllers/SubscribeList');
+        unsubscribeMany,subscribeMany,findSubscribeBefore } = require('../controllers/SubscribeList');
 const { subscribe,unsubscribe_with_socketID,unsubscribe_with_name } = require('../server/utils/subscribe_event');
 // const {countLine} = require('../server/utils/countLine');
 const {convertCondition} = require('../server/utils/convert');
@@ -26,7 +27,7 @@ router.get('/',(req, res, next) => {
       if(sub_result != "" && sub_result !== undefined && sub_result !== null) {
         var subscribe_sensor = sub_result.map(data => {
           return {
-            sensorID: data._sensorID._id,
+            sensorID: data._sensorID.map(sensor => ObjectId(sensor._id)),
             subscribeID: data._id
           };
         });
@@ -183,9 +184,13 @@ router.post('/subscribeMany', (req, res, next) => {
   // var str = req.body;
   // console.log(str);
   // res.json("received msg");
-  findExist(req.session.views,req.body.subscription)//find exist subscription
+  findSubscribeBefore(req.session.views,req.body.subscription)//find exist subscription
     .then(exist => {
-      console.log("exist : "+exist);
+      if(exist && exist.length)
+      {
+        console.log("exist : "+exist);
+        throw new Error("sensor already subscribe before");
+      }
       findUserID(req.session.views)//find user ID
         .then(userID => {
           if(!userID)
@@ -196,19 +201,19 @@ router.post('/subscribeMany', (req, res, next) => {
           //subscribe new
           return subscribeMany(req.session.views,userID,req.body.subscription);
         })
-        .then(result => {
-          if(result) {
-            console.log("subscribeMany : "+result);
-            //unsubscribe previous exist subscription
-            return unsubscribeMany(req.session.views,exist);
-          }
-        })
+        // .then(result => {
+        //   if(result) {
+        //     console.log("subscribeMany : "+result);
+        //     //unsubscribe previous exist subscription
+        //     return unsubscribeMany(req.session.views,exist);
+        //   }
+        // })
         .then(result => {
           res.json({msg:"success"});
           console.log(result);
         })
         .catch(err => {
-          throw new Error(err);
+          throw new Error(err.message);
           console.log(err);
         });
     })

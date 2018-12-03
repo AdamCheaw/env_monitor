@@ -54,49 +54,50 @@ socket.on('connect', function () {
 socket.on('notification', function(SensorData) {
 
   //var i = $('#'+SensorData._id+' .index').html();
-  var html = ""
-  if(SensorData.option == "default") {
-    html = SensorData.temp;
-  }
-  else {
-    SensorData.condition.forEach(thisCondition => {
-      if(thisCondition.type == "max" && Number(SensorData.temp) > Number(thisCondition.value)) {
-        value = '<span class="font-warning"><i class="icon-warning-sign"></i> '+SensorData.temp+'</span>';
-        console.log(thisCondition.value);
-      }
-      else if (thisCondition.type == "min" && Number(SensorData.temp) < Number(thisCondition.value)) {
-        value = '<span class="font-warning"><i class="icon-warning-sign"></i> '+SensorData.temp+'</span>';
-      }
-      else if(thisCondition.type == "precision")
-      {
-        value = doc._sensorID.temp;
-      }
-      else if(thisCondition.type == "equal" && Number(SensorData.temp) == Number(thisCondition.value)) {
-        value = '<span class="font-warning"><i class="icon-warning-sign"></i> '+SensorData.temp+'</span>';
-      }
-      else if(
-        thisCondition.type == "between" && (
-           Number(SensorData.temp) > Number(thisCondition.minValue) &&
-           Number(SensorData.temp) < Number(thisCondition.maxValue)
-        )
-      ) {
-        value = '<span class="font-warning"><i class="icon-warning-sign"></i> '+SensorData.temp+'</span>';
-      }
-      else {
-        value = '<span class="font-safe"><i class="icon-star"></i></span>';
-      }
-    });
-    html = value;
-  }
-  //temp value
-  $("#"+SensorData._id+' .sensor-temp').html(html);
-  //status
-  html = "<b class=\"online\" >online</b>";
-  $("#"+SensorData._id+' .sensor-status').html(html);
-  //date
-  html = moment.parseZone(SensorData.date).local().format('YYYY MMM Do, h:mm:ssa');
-  $("#"+SensorData._id+' .sensor-date').html(html);
+  // var html = ""
+  // if(SensorData.option == "default") {
+  //   html = SensorData.temp;
+  // }
+  // else {
+  //   SensorData.condition.forEach(thisCondition => {
+  //     if(thisCondition.type == "max" && Number(SensorData.temp) > Number(thisCondition.value)) {
+  //       value = '<span class="font-warning"><i class="icon-warning-sign"></i> '+SensorData.temp+'</span>';
+  //       console.log(thisCondition.value);
+  //     }
+  //     else if (thisCondition.type == "min" && Number(SensorData.temp) < Number(thisCondition.value)) {
+  //       value = '<span class="font-warning"><i class="icon-warning-sign"></i> '+SensorData.temp+'</span>';
+  //     }
+  //     else if(thisCondition.type == "precision")
+  //     {
+  //       value = doc._sensorID.temp;
+  //     }
+  //     else if(thisCondition.type == "equal" && Number(SensorData.temp) == Number(thisCondition.value)) {
+  //       value = '<span class="font-warning"><i class="icon-warning-sign"></i> '+SensorData.temp+'</span>';
+  //     }
+  //     else if(
+  //       thisCondition.type == "between" && (
+  //          Number(SensorData.temp) > Number(thisCondition.minValue) &&
+  //          Number(SensorData.temp) < Number(thisCondition.maxValue)
+  //       )
+  //     ) {
+  //       value = '<span class="font-warning"><i class="icon-warning-sign"></i> '+SensorData.temp+'</span>';
+  //     }
+  //     else {
+  //       value = '<span class="font-safe"><i class="icon-star"></i></span>';
+  //     }
+  //   });
+  //   html = value;
+  // }
+  // //temp value
+  // $("#"+SensorData._id+' .sensor-temp').html(html);
+  // //status
+  // html = "<b class=\"online\" >online</b>";
+  // $("#"+SensorData._id+' .sensor-status').html(html);
+  // //date
+  // html = moment.parseZone(SensorData.date).local().format('YYYY MMM Do, h:mm:ssa');
+  // $("#"+SensorData._id+' .sensor-date').html(html);
   console.log("listen a notification");
+  console.log(SensorData);
 });
 socket.on('sensor disconnect', function(data) {
 

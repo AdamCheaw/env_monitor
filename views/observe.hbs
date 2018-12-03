@@ -48,23 +48,35 @@
                 </thead>
                 <tbody id="tbody1">
                   {{#each items }}
-                      {{#if this._sensorID.onConnect }}
-                      <tr id="{{this._sensorID._id}}">
+                      {{#if this._sensorID.[0].onConnect }}
+                      <tr id="{{this._sensorID.[0]._id}}">
                         <td class="sensor-index">{{@index}}</td>
-                        <td>{{this._sensorID.name}}</td>
-                        <td class="sensor-temp">{{loadValue this._sensorID.temp this.option this.condition}}</td>
+                        <td>{{this._sensorID.[0].name}}</td>
+                        <td class="sensor-temp">{{loadValue this._sensorID.[0].temp this.option this.condition}}</td>
                         <td class="sensor-status"><b class="online" >online</b></td>
-                        <td class="sensor-date">{{this._sensorID.date}}</td>
-                        <td><a type="button" class="btn-icon btn-danger unsubBtn" id="unsubBtn-{{this._id}}" ><i class="icon-remove"></i></a></td>
+                        <td class="sensor-date">{{this._sensorID.[0].date}}</td>
+                        <td><a type="button"
+                              class="btn-icon btn-danger unsubBtn"
+                              id="unsubBtn-{{this._id}}"
+                            >
+                              <i class="icon-remove"></i>
+                            </a>
+                        </td>
                       </tr>
                       {{else}}
-                      <tr id="{{this._sensorID._id}}">
+                      <tr id="{{this._sensorID.[0]._id}}">
                         <td class="sensor-index">{{@index}}</td>
-                        <td>{{this._sensorID.name}}</td>
+                        <td>{{this._sensorID.[0].name}}</td>
                         <td class="sensor-temp">? </td>
                         <td class="sensor-status"><b class="offline" >offline</b></td>
-                        <td class="sensor-date">{{this._sensorID.date}}</td>
-                        <td><a type="button" class="btn-icon btn-danger unsubBtn" id="unsubBtn-{{this._id}}" ><i class="icon-remove"></i></a></td>
+                        <td class="sensor-date">{{this._sensorID.[0].date}}</td>
+                        <td><a type="button"
+                              class="btn-icon btn-danger unsubBtn"
+                              id="unsubBtn-{{this._id}}"
+                            >
+                              <i class="icon-remove"></i>
+                            </a>
+                        </td>
                       </tr>
                       {{/if}}
                   {{/each}}

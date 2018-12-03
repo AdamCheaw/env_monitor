@@ -5,11 +5,11 @@ mongoose.connect('mongodb://localhost:27017/Sensors',{ useNewUrlParser:true });
 var Schema = mongoose.Schema;
 var SubscribeListSchema = new mongoose.Schema({
 
-  _sensorID: {
+  _sensorID: [{
     type: mongoose.Schema.Types.ObjectId,
     required: true,
     ref: 'SensorData'
-  },
+  }],
   _subscriber: {
     type: mongoose.Schema.Types.ObjectId,
     required: true,
@@ -19,7 +19,10 @@ var SubscribeListSchema = new mongoose.Schema({
   socketID: {type: String},
   option: {type: String,default: 'default'},
   condition: {type: Schema.Types.Mixed},
-  previousValue :{type: Number,default: null}
+  //flag ,get to know previous is matching condition
+  previousMatch: {type: Boolean,default: null},
+  previousValue :{type: Number,default: null},
+  groupType :{type:String,default:'none'}
   // user_list: [{
   //   _id:false,
   //   socketID:{type: String,required: true},

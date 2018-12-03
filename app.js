@@ -48,7 +48,7 @@ app.get("/logout", (req,res,next) => {
 app.use("/sensors", sensor);
 app.use("/getData", user);
 app.use("/observe", observer);
-app.use("/test", test);
+//app.use("/test", test);
 setInterval(function() {
   checkDisconnect();
 }, 60000);

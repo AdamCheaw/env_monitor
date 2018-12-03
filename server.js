@@ -5,10 +5,13 @@ const port = process.env.PORT || 3000;
 
 const server = http.createServer(app);
 const io = socketIO(server);
-const {generateSensorData} = require('./server/utils/generate');
+const {generateSensorData,generateNotification} = require('./server/utils/generate');
 const {subscribe,unsubscribe} = require('./server/utils/subscribe_event');
 const {userOnConnect,userDisconnect} = require('./controllers/user');
-const {searchSubscribeList_withSensorID,notificationList,updateSubList_PreviousValue} = require('./controllers/SubscribeList');
+const {
+  searchSubscribeList_withSensorID,
+  notificationList,
+  updateSubList_PreviousMatchCondition } = require('./controllers/SubscribeList');
 io.on('connection', (socket) => {
   socket.on('auth',(data) => {
     console.log(data.name+' have connected, socket id: '+socket.id);
@@ -39,19 +42,27 @@ io.on('connection', (socket) => {
   //sensor notification
   socket.on('update', (SensorData) => {
     console.log(`socket: listening a updated event from sensor ${SensorData._id}` );
+    console.log("-----------------------------------------------------------");
     notificationList(SensorData._id,Number(SensorData.temp),(results) => {
       if(results!= "") {
-        var idArray = [];
-        for(var i = 0;i < results.length;i++) {
+        var updateMatch = [];
+        var updateNotMatch = [];
+        for(let i = 0;i < results.length;i++) {
           if (io.sockets.connected[results[i].socketID]) {
-            io.to(results[i].socketID).emit('notification', generateSensorData(SensorData,results[i]));
+            io.to(results[i].socketID).emit('notification', generateNotification(results[i]));
             console.log("socket: emit update msg to socket " + results[i].socketID);
-            idArray.push(results[i]._id);//save the user id when notification success
+            if(results[i].previousMatch) {
+              updateMatch.push(results[i]._id);
+            }
+            else {
+              updateNotMatch.push(results[i]._id);
+            }//save the matching flag when notification success
           }
         }
-        if (idArray && idArray.length) {
+        if (updateMatch || updateNotMatch) {
           //update the current notification value to the subscribeList previousValue after emit to user
-          updateSubList_PreviousValue(idArray,Number(SensorData.temp));
+          updateSubList_PreviousMatchCondition(updateMatch,true);
+          updateSubList_PreviousMatchCondition(updateNotMatch,false);
         }
 
       }

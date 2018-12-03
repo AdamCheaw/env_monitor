@@ -6,6 +6,7 @@ var express = require('express');
 var ObjectId = require('mongodb').ObjectID;
 var moment = require('moment');
 const {convertCondition} = require('../server/utils/convert');
+const {generate_NotificationList} = require('./utils/notificationList');
 // find all subscriber subscribe this sensor
 var searchSubscribeList_withSensorID = (sensorID,callback) => {
   //console.log("DB : "+sensorID);
@@ -66,23 +67,6 @@ var searchSubList_withSubName = (name, callback) => {
       if(docs && docs.length){
         var result = [];
         docs.forEach(doc => {
-          // if(doc._sensorID._id) {
-          //   var item = {
-          //      _id: doc._id,
-          //      _sensorID: {
-          //        _id: doc._sensorID._id,
-          //        name: doc._sensorID.name,
-          //        temp: doc._sensorID.temp,
-          //        date: moment.parseZone(doc._sensorID.date).local().format('YYYY MMM Do, h:mm:ssa'),
-          //        onConnect: doc._sensorID.onConnect,
-          //        type: doc._sensorID.type
-          //      },
-          //      subscriberName: doc.subscriberName,
-          //      option: doc.option,
-          //      condition: doc.condition
-          //   };
-          //   result.push(item);
-          // }
           if(doc._sensorID && doc._sensorID.length) {
             var sensors = doc._sensorID.map(thisSensor => {
               return {
@@ -104,11 +88,9 @@ var searchSubList_withSubName = (name, callback) => {
             result.push(item);
           }
         })
-
         callback(result);
         //console.log("searchSubscribeList_withSubscriberName: "+docs);
         return;
-
       }
       else {
         callback(null);
@@ -177,21 +159,46 @@ var subscribeOne = (name,userID,sensorID,option,condition,callback) => {
 
 
 var unsubscribeOne = (subscribeListID,callback) => {
-  SubscribeListData.remove({_id:ObjectId(subscribeListID)}, (err) => {
+  SubscribeListData.deleteOne({_id:ObjectId(subscribeListID)}, (err) => {
     if (err) return callback(err);
     return callback("success");
     console.log('the subdocs were removed');
   });
 }
+
+var unsubscribeOneSensor = (sensorID,subscribeListID) => {
+  return new Promise((resolve, reject) => {
+    SubscribeListData.updateOne(
+      {_id: ObjectId(subscribeListID)},
+      { $pull: { _sensors:ObjectId(sensorID) } }
+    )
+      .exec()
+      .then(() => {
+        return SubscribeListData.deleteMany( {_sensorID:[]} ).exec();
+      })
+      .then(() => {
+        resolve("success");
+      })
+      .catch(err => {
+        if(err) {
+          console.log(err);
+          reject(err.message);
+        }
+      });
+  });
+
+}
+
 //no callback style
 var subscribeMany = (name,userID,subscription) => {
   var insertData = subscription.map(doc => {
     return {
       option: doc.option,
       _subscriber : userID,
-      _sensorID : doc._sensorID.map(sensorID => {return ObjectId(sensorID)}),//ObjectId(doc._sensorID),
+      _sensorID : doc._sensorID.map(sensorID => ObjectId(sensorID)),//ObjectId(doc._sensorID),
       subscriberName : name,
-      condition: convertCondition(doc.condition)
+      condition: convertCondition(doc.condition),
+      groupType: (typeof doc.groupType === 'undefined') ? "none" : doc.groupType
     };
   });
   return new Promise((resolve, reject) => {
@@ -203,16 +210,7 @@ var subscribeMany = (name,userID,subscription) => {
       resolve(result);
     });
   })
-  // return SubscribeListData.insertMany(insertData,(err,result) => {
-  //   return new Promise((resolve, reject) => {
-  //     if(err)
-  //     {
-  //       reject(err);
-  //     }
-  //     resolve(result);
-  //   })
-  //
-  // });
+
 }
 var unsubscribeMany = (userName,sensorID) => {
   return SubscribeListData.deleteMany({
@@ -221,17 +219,22 @@ var unsubscribeMany = (userName,sensorID) => {
   }).exec();
 }
 //find the sensor already subscribe by user before
-var findExist = (userName,subscription) => {
-  sensorIDArray = subscription.map(doc => ObjectId(doc._sensorID));
+var findSubscribeBefore = (userName,subscription) => {
+  var sensorIDArray = [];
+  subscription.forEach(doc => {
+    doc._sensorID.forEach(sensorID => {
+      sensorIDArray.push(ObjectId(sensorID));
+    });
+  });
   return SubscribeListData.find({
     subscriberName:userName,
-    _sensorID: {$in:sensorIDArray}
+    _sensorID: { $in:sensorIDArray }
   }).select("_id").exec();
 }
 // update the subscribeList 's previous value
 // for the next time can compare new value with this previous value
 var updateSubList_PreviousValue = (idArray,newValue) => {
-  console.log(idArray);
+  //console.log(idArray);
   SubscribeListData.updateMany(
     { _id: {$in:idArray} },
     { $set: { previousValue : newValue } },
@@ -245,100 +248,45 @@ var updateSubList_PreviousValue = (idArray,newValue) => {
     });
 }
 
+var updateSubList_PreviousMatchCondition = (idArray,isMatch) => {
+  if(idArray && idArray.length) {
+    SubscribeListData.updateMany(
+      { _id: {$in:idArray} },
+      { $set: { previousMatch : isMatch} },
+      { multi:true }, (err,res) => {
+        if(err) {
+          console.log(err);
+        }
+        else {
+          console.log(`DB: update matching flag`);
+        }
+      });
+  }
+}
+
 //generate the notificationList to user when a sensor notifify a new value
 var notificationList = (sensorID,currentValue,callback) => {
   SubscribeListData.find({ _sensorID: ObjectId(sensorID) })
   .populate({
+    path:'_sensorID',
+    select:'_id name temp date onConnect'
+  })
+  .populate({
     path:'_subscriber',
     select:'_id socketID onConnect'
   })
-  .select('_id _subscriber option condition previousValue')
+  .select('_id _subscriber _sensorID option condition previousValue groupType')
   .exec((err,results) => {
-    var data = [];
+
     if(err) {
       console.log(err);
       return;
     }
     else {
-      results.forEach(result => {
-        var doc = {};
-        if(result.option == "default") {
-          doc = {
-            _id: result._id,
-            socketID : result._subscriber.socketID,
-            onConnect : result._subscriber.onConnect,
-            option : result.option,
-            condition : result.condition
-          };
-
-        }
-        else if(result.option == "advanced")
-        {
-          var match = false;
-          //var match = result.condition.some()
-          for(var i = 0;i < result.condition.length;i++)
-          {
-            var type = result.condition[i].type;
-            if(result.condition[i].value) {
-              var conditionValue = result.condition[i].value;
-            }
-            else if(result.condition[i].minValue && result.condition[i].maxValue) {
-              var conditionValue = {
-                minValue : result.condition[i].minValue,
-                maxValue : result.condition[i].maxValue,
-              }
-            }
-
-
-            if( type == "max" && (currentValue > conditionValue || result.previousValue > conditionValue) ) {
-              match = true;
-              break;
-            }
-            else if( type == "min" && (currentValue < conditionValue || result.previousValue < conditionValue) ) {
-              match = true;
-              break;
-            }
-            else if( type == "precision" ) {
-              match = true;
-              break;
-            }
-            else if( type == "equal" && (currentValue == conditionValue || result.previousValue == conditionValue)) {
-              match = true;
-              break;
-            }
-            else if(
-              type == "between" &&
-              ((currentValue > conditionValue.minValue &&
-                currentValue < conditionValue.maxValue) ||
-                (result.previousValue > conditionValue.minValue &&
-                  result.previousValue < conditionValue.maxValue)
-              )
-            ) {
-              match = true;
-              break;
-            }
-
-          }
-          if(match)
-          {
-            doc = {
-              _id: result._id,
-              socketID : result._subscriber.socketID,
-              onConnect : result._subscriber.onConnect,
-              option : result.option,
-              condition : result.condition
-            };
-          }
-        }
-        if(doc._id)
-        {
-          data.push(doc);
-        }
-
-      });
+      //console.log(results);
+      let data = generate_NotificationList(results,currentValue);
       //console.log(data);
       return callback(data);
-
     }
   });
 }
@@ -350,6 +298,7 @@ module.exports = {
   unsubscribeOne,
   unsubscribeMany,
   notificationList,
-  findExist,
-  updateSubList_PreviousValue
+  findSubscribeBefore,
+  updateSubList_PreviousValue,
+  updateSubList_PreviousMatchCondition
 };

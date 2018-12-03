@@ -117,7 +117,6 @@ router.post('/update', (req, res, next) => {
     .catch(err => {
       console.log(err);
     });
-
     //update the sensor Data
     doc.previousValue = doc.temp;
     doc.temp = req.body.temp;
@@ -125,27 +124,29 @@ router.post('/update', (req, res, next) => {
     doc.onConnect = true;
     doc.expireDate = moment(currentDate).add(210, 's');
     //doc.onConnect = true;
-    doc.save();
-     console.log(doc.name+" updated data");
-    // console.log("ID : "+req.body.sensorId);
-    // console.log("Temp : "+req.body.temp);
-     console.log("Date : "+moment.parseZone(doc.date).local().format('YYYY MMM Do h:mm:ss a'));
-     console.log("...................................................................");
-  })
-  .then(doc => {
-    if(doc) {
-      res.status(200).json({
-        message: "updated success!"
-      });
-      var socket = io('http://localhost:3000');
-      socket.emit('update', generateSensorData(doc,""));
-      console.log('emit an update event to server about data change');
-    }
-    else {
+    doc.save()
+    .then(doc => {
+      if(doc) {
+        res.status(200).json({
+          message: "updated success!"
+        });
+        var socket = io('http://localhost:3000');
+        socket.emit('update', generateSensorData(doc,""));
+        console.log('emit an update event to server about data change');
+      }
+    })
+    .catch(err => {
+      console.log(err);
       res.status(500).json({
         error: "updated failed!"
       });
-    }
+    });
+
+    //  console.log(doc.name+" updated data");
+    // // console.log("ID : "+req.body.sensorId);
+    // // console.log("Temp : "+req.body.temp);
+    //  console.log("Date : "+moment.parseZone(doc.date).local().format('YYYY MMM Do h:mm:ss a'));
+    //  console.log("...................................................................");
   })
   .catch(err => {
     console.log(err);
@@ -153,7 +154,5 @@ router.post('/update', (req, res, next) => {
       error: err
     });
   });
-
-
 });
 module.exports = router;
