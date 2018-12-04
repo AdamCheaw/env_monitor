@@ -3117,14 +3117,14 @@ filter:progid:DXImageTransform.Microsoft.gradient(startColorstr='#fff5f5f5', end
     margin-left: auto !important;
   }
 }
-table td .offline {
+table td .offline ,.media .media-body .offline {
 	background-color:#e63900;
 	padding:1px 5px;
 	border:1px solid #e63900;
 	border-radius:2px;
 	color:white;
 }
-table td .online {
+table td .online,.media .media-body .online {
 	background-color:#47d147;
 	padding:1px 5px;
 	border:1px solid #47d147;
@@ -3176,4 +3176,14 @@ table td .online {
 .font-value{
 	color: #d14;
 	font-weight: bold;
+}
+.text-right {
+	text-align: right;
+}
+.media .sensor-value {
+	margin:15px 0px;
+	font-size: 30px;
+}
+.media .icon-lg {
+	font-size: 30px;
 }
