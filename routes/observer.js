@@ -18,6 +18,7 @@ router.get('/', (req, res, next) => {
   searchSubList_withSubName(req.session.views,function(result,subInfo) {
     if(result != "" || result !== undefined) {
       res.render('observe',{items:result, session:req.session.views});
+      console.log(result);
     }
     else {
       res.render('observe',{items:result, session:req.session.views});

@@ -1,35 +1,11 @@
 
 {{>header}}
-
 <div class="wrapper">
   <div class="container">
     <div class="row">
-
-      {{!-- <div class="span3">
-        <div class="sidebar">
-            <ul class="widget widget-menu unstyled">
-              <li class="active"><a href="/getData"><i class="menu-icon icon-list-alt"></i>Sensors
-              </a></li>
-              <li><a href="task.html"><i class="menu-icon icon-tasks"></i>Tasks <b class="label orange pull-right">
-                  19</b> </a></li>
-              <li><a class="collapsed" data-toggle="collapse" href="#togglePages1"><i class="menu-icon icon-desktop">
-                </i><i class="icon-chevron-down pull-right"></i><i class="icon-chevron-up pull-right">
-                </i>observe window </a>
-                  <ul id="togglePages1" class="collapse unstyled">
-                      <li><a href="/observe"><i class="icon-table"></i> Table</a></li>
-                      <li><a href="other-user-profile.html"><i class="icon-map-marker"></i> Graph</a></li>
-                  </ul>
-              </li>
-            </ul>
-            <!--/.widget-nav-->
-        </div>
-        <!--/.sidebar-->
-      </div>
-      <!--/.span3--> --}}
       <div class="span12">
         <div class="content">
           <!--/.module-->
-
           <div class="module">
             <div class="module-head">
                 <h3>
@@ -38,101 +14,161 @@
             <div class="module-body">
 
               <div class="row-fluid">
-                {{!-- form --}}
+                <div class="span6 mt-2">
+                  <div class="row-fluid">
+                    {{!-- list all sensors to pick by user --}}
+                    <div class="span6">
+                        <div class="control-group" >
+                          <label class="control-label" style="margin-left:5px;">Sensors</label>
+                          <div class="vertical-menu span11" id="vertical-menu1">
+                            {{#each items.data }}
+                              <a href="#">{{this.name}}</a>
+                            {{/each}}
+                            <a href="#">abc</a>
+                            <a href="#">abc</a>
+                            <a href="#">abc</a>
+                            <a href="#">abc</a>
+                            <a href="#">abc</a>
+                            <a href="#">abc</a>
+                          </div>
+                        </div>
+                        {{!-- groupType option  --}}
+                        <div class="control-group" id="">
+                          <label class="control-label mt-md-3">Group</label>
+                          <div class="controls">
+                            <label class="radio inline">
+                              <input type="radio" name="group-optionsRadios" id="radios-none" value="none" checked="">
+                              none
+                            </label>
+                            <label class="radio inline">
+                              <input type="radio" name="group-optionsRadios" id="radios-and" value="AND">
+                              AND
+                            </label>
+                            <label class="radio inline">
+                              <input type="radio" name="group-optionsRadios" id="radios-or" value="OR">
+                              OR
+                            </label>
+                          </div>
+                          <br/>
+                          {{!-- end groupType option  --}}
+                          {{!-- group title 's input field --}}
+                          <div id="group-input" class="enabled">
+                            <label class="control-label">Group 's title</label>
+                            <div class="controls" id="">
+                              <input type="text" id="group-title-input" list="group-title" class="span11"/>
+                              <datalist id="group-title">
+                                {{!-- <option value=""></option> --}}
+                              </datalist>
+                            </div>
+                            <br/>
+                          </div>
 
-                  <div class="span3">
-                    <div class="control-group" >
-                      <label class="control-label" style="margin-left:5px;">Sensors</label>
-                      <div class="vertical-menu span12" id="vertical-menu1">
-                        {{#each items.data }}
-                          <a href="#">{{this.name}}</a>
-                        {{/each}}
+                        </div>
+                      </div>
+                    <!-- form to setting the subscription -->
+                    <div class="span6">
+                      <div id="form1" class="form-vertical">
+                          <div class="control-group" >
+                            <label class="control-label">Name</label>
+                            <div class="controls" id="">
+
+                              <input type="text" name="" id="autocomplete-dynamic" class="span11"/>
+                            </div>
+                            <br/>
+                            <label class="control-label">Option</label>
+      											<div class="controls">
+      												<label class="radio inline">
+      													<input type="radio" name="form1-optionsRadios" id="Radios1" value="default" checked="">
+      													Default
+      												</label>
+      												<label class="radio inline">
+      													<input type="radio" name="form1-optionsRadios" id="Radios2" value="advanced">
+      													Advanced
+      												</label>
+      											</div>
+                            <br/>
+                            <div id="advanced-block" class="enabled">
+                              <label class="control-label" for="basicinput1">Greater than <input type="checkbox" value=""></label>
+                              <div class="controls" id="i1-1">
+                                <input type="text" id="form1_maxValue" placeholder="" class="span11" >
+                              </div>
+                              <br/>
+                              <label class="control-label" for="basicinput2">Lower than <input type="checkbox" value=""></label>
+                              <div class="controls" id="i1-2">
+                                <input type="text" id="form1_minValue" placeholder="" class="span11">
+                              </div>
+                              <br/>
+                              <label class="control-label" for="basicinput2">Equal to <input type="checkbox" value=""></label>
+                              <div class="controls" id="i1-3">
+                                <input type="text" id="form1_equalValue" placeholder="" class="span11">
+                              </div>
+                              <br/>
+                              <label class="control-label" for="selectOption1">Precision</label>
+                              <div class="controls" id="o1-1">
+                                <select tabindex="1" id="form1_precisionValue" data-placeholder="Select here.." class="span11" >
+                                  <option value="">Select here..</option>
+                                  <option value="0">0</option>
+                                  <option value="1">1</option>
+                                </select>
+                              </div>
+                              <br/>
+                              <label class="control-label" for="basicinput3">Between <input type="checkbox" value=""></label>
+
+                              <div class="row-fluid">
+                                <div class="span6">
+                                  <div class="controls">
+                                    <div class="input-prepend">
+            													<span class="add-on">min </span>
+                                      <input class="span9" type="text" id="form1_b_minValue">
+            												</div>
+                                  </div>
+
+                                </div>
+                                <div class="span6">
+                                  <div class="controls">
+                                    <div class="input-prepend">
+            													<span class="add-on">max</span>
+                                      <input class="span9" type="text" id="form1_b_maxValue">
+            												</div>
+                                  </div>
+
+                                </div>
+                              </div>
+                              {{!-- end row-fluid --}}
+                            </div>
+
+                          </div>
+
+                          <div class="control-group ">
+      												<button type="button" class="btn btn-success pull-right" id="form1-add"> ADD <i class="icon-plus-sign"></i></button>
+      										</div>
+                          <br/>
+                      </div>
+                      {{!-- end form1 --}}
+                    </div>
+                    {{!-- end span6 --}}
+
+                  </div>
+                </div>
+                {{!-- show current subscription --}}
+                <div class="span6">
+                  <h4 class="align-center">Subscription</h4>
+                  <div class="subscription-container">
+
+                    <div id="subscription-board">
+                      <div class="span12" >
+                        {{!-- subscription template will append here --}}
                       </div>
                     </div>
-                  <div class="controls" id="">
+                    <hr style="border-top:1px dashed #ccc;">
+                    <div class="pull-right">
+                      <button type="button" class="btn btn-danger" id="subscription-clearBtn">Clear</button>
+                      <button type="button" class="btn btn-info" id="subscrition-submitBtn">Submit</button>
+  						      </div>
                   </div>
+
                 </div>
-
-                <div class="span4">
-                  <div id="form1" class="form-vertical">
-                      <div class="control-group" >
-                        <label class="control-label">Name</label>
-                        <div class="controls" id="">
-
-                          <input type="text" name="" id="autocomplete-dynamic" class="span12"/>
-                        </div>
-                        <br/>
-                        <label class="control-label">Option</label>
-  											<div class="controls">
-  												<label class="radio inline">
-  													<input type="radio" name="form1-optionsRadios" id="Radios1" value="default" checked="">
-  													Default
-  												</label>
-  												<label class="radio inline">
-  													<input type="radio" name="form1-optionsRadios" id="Radios2" value="advanced">
-  													Advanced
-  												</label>
-  											</div>
-                        <br/>
-                        <div id="advanced-block" class="enabled">
-                          <label class="control-label" for="basicinput1">Greater than <input type="checkbox" value=""></label>
-                          <div class="controls" id="i1-1">
-                            <input type="text" id="form1_maxValue" placeholder="" class="span12" >
-                          </div>
-                          <br/>
-                          <label class="control-label" for="basicinput2">Lower than <input type="checkbox" value=""></label>
-                          <div class="controls" id="i1-2">
-                            <input type="text" id="form1_minValue" placeholder="" class="span12">
-                          </div>
-                          <br/>
-                          <label class="control-label" for="basicinput2">Equal to <input type="checkbox" value=""></label>
-                          <div class="controls" id="i1-3">
-                            <input type="text" id="form1_equalValue" placeholder="" class="span12">
-                          </div>
-                          <br/>
-                          <label class="control-label" for="selectOption1">Precision</label>
-                          <div class="controls" id="o1-1">
-                            <select tabindex="1" id="form1_precisionValue" data-placeholder="Select here.." class="span12" >
-                              <option value="">Select here..</option>
-                              <option value="0">0</option>
-                              <option value="1">1</option>
-                            </select>
-                          </div>
-                          <br/>
-                          <label class="control-label" for="basicinput3">Between <input type="checkbox" value=""></label>
-
-                          <div class="row-fluid">
-                            <div class="span6">
-                              <div class="controls">
-                                <div class="input-prepend">
-        													<span class="add-on">min </span>
-                                  <input class="span9" type="text" id="form1_b_minValue">
-        												</div>
-                              </div>
-
-                            </div>
-                            <div class="span6">
-                              <div class="controls">
-                                <div class="input-prepend">
-        													<span class="add-on">max</span>
-                                  <input class="span9" type="text" id="form1_b_maxValue">
-        												</div>
-                              </div>
-
-                            </div>
-                          </div>
-                          {{!-- end row-fluid --}}
-                        </div>
-
-                      </div>
-
-                      <div class="control-group pull-right">
-  												<button type="button" class="btn btn-success " id="form1-add"> ADD <i class="icon-plus-sign"></i></button>
-  										</div>
-                  </div>
-                </div>
-
-                <div class="span5">
+                {{!-- <div class="span5">
                   <form id="form2" class="form-vertical">
                     <div class="control-group" >
                       <div class="controls" id="" >
@@ -147,12 +183,13 @@
                       </div>
                     </div>
                   </form>
-                </div>
+                </div> --}}
               </div>
 
             </div>
           </div>
 
+          {{!-- show all sensor  --}}
           <div class="module">
               <div class="module-head">
                   <h3>
@@ -167,7 +204,7 @@
               </div>
               <div class="module-body">
 
-                  <table class="table table-condensed table-striped datatable-1" id="sub-table">
+                  <table class="table table-condensed table-striped datatable-1" id="sub-table" >
                     <thead>
                     <tr >
                       <th>#</th>
@@ -229,9 +266,106 @@
   var sub_result = {{{subscribe_sensor}}};
   var allSensor = {{{toJSON items}}};
 </script>
+{{!-- subscription template  --}}
+<script id="subscription-temp" type="text/x-handlebars-template">
+  <div class="card" >
+    <div class="card-header" id="heading-\{{index}}">
+      <h5 class="mb-0">
+        <i class="icon-remove font-warning pull-right"></i>
+        <i class="icon-edit font-safe pull-right"></i>
 
+        <a class="" data-toggle="collapse" data-target="#sub-\{{index}}" aria-expanded="false" aria-controls="sub-\{{index}}">
+          \{{name}}
+        </a>
+      </h5>
+    </div>
+    <div id="sub-\{{index}}" class="collapse" aria-labelledby="heading-\{{index}}" data-parent="#subscription-board">
+      <div class="card-body">
+        <dl class="dl-horizontal">
+          <dt>Name</dt>
+          <dd>
+            \{{name}}
+          </dd>
+          <hr/>
+          <dt>Option</dt>
+          <dd>
+            \{{option}}
+          </dd>
+          <hr/>
+          \{{#if condition}}
+          <dt>Condition</dt>
+          <dd>
+            <ul class="list-style-num">
+              \{{#each condition}}
+              <li>type: \{{this.type}}, value: \{{this.value}} </li>
+              \{{/each}}
+            </ul>
+          </dd>
+          <hr/>
+          \{{/if}}
+        </dl>
+      </div>
+    </div>
+  </div>
+</script>
+{{!-- subscriptions group template --}}
+<script id="subscriptionGroup-temp" type="text/x-handlebars-template">
+  <div class="card" >
+    <div class="card-header" id="heading-\{{index}}">
+      <h5 class="mb-0">
+        <i class="icon-remove font-warning pull-right"></i>
+        <i class="icon-edit font-safe pull-right"></i>
+
+        <a class="" data-toggle="collapse" data-target="#sub-\{{index}}" aria-expanded="false" aria-controls="sub-\{{index}}">
+          \{{groupTitle}}
+        </a>
+      </h5>
+    </div>
+    <div id="sub-\{{index}}" class="collapse" aria-labelledby="heading-\{{index}}" data-parent="#subscription-board">
+      <div class="card-body">
+        <dl class="dl-horizontal">
+          <dt>Group 's title</dt>
+          <dd>
+            \{{groupTitle}}
+          </dd>
+          <hr/>
+          <dt>Option</dt>
+          <dd>
+            \{{option}}
+          </dd>
+          <hr/>
+          <dt>Group Type</dt>
+          <dd>\{{groupType}}</dd>
+          <hr/>
+          <dt>Condition</dt>
+          <dd>
+            <ul class="list-style-num">
+              \{{#each condition}}
+              <li>type: \{{this.type}}, value: \{{this.value}} </li>
+              \{{/each}}
+            </ul>
+          </dd>
+          <hr/>
+          <dt>Sensors</dt>
+          <dd class="list-description">
+            <ul id="ul-\{{index}}">
+              \{{#each sensorName as |item|}}
+              <li>
+              \{{item}}
+              <i class="icon-trash pull-right" id="list-\{{@index}}"></i>
+              </li>
+              \{{/each}}
+            </ul>
+          </dd>
+          <hr/>
+        </dl>
+      </div>
+    </div>
+  </div>
+</script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/handlebars.js/4.0.12/handlebars.min.js" type="text/javascript"></script>
+<script src="js/constructor/subscription.js" type="text/javascript"></script>
 <script src="js/getAll.js" type="text/javascript"></script>
-
 <div class="modal fade" id="myModal" role="dialog">
   <div class="modal-dialog">
     <!-- Modal content-->

@@ -61,7 +61,7 @@ var searchSubList_withSubName = (name, callback) => {
       path:'_sensorID',
       select:'_id name temp date onConnect type'
     })
-    .select('subscriberName option condition')
+    .select('subscriberName option condition groupType')
     .exec()
     .then(docs => {
       if(docs && docs.length){
@@ -83,7 +83,8 @@ var searchSubList_withSubName = (name, callback) => {
                _sensorID: sensors,
                subscriberName: doc.subscriberName,
                option: doc.option,
-               condition: doc.condition
+               condition: doc.condition,
+               groupType: doc.groupType
             };
             result.push(item);
           }
@@ -198,7 +199,7 @@ var subscribeMany = (name,userID,subscription) => {
       _sensorID : doc._sensorID.map(sensorID => ObjectId(sensorID)),//ObjectId(doc._sensorID),
       subscriberName : name,
       condition: convertCondition(doc.condition),
-      groupType: (typeof doc.groupType === 'undefined') ? "none" : doc.groupType
+      groupType: (typeof doc.groupType === 'undefined') ? null : doc.groupType
     };
   });
   return new Promise((resolve, reject) => {
@@ -275,7 +276,7 @@ var notificationList = (sensorID,currentValue,callback) => {
     path:'_subscriber',
     select:'_id socketID onConnect'
   })
-  .select('_id _subscriber _sensorID option condition previousValue groupType')
+  .select('_id _subscriber _sensorID option condition previousValue groupType previousMatch')
   .exec((err,results) => {
 
     if(err) {

@@ -22,12 +22,7 @@ var SubscribeListSchema = new mongoose.Schema({
   //flag ,get to know previous is matching condition
   previousMatch: {type: Boolean,default: null},
   previousValue :{type: Number,default: null},
-  groupType :{type:String,default:'none'}
-  // user_list: [{
-  //   _id:false,
-  //   socketID:{type: String,required: true},
-  //   option:{type: String,default: 'default'}
-  // }]
+  groupType :{type:String,default:null}
 },{collection: 'SubscribeList'});
 module.exports = mongoose.model('SubscribeList', SubscribeListSchema);
 //console.log();

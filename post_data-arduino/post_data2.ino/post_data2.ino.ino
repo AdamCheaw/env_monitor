@@ -14,12 +14,12 @@ DHT dht(DHTPIN, DHTTYPE); //// Initialize DHT sensor for normal 16mhz Arduino
 float temp; //Stores temperature value
 ///////please enter your sensitive data in the Secret tab/arduino_secrets.h
 /////// Wifi Settings ///////
-char ssid[] = "dlink-cnc";//type your ssid
-char pass[] = "12345678";//type your password
+char ssid[] = "CHEAW";//type your ssid
+char pass[] = "0978579421";//type your password
 String n = "sensor1";
 //String jsonStr = "{\"name\":\"Sensor-1\",\"temp\":\"25.0\"}";// 定義JSON字串
 
-char serverAddress[] = "192.168.0.100";  // server address
+char serverAddress[] = "192.168.0.4";  // server address
 int port = 3000;
 
 WiFiClient wifi;

@@ -1,5 +1,118 @@
-var socket = io();
-$('#sub-table').on('click', '.unsubBtn', function(e) {
+const socket = io();
+//filter sensor value with condition to finding match or not
+const filterByCondition = (condition,sensorValue) => {
+  for(let i = 0;i < condition.length;i++) {
+    if(condition[i].type == "max" && Number(sensorValue) > Number(condition[i].value)) {
+      return true;
+    }
+    else if(condition[i].type == "min" && Number(sensorValue) < Number(condition[i].value)) {
+      return true;
+    }
+    else if (condition[i].type == "precision") {
+      return true;
+    }
+    else if (condition[i].type == "equal" && Number(sensorValue) == Number(condition[i].value)) {
+      return true;
+    }
+    else if (condition[i].type == "between" &&
+             ( Number(sensorValue) > Number(condition[i].minValue) &&
+               Number(sensorValue) < Number(condition[i].maxValue)
+             )
+            )
+    {
+      return true;
+    }
+  }
+  return false;
+}
+//changing single subscription 's view
+const changeOneSubscriptionView = (docs) => {
+  let html = "";
+  if(docs.option == "default") {
+    html = `<span class="font-blue">${docs._sensorID[0].temp}</span>`;
+  }
+  else if(docs.option == "advanced") {
+    if(filterByCondition(docs.condition,docs._sensorID[0].temp)){
+      html = `<span class="font-warning"><i class="icon-warning-sign font-md"></i> ${docs._sensorID[0].temp}</span>`;
+    }
+    else {
+      html = '<span class="font-safe"><i class="icon-star font-lg"></i></span>';
+    }
+  }
+  //change Subscription value
+  $("#subscription-"+docs._id+" .sensor-value").html(html);
+}
+//changing group subscription 's table info
+const changeTableView = (docs) => {
+  let condition = docs.condition;
+  docs._sensorID.forEach(doc => {
+    let value = date = status = "";
+    if(filterByCondition(condition,doc.temp)) {
+      value = `<span class="font-warning"><i class="icon-warning-sign font-md"></i> ${doc.temp}</span>`;
+    }
+    else {
+      value = `<span class="font-safe"><i class="icon-star font-md"></i></span>`;
+    }
+    if(doc.onConnect){
+      status = '<b class="online">online</b>';
+    }
+    else {
+      status = '<b class="offline">offline</b>';
+    }
+    date = moment.parseZone(doc.date).local().format('YYYY MMM Do, h:mm:ssa');
+    $(`#table-row-${doc._id} .value`).html(value);
+    $(`#table-row-${doc._id} .date`).html(date);
+    $(`#table-row-${doc._id} .status`).html(status);
+  });
+}
+//changing group subscription 's status (safe or not safe) symbol
+const changeGroupStatus = (docs) => {
+  let sensors = docs._sensorID;
+  var isSafe
+  if(docs.groupType == "AND") {
+    //all the sensor value need to match with condition
+    isSafe = false;
+    for(let i = 0;i < sensors.length;i++) {
+      if(!sensors[i].onConnect) {
+        isSafe = false;
+        break;
+      }
+      //if a single sensor did not match condition , return safe mode
+      //console.log(filterByCondition(docs.condition,sensors[i].temp));
+      if(!filterByCondition(docs.condition,sensors[i].temp)) {
+        isSafe = true;
+        break;
+      }
+    }
+    console.log("check finish");
+  }
+  else if(docs.groupType == "OR") {
+    //just need a sensor matching condition
+    isSafe = true;
+    for(let i = 0;i < sensors.length;i++) {
+      if(!sensors[i].onConnect) {
+        isSafe = false;
+        break;
+      }
+      //if a single sensor matching condition , return no safe mode
+      if(filterByCondition(docs.condition,sensors[i].temp)) {
+        isSafe = false;
+        break;
+      }
+    }
+  }
+  if(isSafe) {
+    html = '<span class="font-safe"><i class="icon-star"></i></span>';
+    $("#subscription-"+docs._id+" .sensor-value").html(html);
+  }
+  else if(!isSafe) {
+
+    html = '<span class="font-warning"><i class="icon-warning-sign "></i></span>';
+    $("#subscription-"+docs._id+" .sensor-value").html(html);
+  }
+
+}
+$('#subscription-1').on('click', '.unsubBtn', function(e) {
   idClicked = e.target.id;//get btn clicked id
   idClicked = idClicked.replace('unsubBtn-', '');
   console.log("idClicked: "+idClicked);
@@ -26,11 +139,11 @@ $('#sub-table').on('click', '.unsubBtn', function(e) {
            // $("#myModal").modal("hide");
         },
         success: function(data){
-          $("#unsubBtn-"+idClicked).parent().parent().remove();
-          alert("unsubscribe success!");
+          $("#subscription-"+idClicked).parent().parent().remove();
+          toastr.success('unsubscribe success!')
         },
         error: function(){
-          alert("unsubscribe failed!");
+          toastr.error('unsubscribe failed!')
         }
     })
 
@@ -52,7 +165,17 @@ socket.on('connect', function () {
 
 });
 socket.on('notification', function(SensorData) {
-
+  if(SensorData.groupType == 'AND') {
+    changeGroupStatus(SensorData);
+    changeTableView(SensorData);
+  }
+  else if(SensorData.groupType == 'OR') {
+    changeTableView(SensorData);
+    changeGroupStatus(SensorData);
+  }
+  else {
+    changeOneSubscriptionView(SensorData);
+  }
   //var i = $('#'+SensorData._id+' .index').html();
   // var html = ""
   // if(SensorData.option == "default") {
@@ -118,7 +241,6 @@ socket.on('sensor disconnect', function(data) {
   html = "?";
   $("#"+data.disconnectSensorID+' .sensor-temp').html(html);
   console.log("sensor disconnect :"+data.disconnectSensorID);
-
 });
 socket.on('disconnect', function () {
   console.log('Disconnected from server');

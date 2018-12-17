@@ -1,5 +1,30 @@
 var hbs = require('handlebars');
+var filterByCondition = (condition,sensorValue) => {
+  for(let i = 0;i < condition.length;i++) {
+    if(condition[i].type == "max" && Number(sensorValue) > Number(condition[i].value)) {
+      return true;
+    }
+    else if(condition[i].type == "min" && Number(sensorValue) < Number(condition[i].value)) {
+      return true;
+    }
+    else if (condition[i].type == "precision") {
+      return true;
+    }
+    else if (condition[i].type == "equal" && Number(sensorValue) == Number(condition[i].value)) {
+      return true;
+    }
+    else if (condition[i].type == "between" &&
+             ( Number(sensorValue) > Number(condition[i].minValue) &&
+               Number(sensorValue) < Number(condition[i].maxValue)
+             )
+            )
+    {
+      return true;
+    }
 
+  }
+  return false;
+}
 module.exports = {
   ifeq: function(a, b, options){
     if (a === b) {
@@ -58,7 +83,46 @@ module.exports = {
       }
     }
     else {
-      value = sensorValue;
+      value = new hbs.SafeString(
+        '<span class="font-blue">'
+        + sensorValue
+        + '</span>');
+    }
+    return value;
+  },
+  loadGroupValue: (sensors, groupType, condition) => {
+    var value;
+    if(groupType == "AND") {
+      value = '<span class="font-warning"><i class="icon-warning-sign "></i></span>';
+      //compare all sensor with multiple condition
+      for(let i = 0;i < sensors.length;i++) {
+        //if a single sensor disconnect , return noSafe mode
+        if(!sensors[i].onConnect) {
+          value = '<span class="font-warning"><i class="icon-warning-sign"></i></span>'
+          break;
+        }
+        //if a single sensor did not match condition , return safe mode
+        if(!filterByCondition(condition,sensors[i].temp)){
+          value = '<span class="font-safe"><i class="icon-star "></i></span>';
+          break;
+        }
+      }
+
+    }
+    else if(groupType == "OR") {
+      value = '<span class="font-safe"><i class="icon-star "></i></span>';
+      for(let i = 0;i < sensors.length;i++) {
+        //if a single sensor disconnect , return noSafe mode
+        if(!sensors[i].onConnect) {
+          value = '<span class="font-warning"><i class="icon-warning-sign "></i></span>'
+          break;
+        }
+        //if a single sensor match a condition , return noSafe mode
+        if(filterByCondition(condition,sensors[i].temp)){
+          value = '<span class="font-warning"><i class="icon-warning-sign "></i></span>';
+          break;
+        }
+      }
     }
     return value;
   },
@@ -91,5 +155,11 @@ module.exports = {
     	res += "..."
     }
     return res;
+  },
+  isGroup: function(value, options){
+    if (value == "AND" || "OR") {
+        return true;
+    }
+    return false;
   }
 }

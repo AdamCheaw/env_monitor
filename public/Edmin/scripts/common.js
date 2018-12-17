@@ -1,23 +1,25 @@
 ﻿$(document).ready(function () {
     if($('.datatable-1').length>0){
-        $('.datatable-1').dataTable();
+        $('.datatable-1').dataTable( {
+        });
+
         $('.dataTables_paginate').addClass('btn-group datatable-pagination');
         $('.dataTables_paginate > a').wrapInner('<span />');
         $('.dataTables_paginate > a:first-child').append('<i class="icon-chevron-left shaded"></i>');
         $('.dataTables_paginate > a:last-child').append('<i class="icon-chevron-right shaded"></i>');
-    
+
         $( '.slider-range').slider({
 			    range: true,
 			    min: 0,
 			    max: 20000,
-			    values: [ 3000, 12000 ],			
+			    values: [ 3000, 12000 ],
 			    slide: function(event, ui) {
 				    $(this).find('.ui-slider-handle').attr('title', ui.value);
 			    },
 	    });
-	
+
         $( '#amount' ).val( '$' + $( '.slider-range' ).slider( 'values', 0 ) + ' - $' + $( '.slider-range' ).slider( 'values', 1 ) );
-    
+
 
     //Graph/Chart index.html
 
@@ -87,16 +89,16 @@
         var d1 = [ [0, 1], [1, 14], [2, 5], [3, 4], [4, 5], [5, 1], [6, 14], [7, 5],  [8, 5] ];
 		var d2 = [ [0, 5], [1, 2], [2, 10], [3, 1], [4, 9],  [5, 5], [6, 2], [7, 10], [8, 8] ];
 
-		var plot = $.plot($("#placeholder"), 
+		var plot = $.plot($("#placeholder"),
 		[ { data: d1, label: "Data A" }, { data: d2, label: "Data B" } ], {
-			lines: { 
-				show: true, 
-				fill: false, 
-				lineWidth: 2 
+			lines: {
+				show: true,
+				fill: false,
+				lineWidth: 2
 			},
-			points: { 
-				show: true, 
-				lineWidth: 5 
+			points: {
+				show: true,
+				lineWidth: 5
 			},
 			grid: {
 				clickable: true,
@@ -117,14 +119,14 @@
 
 		var plot = $.plot($("#placeholder2"),
 			   [ { data: d1, label: "Data Y"}, { data: d2, label: "Data X" } ], {
-					lines: { 
-						show: true, 
+					lines: {
+						show: true,
 						fill: true, /*SWITCHED*/
-						lineWidth: 2 
+						lineWidth: 2
 					},
-					points: { 
-						show: true, 
-						lineWidth: 5 
+					points: {
+						show: true,
+						lineWidth: 5
 					},
 					grid: {
 						clickable: true,
@@ -157,18 +159,18 @@
 			if (item) {
 				if (previousPoint != item.dataIndex) {
 					previousPoint = item.dataIndex;
-					
+
 					$("#gridtip").remove();
 					var x = item.datapoint[0].toFixed(0),
 						y = item.datapoint[1].toFixed(0);
-					
+
 					showTooltip(item.pageX, item.pageY,
 								"x : " + x + "&nbsp;&nbsp;&nbsp; y : " + y);
 				}
 			}
 			else {
 				$("#gridtip").remove();
-				previousPoint = null;            
+				previousPoint = null;
 			}
 		});
 

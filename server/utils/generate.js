@@ -11,14 +11,16 @@ var generateSensorData = (data,subInfo) => {
 };
 var generateNotification = (data) => {
   return {
-    _id: data.name,
+    _id: data._id,
     option: data.option,
     condition: data.condition,
+    groupType: data.groupType,
     _sensorID: data._sensorID.map(sensor => {
       return {
         _id: sensor._id,
         temp: sensor.temp,
-        date: sensor.date
+        onConnect: sensor.onConnect,
+        date: sensor.date,
       };
     })
   };

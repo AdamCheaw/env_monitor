@@ -43,7 +43,7 @@ var generate_NotificationList = (results,currentValue) => {
         for(let j = 0;j < result._sensorID.length;j++) {
           var thisSensor = result._sensorID[j];
           //if sensor no on Connect , break the loop
-          console.log(result._sensorID[j]);
+          // console.log(result._sensorID[j]);
           if(!thisSensor.onConnect) {
             match = false;
             //console.log("match");
@@ -91,7 +91,8 @@ var generate_NotificationList = (results,currentValue) => {
               _id: sensor._id,
               name: sensor.name,
               temp: sensor.temp,
-              date: sensor.date
+              date: sensor.date,
+              onConnect:sensor.onConnect
             };
           }),
           groupType: result.groupType,
@@ -102,7 +103,7 @@ var generate_NotificationList = (results,currentValue) => {
     }
     // when result.option == "advanced"
     // just need to match one sensor condition
-    else if(result.option == "advanced" && (result.groupType == "OR" || result.groupType == "none" )){
+    else if(result.option == "advanced" && (result.groupType == "OR" || result.groupType == null )){
       var match = false;//for determine match or not
       //compare every condition in the subscription
       for(let i = 0;i < result.condition.length;i++) {
@@ -167,7 +168,8 @@ var generate_NotificationList = (results,currentValue) => {
               _id: sensor._id,
               name: sensor.name,
               temp: sensor.temp,
-              date: sensor.date
+              date: sensor.date,
+              onConnect:sensor.onConnect
             };
           }),
           groupType: result.groupType,
@@ -177,7 +179,7 @@ var generate_NotificationList = (results,currentValue) => {
     }
     //when previousMatch is true and current condition did not matching
     //need to notification user condition is back to normal
-    else if(result.previousMatch) {
+    if(result.previousMatch) {
       doc = {
         _id: result._id,
         socketID : result._subscriber.socketID,
@@ -189,19 +191,19 @@ var generate_NotificationList = (results,currentValue) => {
             _id: sensor._id,
             name: sensor.name,
             temp: sensor.temp,
-            date: sensor.date
+            date: sensor.date,
+            onConnect:sensor.onConnect
           };
         }),
         groupType: result.groupType,
         previousMatch: false
       };
-
   }
-  
     if(doc._id) {
       data.push(doc);
     }
   });
+  //console.log(data);
   return data;
 }
 

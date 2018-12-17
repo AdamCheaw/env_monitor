@@ -1,5 +1,89 @@
 
 var idClicked;
+var subs = new Subscription();
+//get user condition input field and output to an array of object
+function getCondition() {
+  let condition = [];
+  if($("#form1_maxValue").val()) {
+    var data = {
+      type: "max",
+      value: Number($("#form1_maxValue").val())
+    };
+    condition.push(data);
+  }
+  if($("#form1_minValue").val()) {
+    var data = {
+      type: "min",
+      value: Number($("#form1_minValue").val())
+    };
+    condition.push(data);
+  }
+  if($("#form1_precisionValue option:selected").val()) {
+    var data = {
+      type: "precision",
+      value: $("#form1_precisionValue option:selected").val()
+    };
+    condition.push(data);
+  }
+  if($("#form1_b_minValue").val() && $("#form1_b_minValue").val()) {
+    var data = {
+      type: "between",
+      minValue: Number($("#form1_b_minValue").val()),
+      maxValue: Number($("#form1_b_maxValue").val()),
+    };
+    condition.push(data);
+  }
+  if($("#form1_equalValue").val()) {
+    var data = {
+      type: "equal",
+      value: Number($("#form1_equalValue").val())
+    };
+    condition.push(data);
+  }
+  return condition;
+}
+//according all Subscription refresh subscription board
+function refreshSubscription(docs) {
+  $("#subscription-board .span12").html("");
+  $("#group-title").html("");
+  let i = 0;
+  docs.forEach(doc => {//default
+    if(doc.option == "default") {
+      var scriptHtml = $("#subscription-temp")[0].innerHTML;
+      var template = Handlebars.compile(scriptHtml);
+      var obj = { index:i, name:doc.name, option:"default" };
+      var html = template(obj);
+      $("#subscription-board .span12").append(html);
+    }
+    else {//advanced
+      if(doc.groupType == "AND" || doc.groupType == "OR") { //group
+        var scriptHtml = $("#subscriptionGroup-temp")[0].innerHTML;
+        var template = Handlebars.compile(scriptHtml);
+        var obj = {
+          index: i,
+          groupTitle: doc.groupTitle,
+          option: "advanced",
+          condition: doc.condition,
+          sensorName: doc.sensorName,
+          groupType: doc.groupType
+        };
+        var html = template(obj);
+        $("#subscription-board .span12").append(html);
+        //append option to group-title 's input
+        html = `<option>${doc.groupTitle}</option>`;
+        $("#group-title").append(html);
+      }
+      else {
+        var scriptHtml = $("#subscription-temp")[0].innerHTML;
+        var template = Handlebars.compile(scriptHtml);
+        var obj = { index:i, name:doc.name, option:"advanced", condition:doc.condition };
+        var html = template(obj);
+        $("#subscription-board .span12").append(html);
+      }
+    }
+    i += 1;
+  })
+}
 $("#vertical-menu1 a:first").addClass("active");
 $(document).ready(function(){
     // $("#myModal").modal("show");
@@ -196,12 +280,38 @@ $(document).ready(function(){
       $("#form1 #autocomplete-dynamic").val(text);
     });
     //switching the advanced option enabled or disabled
-    $("#form1 #Radios2").click(function(){
+    $("#form1 #Radios2").click(function(){//advanced
       $("#form1 #advanced-block").removeClass("enabled");
     });
-    $("#form1 #Radios1").click(function(){
+    $("#form1 #Radios1").click(function(){//default
       $("#form1 #advanced-block").addClass("enabled");
+      $("#group-input").addClass("enabled");
+      //$("#group-input").val(" ");
+      $("#radios-none").prop("checked", true);
+      $("#radios-and").prop("checked", false);
+      $("#radios-or").prop("checked", false);
     });
+
+    //switching groupType radios
+    $("#radios-none").click(function(){
+      $("#form1 #advanced-block").addClass("enabled");
+      $("#group-input").addClass("enabled");
+      $("#Radios1").prop("checked", true);
+      $("#Radios2").prop("checked", false);
+    });
+    $("#radios-and").click(function(){
+      $("#form1 #advanced-block").removeClass("enabled");
+      $("#group-input").removeClass("enabled");
+      $("#Radios1").prop("checked", false);
+      $("#Radios2").prop("checked", true);
+    });
+    $("#radios-or").click(function(){
+      $("#form1 #advanced-block").removeClass("enabled");
+      $("#group-input").removeClass("enabled");
+      $("#Radios1").prop("checked", false);
+      $("#Radios2").prop("checked", true);
+    });
+
     //when form1 add btn being click, adding to subscription
     var subscription = [];//used for saving multiple subscrition
     $('#form1').on('click', '#form1-add', function(e) {
@@ -219,93 +329,74 @@ $(document).ready(function(){
         return;
       }
       var form1_optionValue = $("input[name='form1-optionsRadios']:checked").val();
-      if(form1_optionValue == "default")//optionValue is default
-      {
-        var form1_Data = {
+      var groupType = $("input[name='group-optionsRadios']:checked").val();
+      var groupTitle = $("#group-title-input").val();
+      if(form1_optionValue == "default"){ //optionValue is default
+        var doc = {
             _sensorID: [form1_id],
             name: form1_inputName,
             option: form1_optionValue,
-            groupType: "none"
+            groupType: null,
         };
+        subs.addOneSubscription(doc);
       }
       else {//optionValue is advanced
-        var condition = [];
-        if($("#form1_maxValue").val()) {
-          var data = {
-            type: "max",
-            value: Number($("#form1_maxValue").val())
-          };
-          condition.push(data);
-        }
-        if($("#form1_minValue").val()) {
-          var data = {
-            type: "min",
-            value: Number($("#form1_minValue").val())
-          };
-          condition.push(data);
-        }
-        if($("#form1_precisionValue option:selected").val()) {
-          var data = {
-            type: "precision",
-            value: $("#form1_precisionValue option:selected").val()
-          };
-          condition.push(data);
-        }
-        if($("#form1_b_minValue").val() && $("#form1_b_minValue").val()) {
-          var data = {
-            type: "between",
-            minValue: Number($("#form1_b_minValue").val()),
-            maxValue: Number($("#form1_b_maxValue").val()),
-          };
-          condition.push(data);
-        }
-        if($("#form1_equalValue").val()) {
-          var data = {
-            type: "equal",
-            value: Number($("#form1_equalValue").val())
-          };
-          condition.push(data);
-        }
-
-        //advanced input field is empty
-        if(condition.length == 0) {
+        let condition = getCondition();
+        //advanced input field is empty ,alert warning
+        if(condition.length > 0) {
           swal("something went wrong", "advanced condition can't be empty", "warning")
           return;
         }
-        var form1_Data = {
-          _sensorID: [form1_id],
-          name: form1_inputName,
-          option: "advanced",
-          condition: condition,
-          groupType: "none"
-        };
+        if(groupType == "AND" || groupType == "OR") {
+          var doc = {
+            _sensorID: [form1_id],
+            sensorName: [form1_inputName],
+            option: "advanced",
+            condition: condition,
+            groupType: groupType,
+            groupTitle: groupTitle
+          };
+          subs.addToGroup(doc);
+        }
+        else {//option value is advanced and groupType is none||null
+          var doc = {
+            _sensorID: [form1_id],
+            name: form1_inputName,
+            option: "advanced",
+            condition: condition,
+            groupType: groupType,
+          };
+          subs.addOneSubscription(doc);
+        }
       }
+      refreshSubscription(subs.getAllSubscription())
+      console.log(subs.getAllSubscription());
       // end else //
       //find user adding to subscription before
-      var findMatch = subscription.findIndex(obj => obj.name == form1_Data.name);
-      if(findMatch > -1) {
-        subscription.splice(findMatch, 1);//remove the matching subscription
-      }
-      subscription.push(form1_Data);
-      //show to the subscription
-      $("#form2 #form2-subscription").val(
-        JSON.stringify(subscription.map(thisSub =>{
-          if(thisSub.option == "default") {
-            return {
-              name:thisSub.name,
-              option:thisSub.option
-            };
-          }
-          else {
-            return {
-              name:thisSub.name,
-              option:thisSub.option,
-              condition:thisSub.condition
-            };
-          }
-        }),null,3)
-      );
-
+    //   var findMatch = subscription.findIndex(obj => obj.name == form1_Data.name);
+    //   if(findMatch > -1) {
+    //     subscription.splice(findMatch, 1);//remove the matching subscription
+    //   }
+    //   subscription.push(form1_Data);
+    //   //show to the subscription
+    //   $("#form2 #form2-subscription").val(
+    //     JSON.stringify(subscription.map(thisSub =>{
+    //       if(thisSub.option == "default") {
+    //         return {
+    //           name:thisSub.name,
+    //           option:thisSub.option
+    //         };
+    //       }
+    //       else {
+    //         return {
+    //           name:thisSub.name,
+    //           option:thisSub.option,
+    //           condition:thisSub.condition
+    //         };
+    //       }
+    //     }),null,3)
+    //   );
+    //
     });
 
     //clear subscription
@@ -351,10 +442,8 @@ $(document).ready(function(){
               swal("something went wrong", msg.msg, "error")
             }
         })
-
       }
       else {
-
         swal("something went wrong", "subscription is empty", "warning")
       }
     });
