@@ -84,6 +84,28 @@ function refreshSubscription(docs) {
     i += 1;
   })
 }
+//filter the subscription and post to back-end
+function filterSubscriptions(docs) {
+  let results = docs.map(doc => {
+    if(doc.groupType == "AND" || doc.groupType == "OR") {//group
+      return {
+        _sensorID: doc._sensorID,
+        option: doc.option,
+        condition: doc.condition,
+        groupTitle: doc.groupTitle,
+        groupType: doc.groupType
+      }
+    }
+    else { //advanced , no group
+      return {
+        _sensorID: doc._sensorID,
+        option: doc.option,
+        condition: (typeof doc.condition === 'undefined') ? [] : doc.groupCondition
+      }
+    }
+  });
+  return results;
+}
 $("#vertical-menu1 a:first").addClass("active");
 $(document).ready(function(){
     // $("#myModal").modal("show");
@@ -328,6 +350,12 @@ $(document).ready(function(){
         swal("something went wrong", "this sensor does not exist", "warning")
         return;
       }
+
+      if(subs.findSensorDuplicate(form1_id) !== undefined) {
+        console.log(subs.findSensorDuplicate(form1_id));
+        swal("something went wrong", "this sensor has been subscribe already", "warning")
+        return;
+      }
       var form1_optionValue = $("input[name='form1-optionsRadios']:checked").val();
       var groupType = $("input[name='group-optionsRadios']:checked").val();
       var groupTitle = $("#group-title-input").val();
@@ -343,11 +371,15 @@ $(document).ready(function(){
       else {//optionValue is advanced
         let condition = getCondition();
         //advanced input field is empty ,alert warning
-        if(condition.length > 0) {
+        if(condition.length < 0) {
           swal("something went wrong", "advanced condition can't be empty", "warning")
           return;
         }
         if(groupType == "AND" || groupType == "OR") {
+          if(!groupTitle && !groupTitle.length) {
+            swal("something went wrong", "group 's title can't be empty", "warning")
+            return;
+          }
           var doc = {
             _sensorID: [form1_id],
             sensorName: [form1_inputName],
@@ -406,13 +438,14 @@ $(document).ready(function(){
     });
 
     //submit subscription
-    $("#form2 #form2-submitBtn").click(function(){
-      if(subscription.length > 0)
+    $(".subscription-container #subscrition-submitBtn").click(function(){
+      let docs = filterSubscriptions(subs.getAllSubscription());
+      if(docs.length > 0)
       { //calling ajax to post subscription
         $.ajax({
             type        : 'POST',
             url         : '/getData/subscribeMany',
-            data        : {subscription}, // {subscription : subscription}
+            data        : { subscription:docs },
             dataType    : 'json',
             // encode      : true,
             beforeSend: function(){
@@ -420,17 +453,16 @@ $(document).ready(function(){
               //   image       : "",
               //   fontawesome : "fa fa-cog fa-spin"
               // });
-              $("#form2 #form2-submitBtn").attr('disabled', 'disabled').text('Sending');
+              $(".subscription-container #subscrition-submitBtn").attr('disabled', 'disabled').text('Sending');
             },
             complete: function(){
-
                console.log("ajax send finish");
                //$("#myModal").modal("hide");
             },
             success: function(data){
               //alert("success");
               // $.LoadingOverlay("hide");
-              $("#form2 #form2-submitBtn").removeAttr('disabled').text('Submit');
+              $(".subscription-container #subscrition-submitBtn").removeAttr('disabled').text('Submit');
               swal("Yours subscribe is success", " ", "success")
                 .then(() => {
                   window.location.reload();
@@ -438,7 +470,7 @@ $(document).ready(function(){
             },
             error: function(data){
               let msg = JSON.parse(data.responseText);
-              $("#form2 #form2-submitBtn").removeAttr('disabled').text('Submit');
+              $(".subscription-container #subscrition-submitBtn").removeAttr('disabled').text('Submit');
               swal("something went wrong", msg.msg, "error")
             }
         })

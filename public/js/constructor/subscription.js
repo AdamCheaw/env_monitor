@@ -10,9 +10,17 @@ function Subscription() {
     this.subscriptions.splice(index,1);
   }
   this.findSensorDuplicate = function(id) {
-    var result = this.subscriptions.map(subscription =>  {
-      return subscription._sensorID;
-    }).filter(thisId => this == id);
+    for(let i = 0;i < this.subscriptions.length;i++) {
+      var result = this.subscriptions[i]._sensorID.find(sensorID => {
+        return sensorID == id;
+      });
+      if(result !== undefined){
+        return result;
+      }
+    }
+    // var result = this.subscriptions.find(subscription => {
+    //   return subscription._sensorID == id;
+    // });
     return result;
   }
   // find the group 's index

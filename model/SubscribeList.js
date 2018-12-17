@@ -22,7 +22,8 @@ var SubscribeListSchema = new mongoose.Schema({
   //flag ,get to know previous is matching condition
   previousMatch: {type: Boolean,default: null},
   previousValue :{type: Number,default: null},
-  groupType :{type:String,default:null}
+  groupType :{type:String,default:null},
+  groupTitle :{type:String,default:null}
 },{collection: 'SubscribeList'});
 module.exports = mongoose.model('SubscribeList', SubscribeListSchema);
 //console.log();

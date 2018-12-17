@@ -199,7 +199,8 @@ var subscribeMany = (name,userID,subscription) => {
       _sensorID : doc._sensorID.map(sensorID => ObjectId(sensorID)),//ObjectId(doc._sensorID),
       subscriberName : name,
       condition: convertCondition(doc.condition),
-      groupType: (typeof doc.groupType === 'undefined') ? null : doc.groupType
+      groupType: (typeof doc.groupType === 'undefined') ? null : doc.groupType,
+      groupTitle: (typeof doc.groupTitle === 'undefined') ? null : doc.groupTitle
     };
   });
   return new Promise((resolve, reject) => {
