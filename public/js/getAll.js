@@ -106,6 +106,7 @@ function filterSubscriptions(docs) {
   });
   return results;
 }
+
 $("#vertical-menu1 a:first").addClass("active");
 $(document).ready(function(){
     // $("#myModal").modal("show");
@@ -371,7 +372,7 @@ $(document).ready(function(){
       else {//optionValue is advanced
         let condition = getCondition();
         //advanced input field is empty ,alert warning
-        if(condition.length < 0) {
+        if(!condition.length) {
           swal("something went wrong", "advanced condition can't be empty", "warning")
           return;
         }
@@ -431,14 +432,22 @@ $(document).ready(function(){
     //
     });
 
+    //remove a subscription list
+    $('#subscription-board').on('click', '.sub-removeBtn',function(e) {
+      idClicked = e.target.id;//get btn clicked id
+      idClicked = idClicked.replace('sub-removeBtn-', '');
+      // console.log("idClicked: "+idClicked);
+      subs.removeOneSubscription(idClicked);
+      refreshSubscription(subs.getAllSubscription());
+    });
     //clear subscription
-    $("#form2 #form2-clearBtn").click(function(){
-      subscription = [];
-      $("#form2 #form2-subscription").val("");
+    $(".subscription-container #subscription-clearBtn").click(function(){
+      subs.clear()
+      $("#subscription-board .span12").html("");
     });
 
     //submit subscription
-    $(".subscription-container #subscrition-submitBtn").click(function(){
+    $(".subscription-container #subscription-submitBtn").click(function(){
       let docs = filterSubscriptions(subs.getAllSubscription());
       if(docs.length > 0)
       { //calling ajax to post subscription

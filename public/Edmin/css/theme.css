@@ -3271,6 +3271,9 @@ table td .online,.media .media-body .online {
 	max-height:150px;
   overflow-y:auto;
 }
+.sub-removeBtn:hover , .sub-editBtn:hover {
+	cursor: pointer;
+}
 @media(max-width:767px){
 	body{padding:0!important}
 	.wrapper{padding:20px 15px}

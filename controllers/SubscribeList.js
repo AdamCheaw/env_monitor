@@ -61,13 +61,14 @@ var searchSubList_withSubName = (name, callback) => {
       path:'_sensorID',
       select:'_id name temp date onConnect type'
     })
-    .select('subscriberName option condition groupType')
+    .select('subscriberName option condition groupType groupTitle')
     .exec()
     .then(docs => {
       if(docs && docs.length){
         var result = [];
         docs.forEach(doc => {
           if(doc._sensorID && doc._sensorID.length) {
+            //mapping every sensor in this subscription
             var sensors = doc._sensorID.map(thisSensor => {
               return {
                  _id: thisSensor._id,
@@ -84,7 +85,8 @@ var searchSubList_withSubName = (name, callback) => {
                subscriberName: doc.subscriberName,
                option: doc.option,
                condition: doc.condition,
-               groupType: doc.groupType
+               groupType: doc.groupType,
+               groupTitle: doc.groupTitle
             };
             result.push(item);
           }

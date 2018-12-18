@@ -163,7 +163,7 @@
                     <hr style="border-top:1px dashed #ccc;">
                     <div class="pull-right">
                       <button type="button" class="btn btn-danger" id="subscription-clearBtn">Clear</button>
-                      <button type="button" class="btn btn-info" id="subscrition-submitBtn">Submit</button>
+                      <button type="button" class="btn btn-info" id="subscription-submitBtn">Submit</button>
   						      </div>
                   </div>
 
@@ -271,8 +271,8 @@
   <div class="card" >
     <div class="card-header" id="heading-\{{index}}">
       <h5 class="mb-0">
-        <i class="icon-remove font-warning pull-right"></i>
-        <i class="icon-edit font-safe pull-right"></i>
+        <div class="sub-removeBtn ml-1 pull-right" id="sub-removeBtn-\{{index}}" ><i class="icon-remove font-warning"></i></div>
+        <div class="sub-editBtn ml-1 pull-right" id="sub-editBtn-\{{index}}" ><i class="icon-edit font-safe"></i></div>
 
         <a class="" data-toggle="collapse" data-target="#sub-\{{index}}" aria-expanded="false" aria-controls="sub-\{{index}}">
           \{{name}}
@@ -313,18 +313,18 @@
   <div class="card" >
     <div class="card-header" id="heading-\{{index}}">
       <h5 class="mb-0">
-        <i class="icon-remove font-warning pull-right"></i>
-        <i class="icon-edit font-safe pull-right"></i>
+        <div class="sub-removeBtn ml-1 pull-right" id="sub-removeBtn-\{{index}}" ><i class="icon-remove font-warning"></i></div>
+        <div class="sub-editBtn ml-1 pull-right" id="sub-editBtn-\{{index}}" ><i class="icon-edit font-safe"></i></div>
 
         <a class="" data-toggle="collapse" data-target="#sub-\{{index}}" aria-expanded="false" aria-controls="sub-\{{index}}">
           \{{groupTitle}}
-        </a>
+        </a><b class="label orange ml-1">\{{sensorName.length}}</b>
       </h5>
     </div>
     <div id="sub-\{{index}}" class="collapse" aria-labelledby="heading-\{{index}}" data-parent="#subscription-board">
       <div class="card-body">
         <dl class="dl-horizontal">
-          <dt>Group 's title</dt>
+          <dt>Group Title</dt>
           <dd>
             \{{groupTitle}}
           </dd>

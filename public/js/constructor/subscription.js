@@ -23,6 +23,10 @@ function Subscription() {
     // });
     return result;
   }
+  this.clear = function() {
+    this.subscriptions = [];
+    return;
+  }
   // find the group 's index
   this.findGroupIndex = function(groupTitle) {
     var index = this.subscriptions.findIndex(subscrition => {
