@@ -24,12 +24,6 @@
                             {{#each items.data }}
                               <a href="#">{{this.name}}</a>
                             {{/each}}
-                            <a href="#">abc</a>
-                            <a href="#">abc</a>
-                            <a href="#">abc</a>
-                            <a href="#">abc</a>
-                            <a href="#">abc</a>
-                            <a href="#">abc</a>
                           </div>
                         </div>
                         {{!-- groupType option  --}}
@@ -88,38 +82,39 @@
       											</div>
                             <br/>
                             <div id="advanced-block" class="enabled">
-                              <label class="control-label" for="basicinput1">Greater than <input type="checkbox" value=""></label>
+                              <label class="control-label" for="basicinput1">Greater than <input type="checkbox" value="" class="unlock-input"></label>
                               <div class="controls" id="i1-1">
-                                <input type="text" id="form1_maxValue" placeholder="" class="span11" >
+                                <input type="text" id="form1_maxValue" placeholder="" class="span11 input-condition" disabled>
+
                               </div>
                               <br/>
-                              <label class="control-label" for="basicinput2">Lower than <input type="checkbox" value=""></label>
+                              <label class="control-label" for="basicinput2">Lower than <input type="checkbox" value="" class="unlock-input"></label>
                               <div class="controls" id="i1-2">
-                                <input type="text" id="form1_minValue" placeholder="" class="span11">
+                                <input type="text" id="form1_minValue" placeholder="" class="span11 input-condition" disabled>
                               </div>
                               <br/>
-                              <label class="control-label" for="basicinput2">Equal to <input type="checkbox" value=""></label>
+                              <label class="control-label" for="basicinput2">Equal to <input type="checkbox" value="" class="unlock-input"></label>
                               <div class="controls" id="i1-3">
-                                <input type="text" id="form1_equalValue" placeholder="" class="span11">
+                                <input type="text" id="form1_equalValue" placeholder="" class="span11 input-condition" disabled>
                               </div>
                               <br/>
-                              <label class="control-label" for="selectOption1">Precision</label>
+                              <label class="control-label" for="selectOption1">Precision <input type="checkbox" value="" class="unlock-input"></label>
                               <div class="controls" id="o1-1">
-                                <select tabindex="1" id="form1_precisionValue" data-placeholder="Select here.." class="span11" >
+                                <select tabindex="1" id="form1_precisionValue" data-placeholder="Select here.." class="span11 input-condition" disabled >
                                   <option value="">Select here..</option>
                                   <option value="0">0</option>
                                   <option value="1">1</option>
                                 </select>
                               </div>
                               <br/>
-                              <label class="control-label" for="basicinput3">Between <input type="checkbox" value=""></label>
+                              <label class="control-label" for="basicinput3">Between <input type="checkbox" value="" class="unlock-input-between"></label>
 
                               <div class="row-fluid">
                                 <div class="span6">
                                   <div class="controls">
                                     <div class="input-prepend">
             													<span class="add-on">min </span>
-                                      <input class="span9" type="text" id="form1_b_minValue">
+                                      <input class="span9 input-condition-between" type="text" id="form1_b_minValue" disabled>
             												</div>
                                   </div>
 
@@ -128,7 +123,7 @@
                                   <div class="controls">
                                     <div class="input-prepend">
             													<span class="add-on">max</span>
-                                      <input class="span9" type="text" id="form1_b_maxValue">
+                                      <input class="span9 input-condition-between" type="text" id="form1_b_maxValue" disabled>
             												</div>
                                   </div>
 
