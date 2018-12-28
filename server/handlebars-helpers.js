@@ -41,14 +41,14 @@ module.exports = {
       for(var i = 0;i < condition.length;i++) {
         if(condition[i].type == "max" && Number(sensorValue) > Number(condition[i].value)) {
           value = new hbs.SafeString(
-            '<span class="font-warning"><i class="icon-warning-sign"></i> '
+            '<span class="font-warning"><i class="icon-md icon-warning-sign"></i> '
             + sensorValue
             + '</span>');
           break;
         }
         else if (condition[i].type == "min" && Number(sensorValue) < Number(condition[i].value)) {
           value = new hbs.SafeString(
-            '<span class="font-warning"><i class="icon-warning-sign"></i> '
+            '<span class="font-warning"><i class="icon-md icon-warning-sign"></i> '
             + sensorValue
             + '</span>');
           break;
@@ -58,7 +58,7 @@ module.exports = {
         }
         else if (condition[i].type == "equal" && Number(sensorValue) == Number(condition[i].value)) {
           value = new hbs.SafeString(
-            '<span class="font-warning"><i class="icon-warning-sign"></i> '
+            '<span class="font-warning"><i class="icon-md icon-warning-sign"></i> '
             + sensorValue
             + '</span>');
           break;
@@ -70,7 +70,7 @@ module.exports = {
                 )
         {
           value = new hbs.SafeString(
-            '<span class="font-warning"><i class="icon-warning-sign"></i> '
+            '<span class="font-warning"><i class="icon-md icon-warning-sign"></i> '
             + sensorValue
             + '</span>');
           break;

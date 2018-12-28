@@ -100,10 +100,11 @@ function filterSubscriptions(docs) {
       return {
         _sensorID: doc._sensorID,
         option: doc.option,
-        condition: (typeof doc.condition === 'undefined') ? [] : doc.groupCondition
+        condition: (typeof doc.condition === 'undefined') ? [] : doc.condition
       }
     }
   });
+
   return results;
 }
 
@@ -200,7 +201,7 @@ $(document).ready(function(){
       }
 
       if(subs.findSensorDuplicate(form1_id) !== undefined) {
-        console.log(subs.findSensorDuplicate(form1_id));
+        //console.log(subs.findSensorDuplicate(form1_id));
         swal("something went wrong", "this sensor has been subscribe already", "warning")
         return;
       }
@@ -250,7 +251,7 @@ $(document).ready(function(){
         }
       }
       refreshSubscription(subs.getAllSubscription())
-      //console.log(subs.getAllSubscription());
+
 
     });
 

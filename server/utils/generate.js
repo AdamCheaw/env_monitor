@@ -25,5 +25,15 @@ var generateNotification = (data) => {
     })
   };
 }
-
-module.exports = {generateSensorData , generateNotification};
+var generateSensorDisconnectData = (doc,sensorID) => {
+  return {
+    _id: doc._id,
+    groupType: doc.groupType,
+    sensorID: sensorID
+  }
+}
+module.exports = {
+  generateSensorData ,
+  generateNotification ,
+  generateSensorDisconnectData
+};

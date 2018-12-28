@@ -28,6 +28,7 @@ var searchSubscribeList_withSensorID = (sensorID,callback) => {
         console.log(docs);
         var items = [];
         //find the current onConnect subscriber
+
         docs.forEach(item => {
           if(item._subscriber){//if !null push to the items
             var doc = {
@@ -52,6 +53,16 @@ var searchSubscribeList_withSensorID = (sensorID,callback) => {
       console.log(err);
       return err
     });
+}
+var findAllSubscriber_bySensorID = (sensorID) => {
+  return SubscribeListData.find({ _sensorID:ObjectId(sensorID) })
+    .populate({
+      path:'_subscriber',
+      //match:{onConnect:true},
+      select:'socketID _id onConnect'
+    })
+    .select('_subscriber groupType _id')
+    .exec();
 }
 
 var searchSubList_withSubName = (name, callback) => {
@@ -297,6 +308,7 @@ var notificationList = (sensorID,currentValue,callback) => {
 module.exports = {
   searchSubscribeList_withSensorID,
   searchSubList_withSubName,
+  findAllSubscriber_bySensorID,
   subscribeOne,
   subscribeMany,
   unsubscribeOne,

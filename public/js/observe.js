@@ -1,4 +1,4 @@
-const socket = io();
+const socket = io().connect('http://localhost:3000');
 //filter sensor value with condition to finding match or not
 const filterByCondition = (condition,sensorValue) => {
   for(let i = 0;i < condition.length;i++) {
@@ -33,7 +33,7 @@ const changeOneSubscriptionView = (docs) => {
   }
   else if(docs.option == "advanced") {
     if(filterByCondition(docs.condition,docs._sensorID[0].temp)){
-      html = `<span class="font-warning"><i class="icon-warning-sign font-md"></i> ${docs._sensorID[0].temp}</span>`;
+      html = `<span class="font-warning"><i class="icon-warning-sign icon-md"></i> ${docs._sensorID[0].temp}</span>`;
     }
     else {
       html = '<span class="font-safe"><i class="icon-star font-lg"></i></span>';
@@ -112,6 +112,23 @@ const changeGroupStatus = (docs) => {
   }
 
 }
+//when sensor disconnect , change status to offline
+const handleSensorDisconnect = (doc) => {
+  if(doc.groupType) { //groupType != null
+    //change to offline
+    $(`#subscription-${doc._id} #table-row-${doc.sensorID} .status`)
+      .html('<b class="offline">offline</b>');
+    //change status icon
+    $(`#subscription-${doc._id} #table-row-${doc.sensorID} .value`)
+      .html('<span class="font-yellow"><i class="icon-question-sign"></i></span>');
+  }
+  else {
+    $("#subscription-"+doc._id+" .media-body .span10 b")
+      .text("offline").removeClass("online").addClass("offline");
+    $("#subscription-"+doc._id+" .media-body .span2 .sensor-value")
+      .html('<span class="font-yellow"><i class="icon-question-sign"></i></span>')
+  }
+}
 $('#subscription-1').on('click', '.unsubBtn', function(e) {
   idClicked = e.target.id;//get btn clicked id
   idClicked = idClicked.replace('unsubBtn-', '');
@@ -176,71 +193,17 @@ socket.on('notification', function(SensorData) {
   else {
     changeOneSubscriptionView(SensorData);
   }
-  //var i = $('#'+SensorData._id+' .index').html();
-  // var html = ""
-  // if(SensorData.option == "default") {
-  //   html = SensorData.temp;
-  // }
-  // else {
-  //   SensorData.condition.forEach(thisCondition => {
-  //     if(thisCondition.type == "max" && Number(SensorData.temp) > Number(thisCondition.value)) {
-  //       value = '<span class="font-warning"><i class="icon-warning-sign"></i> '+SensorData.temp+'</span>';
-  //       console.log(thisCondition.value);
-  //     }
-  //     else if (thisCondition.type == "min" && Number(SensorData.temp) < Number(thisCondition.value)) {
-  //       value = '<span class="font-warning"><i class="icon-warning-sign"></i> '+SensorData.temp+'</span>';
-  //     }
-  //     else if(thisCondition.type == "precision")
-  //     {
-  //       value = doc._sensorID.temp;
-  //     }
-  //     else if(thisCondition.type == "equal" && Number(SensorData.temp) == Number(thisCondition.value)) {
-  //       value = '<span class="font-warning"><i class="icon-warning-sign"></i> '+SensorData.temp+'</span>';
-  //     }
-  //     else if(
-  //       thisCondition.type == "between" && (
-  //          Number(SensorData.temp) > Number(thisCondition.minValue) &&
-  //          Number(SensorData.temp) < Number(thisCondition.maxValue)
-  //       )
-  //     ) {
-  //       value = '<span class="font-warning"><i class="icon-warning-sign"></i> '+SensorData.temp+'</span>';
-  //     }
-  //     else {
-  //       value = '<span class="font-safe"><i class="icon-star"></i></span>';
-  //     }
-  //   });
-  //   html = value;
-  // }
-  // //temp value
-  // $("#"+SensorData._id+' .sensor-temp').html(html);
-  // //status
-  // html = "<b class=\"online\" >online</b>";
-  // $("#"+SensorData._id+' .sensor-status').html(html);
-  // //date
-  // html = moment.parseZone(SensorData.date).local().format('YYYY MMM Do, h:mm:ssa');
-  // $("#"+SensorData._id+' .sensor-date').html(html);
+
   console.log("listen a notification");
   console.log(SensorData);
 });
 socket.on('sensor disconnect', function(data) {
-
-  // var i = $('#'+SensorData._id+' .index').html();
-  // var html = "<td class=\"index\">"+i+"</td>";
-  // html += "<td>"+SensorData.name+"</td>";
-  // html += "<td>"+SensorData.temp+"</td>";
-  // html += "<td><b class=\"online\">online</b></td>";
-  // html += "<td>"+SensorData.date+"</td>";
-  //
-  // // html += "<div>Name: "+SensorData.name+"</div>";
-  // // html += "<div>temp: "+SensorData.temp+"</div>";
-  // // html += "<div>onConnect: "+SensorData.onConnect+"</div>";
-  // //var selector = "#"+SensorData._id;
-  // $("#"+SensorData._id).html(html);
-  var html = "<b class=\"offline\" >offline</b>";
-  $("#"+data.disconnectSensorID+' .sensor-status').html(html);
-  html = "?";
-  $("#"+data.disconnectSensorID+' .sensor-temp').html(html);
-  console.log("sensor disconnect :"+data.disconnectSensorID);
+  handleSensorDisconnect(data)
+  // var html = "<b class=\"offline\" >offline</b>";
+  // $("#"+data.disconnectSensorID+' .sensor-status').html(html);
+  // html = "?";
+  // $("#"+data.disconnectSensorID+' .sensor-temp').html(html);
+  console.log("sensor disconnect :"+data._id);
 });
 socket.on('disconnect', function () {
   console.log('Disconnected from server');

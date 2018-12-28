@@ -63,7 +63,7 @@ router.post('/insert', (req, res, next) => {
       doc.temp = req.body.temp;
       doc.date = new Date();
       doc.onConnect = true;
-      doc.expireDate = moment(currentDate).add(210, 's');
+      doc.expireDate = moment(currentDate).add(10, 's');//210
       previousValue: "";
       //doc.onConnect = true;
       doc.save();
@@ -122,7 +122,7 @@ router.post('/update', (req, res, next) => {
     doc.temp = req.body.temp;
     doc.date = currentDate;
     doc.onConnect = true;
-    doc.expireDate = moment(currentDate).add(210, 's');
+    doc.expireDate = moment(currentDate).add(10, 's');//210
     //doc.onConnect = true;
     doc.save()
     .then(doc => {

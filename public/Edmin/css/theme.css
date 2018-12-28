@@ -3197,7 +3197,7 @@ table td .online,.media .media-body .online {
 	margin:20px 0px 0px 0px;
 	font-size: 40px;
 }
-.media .icon-lg {
+/* .media .icon-lg {
 	font-size: 30px;
 }
 .media .icon-md {
@@ -3205,6 +3205,9 @@ table td .online,.media .media-body .online {
 }
 .media .font-warning span i {
 	font-size: 20px;
+} */
+.media .sensor-value .font-warning i.icon-md {
+	font-size: 25px;
 }
 .media .btn-collapse {
 	padding:2px 8px;
