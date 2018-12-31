@@ -7,10 +7,12 @@ var SensorData = require('../model/sensor');
 const {searchSensorHistory} = require('../controllers/sensorHistory');
 var moment = require('moment');
 var ObjectId = require('mongodb').ObjectID;
+const Utils = require('./utils/getData');
 const {findUserID,createUser} = require('../controllers/user');
 const {searchAllSensor,searchSensorByID} = require('../controllers/sensor');
 const { subscribeOne,unsubscribeOne,searchSubList_withSubName,
         unsubscribeMany,subscribeMany,findSubscribeBefore } = require('../controllers/SubscribeList');
+
 const { subscribe,unsubscribe_with_socketID,unsubscribe_with_name } = require('../server/utils/subscribe_event');
 // const {countLine} = require('../server/utils/countLine');
 const {convertCondition} = require('../server/utils/convert');
@@ -233,4 +235,8 @@ router.post('/unsubscribe', (req, res, next) => {
     }
   })
 });
+//get subscription info
+router.post('/getSubscriptionInfo', Utils.GetSubscriptionInfo);
+//update Subscription Info
+router.post('/updateSubscriptionInfo', Utils.UpdateSubscriptionInfo);
 module.exports = router;

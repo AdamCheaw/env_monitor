@@ -129,51 +129,134 @@ const handleSensorDisconnect = (doc) => {
       .html('<span class="font-yellow"><i class="icon-question-sign"></i></span>')
   }
 }
-$('#subscription-1').on('click', '.unsubBtn', function(e) {
-  idClicked = e.target.id;//get btn clicked id
-  idClicked = idClicked.replace('unsubBtn-', '');
-  console.log("idClicked: "+idClicked);
-  if(idClicked)
-  {
-    var data = {
-        "subscribeListID" : idClicked
-    };
-    $.ajax({
+//handle when editBtn being click and change modal show up 's views
+const handleEditSubscription = (doc,id) => {
+  //scrisrc from ./editSubscription.js
+  changeEditSubView(doc,id);
+  mapSubscriptionToEditForm(doc);
+}
+$(document).ready(function() {
+  //delete a subscription
+  $('#subscription-1').on('click', '.unsubBtn', function(e) {
+    let idClicked = e.target.id;//get btn clicked id
+    idClicked = idClicked.replace('unsubBtn-', '');
+    // console.log("idClicked: "+idClicked);
+    if(idClicked)
+    {
+      var data = {
+          "subscribeListID" : idClicked
+      };
+      $.ajax({
+          type        : 'POST', // define the type of HTTP verb we want to use (POST for our form)
+          url         : '/getData/unsubscribe', // the url where we want to POST
+          data        : data, // our data object
+          dataType    : 'json', // what type of data do we expect back from the server
+          encode          : true,
+          beforeSend: function(){
+            // $.LoadingOverlay("show", {
+            //   image       : "",
+            //   fontawesome : "fa fa-cog fa-spin"
+            // });
+          },
+          complete: function(){
+             // $.LoadingOverlay("hide");
+             // console.log("ajax send finish");
+             // $("#myModal").modal("hide");
+          },
+          success: function(data){
+            $("#subscription-"+idClicked).parent().parent().remove();
+            toastr.success('unsubscribe success!')
+          },
+          error: function(){
+            toastr.error('unsubscribe failed!')
+          }
+      })
+
+    }
+    else {
+
+    }
+
+  });
+  //edit a subscription
+  $('#subscription-1').on('click', '.editBtn' ,function (e) {
+    let idClicked = e.target.id;//get btn clicked id
+    idClicked = idClicked.replace('editBtn-', '');
+    if(idClicked) {
+      var data = {
+        "_id" : idClicked
+      };
+      $.ajax({
         type        : 'POST', // define the type of HTTP verb we want to use (POST for our form)
-        url         : '/getData/unsubscribe', // the url where we want to POST
+        url         : '/getData/getSubscriptionInfo', // the url where we want to POST
         data        : data, // our data object
         dataType    : 'json', // what type of data do we expect back from the server
         encode          : true,
         beforeSend: function(){
-          // $.LoadingOverlay("show", {
-          //   image       : "",
-          //   fontawesome : "fa fa-cog fa-spin"
-          // });
+          $.LoadingOverlay("show", {
+            image       : "",
+            fontawesome : "fa fa-cog fa-spin"
+          });
+        },
+        complete: function(){
+           $.LoadingOverlay("hide");
+           console.log("ajax send finish");
+
+        },
+        success: function(data){
+          handleEditSubscription(data,data._id);
+
+          $("#editSub-Modal").modal("show");
+          console.log(data);
+        },
+        error: function(){
+          toastr.error('something went wrong!')
+        }
+      });
+    }
+  });
+  //confirm edit this subscription
+  $('#editSub-Modal').on('click', '.edit-submit' ,function (e) {
+    let idClicked = e.target.id;//get btn clicked id
+    idClicked = idClicked.replace('submit-', '');
+    if(idClicked) {
+      let afterEdit  = getEditFormSubmit();
+      afterEdit._id = idClicked;
+      console.log(JSON.stringify(afterEdit));
+      // let data = {
+      //   "_id" : idClicked,
+      // };
+      $.ajax({
+        type        : 'POST', // define the type of HTTP verb we want to use (POST for our form)
+        url         : '/getData/updateSubscriptionInfo', // the url where we want to POST
+        data        : afterEdit, // our data object
+        dataType    : 'json', // what type of data do we expect back from the server
+        encode          : true,
+        beforeSend: function(){
+          $("#editSub-Modal .edit-submit").attr('disabled','disabled').text('Sending');
         },
         complete: function(){
            // $.LoadingOverlay("hide");
-           // console.log("ajax send finish");
-           // $("#myModal").modal("hide");
+           console.log("ajax send finish");
+
         },
         success: function(data){
-          $("#subscription-"+idClicked).parent().parent().remove();
-          toastr.success('unsubscribe success!')
+          $("#editSub-Modal .edit-submit").removeAttr('disabled').text('Confirm');
+          swal("edit subscription success", " ", "success")
+            .then(() => {
+              window.location.reload();
+            })
+          console.log(data);
         },
         error: function(){
-          toastr.error('unsubscribe failed!')
+          toastr.error('something went wrong!')
         }
-    })
-
-  }
-  else {
-
-  }
-
+      });
+    }
+  });
 });
 
-$(document).ready(function() {
-
-});
+// handle socket msg
 socket.on('connect', function () {
   console.log('Connected to server');
   console.log('user: '+name);

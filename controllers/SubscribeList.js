@@ -305,6 +305,44 @@ var notificationList = (sensorID,currentValue,callback) => {
     }
   });
 }
+
+//get subscription info
+var getSubscriptionInfo = (id) => {
+  return SubscribeListData.findById(id)
+    .select('option condition groupType groupTitle')
+    .exec();
+  mongoose.disconnect();
+}
+//update subscription info
+var updateSubscriptionInfo = (doc) => {
+  let updateData;
+  //filter update data
+  if(doc.option){
+    updateData = {
+      option : doc.option,
+      condition : convertCondition(doc.condition)
+    };
+  }
+  else if(doc.groupType) {
+    updateData = {
+      groupType : doc.groupType,
+      condition : convertCondition(doc.condition)
+    };
+  }
+  console.log(updateData);
+  return new Promise((resolve, reject) => {
+    SubscribeListData.updateOne({ _id: ObjectId(doc._id) },
+      { $set: updateData })
+      .exec()
+      .then(result => {
+        resolve("ok");
+      })
+      .catch(err => {
+        console.log(err);
+        reject(err);
+      });
+  });
+}
 module.exports = {
   searchSubscribeList_withSensorID,
   searchSubList_withSubName,
@@ -316,5 +354,7 @@ module.exports = {
   notificationList,
   findSubscribeBefore,
   updateSubList_PreviousValue,
-  updateSubList_PreviousMatchCondition
+  updateSubList_PreviousMatchCondition,
+  getSubscriptionInfo,
+  updateSubscriptionInfo
 };

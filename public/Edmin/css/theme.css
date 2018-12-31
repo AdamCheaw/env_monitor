@@ -685,7 +685,7 @@ input[type=button].btn-block, input[type=reset].btn-block, input[type=submit].bt
 	box-shadow: 0 0 5px rgba(0,0,0,0.2)
 }
 .modal .modal-header .close {
-	color: white;
+	color: #555;
 	font-size: 16px;
 	line-height: 30px;
 	height: 30px;
@@ -697,14 +697,18 @@ input[type=button].btn-block, input[type=reset].btn-block, input[type=submit].bt
 	opacity: .6
 }
 .modal .modal-header {
-	background-color: #262626;
-	color:white;
+	background-color: #f5f5f5;
+	color:#555;
 
 }
 .modal .modal-header .modal-title {
 	margin-top:20px;
-	color:#f2f2f2;
+	color:#555;
 	text-align: center;
+}
+.modal .modal-body .unlock-input, .modal .modal-body .unlock-input-btw{
+	margin-top:-1px;
+	margin-left: 2px;
 }
 
 .accordion-group {
@@ -3138,8 +3142,8 @@ table td .online,.media .media-body .online {
 .pull-left .btn {
 	z-index: 1041;
 }
-.icon-eye-open, .icon-remove {
-
+/* prevent btn's icon onclick did not working */
+.icon-eye-open, .icon-remove ,.icon-edit{
     pointer-events:none;
 }
 

@@ -107,6 +107,11 @@ function filterSubscriptions(docs) {
 
   return results;
 }
+const handleEditSubscription = (doc,id) => {
+  //script src from ./editSubscription.js
+  changeEditSubView(doc,id);
+  mapSubscriptionToEditForm(doc);
+}
 
 $("#vertical-menu1 a:first").addClass("active");
 $(document).ready(function(){
@@ -245,16 +250,13 @@ $(document).ready(function(){
             name: form1_inputName,
             option: "advanced",
             condition: condition,
-            groupType: groupType,
+            groupType: null,
           };
           subs.addOneSubscription(doc);
         }
       }
       refreshSubscription(subs.getAllSubscription())
-
-
     });
-
     //remove a subscription list
     $('#subscription-board').on('click', '.sub-removeBtn',function(e) {
       idClicked = e.target.id;//get btn clicked id
@@ -263,12 +265,31 @@ $(document).ready(function(){
       subs.removeOneSubscription(idClicked);
       refreshSubscription(subs.getAllSubscription());
     });
+    //edit a subscription list
+    $('#subscription-board').on('click', '.sub-editBtn',function(e) {
+      idClicked = e.target.id;//get btn clicked id
+      idClicked = idClicked.replace('sub-editBtn-', '');
+      //console.log("idClicked: "+idClicked);
+      let doc = subs.getOneSubscription(idClicked)
+      handleEditSubscription(doc,idClicked);
+      $("#editSub-Modal").modal("show");
+      // subs.removeOneSubscription(idClicked);
+      // refreshSubscription(subs.getAllSubscription());
+    });
     //clear subscription
     $(".subscription-container #subscription-clearBtn").click(function(){
       subs.clear()
       $("#subscription-board .span12").html("");
     });
-
+    // submit to changing a subscription
+    $('#editSub-Modal').on('click', '.edit-submit',function(e) {
+      idClicked = e.target.id;//get btn clicked id
+      idClicked = idClicked.replace('submit-', '');
+      let afterEdit  = getEditFormSubmit();//getting edit form value
+      subs.updateOneSubscription(idClicked , afterEdit);//update the subs object
+      refreshSubscription(subs.getAllSubscription());
+      $("#editSub-Modal").modal("hide");
+    });
     //submit subscription
     $(".subscription-container #subscription-submitBtn").click(function(){
       let docs = filterSubscriptions(subs.getAllSubscription());

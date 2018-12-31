@@ -1,0 +1,120 @@
+<!-- Modal -->
+<div class="modal fade" id="editSub-Modal" role="dialog">
+  <div class="modal-dialog">
+    <!-- Modal content-->
+    <div class="modal-content">
+      <!-- edit subscription's form will append here -->
+    </div>
+
+  </div>
+</div>
+<!-- end Modal -->
+{{!-- edit subscription's form template --}}
+<script id="editSubscription-temp" type="text/x-handlebars-template">
+  <div class="modal-header">
+    <button type="button" class="close" data-dismiss="modal">&times;</button>
+    <h4 class="modal-title">\{{title}}</h4>
+  </div>
+  <div class="modal-body">
+    <div class="form-horizontal">
+      <div class="row-fluid">
+      \{{#if isGroup}}
+        <div class="control-group">
+          <label class="control-label">Grouping's Type</label>
+          <div class="controls">
+            <label class="radio inline">
+              <input type="radio" name="groupType" id="radio-AND" value="AND" checked="">
+              AND
+            </label>
+            <label class="radio inline">
+              <input type="radio" name="groupType" id="radio-OR" value="OR">
+              OR
+            </label>
+          </div>
+        </div>
+      \{{else}}
+        <div class="control-group">
+          <label class="control-label">Option</label>
+          <div class="controls">
+            <label class="radio inline">
+              <input type="radio" name="option" id="radio-default" value="default" checked="">
+              Default
+            </label>
+            <label class="radio inline">
+              <input type="radio" name="option" id="radio-advanced" value="advanced">
+              Advanced
+            </label>
+          </div>
+        </div>
+      \{{/if}}
+        <div class="control-group enabled" >
+          <label class="control-label" for="">Greater than
+            <input type="checkbox" value="" class="unlock-input">
+          </label>
+          <div class="controls">
+            <input type="text" id="input-max" placeholder="You can't type something here..."
+              class="span11 input-condition" disabled>
+          </div>
+        </div>
+        <div class="control-group enabled" >
+          <label class="control-label" for="">Lower than
+            <input type="checkbox" value="" class="unlock-input">
+          </label>
+          <div class="controls">
+            <input type="text" id="input-min" placeholder="You can't type something here..."
+              class="span11 input-condition" disabled>
+          </div>
+        </div>
+        <div class="control-group enabled" >
+          <label class="control-label" for="">Equal to
+            <input type="checkbox" value="" class="unlock-input">
+          </label>
+          <div class="controls">
+            <input type="text" id="input-equal" placeholder="You can't type something here..."
+              class="span11 input-condition" disabled>
+          </div>
+        </div>
+        <div class="control-group enabled">
+          <label class="control-label" for="">Precision
+            <input type="checkbox" value="" class="unlock-input">
+          </label>
+          <div class="controls">
+            <select tabindex="1" id="select-precision" data-placeholder="You can't select here.."
+              class="span11 input-condition" disabled >
+              <option value="">Select here..</option>
+              <option value="0">0</option>
+              <option value="1">1</option>
+            </select>
+          </div>
+        </div>
+        <div class="control-group enabled">
+          <label class="control-label" for="">Between
+            <input type="checkbox" value="" class="unlock-input-btw">
+          </label>
+          <div class="controls">
+            <div class="row-fluid">
+              <div class="span6">
+                <div class="input-prepend">
+                  <span class="add-on">min </span>
+                  <input class="span9 input-condition-between" type="text" id="input-btw-min" disabled>
+                </div>
+              </div>
+              <div class="span6">
+                <div class="input-prepend">
+                  <span class="add-on">max </span>
+                  <input class="span9 input-condition-between" type="text" id="input-btw-max" disabled>
+                </div>
+              </div>
+            </div>
+          </div>
+
+        </div>
+      </div>
+
+    </div>
+  </div>
+  <div class="modal-footer">
+    <button type="button" class="btn btn-danger" data-dismiss="modal">Close</button>
+    <button type="button" class="btn btn-success edit-submit" id="submit-\{{id}}">Confirm</button>
+  </div>
+</script>

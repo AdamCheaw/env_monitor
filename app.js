@@ -51,6 +51,6 @@ app.use("/observe", observer);
 //app.use("/test", test);
 setInterval(function() {
   checkDisconnect();
-}, 15000);//60000
+}, 60000);//60000
 removeExHistoryData();
 module.exports = app;
