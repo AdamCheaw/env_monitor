@@ -60,7 +60,7 @@ var checkDisconnect = () => {
           });
       }
       else {
-        console.log("no sensor disconnect");
+        // console.log("no sensor disconnect");
       }
       //console.log("result :"+items);
     })

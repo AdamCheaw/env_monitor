@@ -15,7 +15,7 @@ const {
 var webSocket = (io) => {
   io.on('connection', (socket) => {
     socket.on('auth',(data) => {
-      console.log(data.name+' have connected, socket id: '+socket.id);
+      console.log('SOCKET - '+data.name+' have connected, socket id: '+socket.id);
       userOnConnect(data.name,socket.id)
         .then(result => {
           if(result) {
@@ -34,7 +34,7 @@ var webSocket = (io) => {
     //when user open new observe page
     socket.on('disconnectSocket', (data) => {
 
-      console.log("disconnect old socket "+data.socketID);
+      console.log("SOCKET - disconnect old socket "+data.socketID);
       if (io.sockets.connected[data.socketID]) {
         io.sockets.connected[data.socketID].disconnect();
       }
@@ -42,7 +42,7 @@ var webSocket = (io) => {
 
     //sensor notification
     socket.on('update', (SensorData) => {
-      console.log(`socket: listening a updated event from sensor ${SensorData._id}` );
+      console.log(`SOCKET - listening a updated event from sensor ${SensorData._id}` );
       console.log("-----------------------------------------------------------");
       notificationList(SensorData._id,Number(SensorData.temp),(results) => {
         if(results!= "") {
@@ -72,7 +72,7 @@ var webSocket = (io) => {
       //io.emit('notification',generateData(data));
     });
     socket.on('sensor disconnect',(data) => {
-      console.log("socket : listening Sensor Disconnect event "+data.disconnect_SID);
+      console.log("SOCKET - listening Sensor Disconnect event "+data.disconnect_SID);
       //multiple sensor id,because will have multiple sensor disconnect in a min
       data.disconnect_SID.forEach(sensorID => {
         findAllSubscriber_bySensorID(sensorID)
@@ -95,7 +95,7 @@ var webSocket = (io) => {
       })
     })
     socket.on('disconnect', () => {
-      console.log('User was disconnected');
+      console.log('SOCKET - User was disconnected');
       userDisconnect(socket.id);
     });
   });
