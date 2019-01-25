@@ -148,7 +148,7 @@ $(document).ready(function() {
       };
       $.ajax({
           type        : 'POST', // define the type of HTTP verb we want to use (POST for our form)
-          url         : '/getData/unsubscribe', // the url where we want to POST
+          url         : '/observe/unsubscribe', // the url where we want to POST
           data        : data, // our data object
           dataType    : 'json', // what type of data do we expect back from the server
           encode          : true,
@@ -188,7 +188,7 @@ $(document).ready(function() {
       };
       $.ajax({
         type        : 'POST', // define the type of HTTP verb we want to use (POST for our form)
-        url         : '/getData/getSubscriptionInfo', // the url where we want to POST
+        url         : '/observe/getSubscriptionInfo', // the url where we want to POST
         data        : data, // our data object
         dataType    : 'json', // what type of data do we expect back from the server
         encode          : true,
@@ -228,7 +228,7 @@ $(document).ready(function() {
       // };
       $.ajax({
         type        : 'POST', // define the type of HTTP verb we want to use (POST for our form)
-        url         : '/getData/updateSubscriptionInfo', // the url where we want to POST
+        url         : '/observe/updateSubscriptionInfo', // the url where we want to POST
         data        : afterEdit, // our data object
         dataType    : 'json', // what type of data do we expect back from the server
         encode          : true,

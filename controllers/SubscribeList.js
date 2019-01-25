@@ -6,7 +6,7 @@ var express = require('express');
 var ObjectId = require('mongodb').ObjectID;
 var moment = require('moment');
 const {convertCondition} = require('../server/utils/convert');
-const {generate_NotificationList} = require('./utils/notificationList');
+const {filter_NotificationList} = require('./utils/notificationList');
 // find all subscriber subscribe this sensor
 var searchSubscribeList_withSensorID = (sensorID,callback) => {
   //console.log("DB : "+sensorID);
@@ -72,7 +72,7 @@ var searchSubList_withSubName = (name, callback) => {
       path:'_sensorID',
       select:'_id name temp date onConnect type'
     })
-    .select('subscriberName option condition groupType groupTitle')
+    .select('subscriberName option condition groupType title')
     .exec()
     .then(docs => {
       if(docs && docs.length){
@@ -97,7 +97,7 @@ var searchSubList_withSubName = (name, callback) => {
                option: doc.option,
                condition: doc.condition,
                groupType: doc.groupType,
-               groupTitle: doc.groupTitle
+               title: doc.title
             };
             result.push(item);
           }
@@ -209,11 +209,12 @@ var subscribeMany = (name,userID,subscription) => {
     return {
       option: doc.option,
       _subscriber : userID,
-      _sensorID : doc._sensorID.map(sensorID => ObjectId(sensorID)),//ObjectId(doc._sensorID),
+      _sensorID : doc._sensorID.map(sensorID => ObjectId(sensorID)),
       subscriberName : name,
       condition: convertCondition(doc.condition),
       groupType: (typeof doc.groupType === 'undefined') ? null : doc.groupType,
-      groupTitle: (typeof doc.groupTitle === 'undefined') ? null : doc.groupTitle
+      title: doc.title
+      //the title is user defined  or sensor name ,it depend on groupType
     };
   });
   return new Promise((resolve, reject) => {
@@ -299,7 +300,7 @@ var notificationList = (sensorID,currentValue,callback) => {
     }
     else {
       //console.log(results);
-      let data = generate_NotificationList(results,currentValue);
+      let data = filter_NotificationList(results,currentValue);
       //console.log(data);
       return callback(data);
     }
@@ -309,7 +310,7 @@ var notificationList = (sensorID,currentValue,callback) => {
 //get subscription info
 var getSubscriptionInfo = (id) => {
   return SubscribeListData.findById(id)
-    .select('option condition groupType groupTitle')
+    .select('option condition groupType title')
     .exec();
   mongoose.disconnect();
 }

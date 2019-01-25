@@ -92,12 +92,13 @@ function filterSubscriptions(docs) {
         _sensorID: doc._sensorID,
         option: doc.option,
         condition: doc.condition,
-        groupTitle: doc.groupTitle,
+        title: doc.groupTitle, //if group title will let user defined
         groupType: doc.groupType
       }
     }
-    else { //advanced , no group
+    else { // no group
       return {
+        title: doc.name, //if not group title will using sensor name
         _sensorID: doc._sensorID,
         option: doc.option,
         condition: (typeof doc.condition === 'undefined') ? [] : doc.condition
@@ -293,8 +294,7 @@ $(document).ready(function(){
     //submit subscription
     $(".subscription-container #subscription-submitBtn").click(function(){
       let docs = filterSubscriptions(subs.getAllSubscription());
-      if(docs.length > 0)
-      { //calling ajax to post subscription
+      if(docs.length > 0) { //calling ajax to post subscription
         $.ajax({
             type        : 'POST',
             url         : '/getData/subscribeMany',

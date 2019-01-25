@@ -23,7 +23,7 @@ var SubscribeListSchema = new mongoose.Schema({
   previousMatch: {type: Boolean,default: null},
   previousValue :{type: Number,default: null},
   groupType :{type:String,default:null},
-  groupTitle :{type:String,default:null}
+  title :{type:String,required: true}
 },{collection: 'SubscribeList'});
 module.exports = mongoose.model('SubscribeList', SubscribeListSchema);
 //console.log();

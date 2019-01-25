@@ -6,6 +6,7 @@ const favicon = require('serve-favicon');
 const logger = require('morgan');
 const cookieParser = require('cookie-parser');
 const bodyParser = require('body-parser');
+const compression = require('compression')
 const sensor = require('./routes/sensor');
 const user = require('./routes/user');
 const observer = require('./routes/observer');
@@ -15,6 +16,8 @@ const expressValidator = require('express-validator');
 const expressSession = require('express-session');
 const {checkDisconnect} = require('./controllers/sensor');
 const {removeExHistoryData} = require('./controllers/schedule');
+const {initialSetup} = require('./controllers/setup');
+
 
 app.engine('hbs',
   hbs({
@@ -28,6 +31,7 @@ app.engine('hbs',
 app.set('views', path.join(__dirname, 'views'));
 app.set('view engine', 'hbs');
 app.use(express.static(path.join(__dirname, 'public')));
+app.use(compression());
 app.use(function(req, res, next) {
   res.header("Access-Control-Allow-Origin", "*");
   res.header("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
@@ -53,4 +57,5 @@ setInterval(function() {
   checkDisconnect();
 }, 60000);//60000
 removeExHistoryData();
+initialSetup();
 module.exports = app;

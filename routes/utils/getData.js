@@ -6,11 +6,10 @@ var ObjectId = require('mongodb').ObjectID;
 const {searchSensorHistory} = require('../../controllers/sensorHistory');
 const {findUserID,createUser} = require('../../controllers/user');
 const {searchAllSensor,searchSensorByID} = require('../../controllers/sensor');
-const { subscribeOne,unsubscribeOne,searchSubList_withSubName,
-        unsubscribeMany,subscribeMany,findSubscribeBefore,
-        getSubscriptionInfo,updateSubscriptionInfo } = require('../../controllers/SubscribeList');
-const { subscribe,unsubscribe_with_socketID,unsubscribe_with_name } = require('../../server/utils/subscribe_event');
-// const {countLine} = require('../server/utils/countLine');
+const {
+  subscribeOne,searchSubList_withSubName,
+  unsubscribeMany,subscribeMany,findSubscribeBefore,
+} = require('../../controllers/SubscribeList');
 const {convertCondition} = require('../../server/utils/convert');
 const {getStartAndEnd,avgInInterval,findInterval} = require('../../server/utils/DateAndTime')
 
@@ -209,50 +208,9 @@ var SubscribeMany = (req, res, next) => {
       console.log(err);
     });
 }
-var Unsubscribe = (req, res, next) => {
-  console.log(`POST - ${req.session.views} request a ajax call /unsubscribe`);
-  unsubscribeOne(req.body.subscribeListID,(result) => {
-    if(result == "success") {//response to ajax
-      res.json({msg:"success"});
-    }
-    else {
-      res.status(400).json({msg:result});
-    }
-  })
-}
-var GetSubscriptionInfo = (req, res, next) => {
-  console.log(`POST - ${req.session.views} request a ajax call /getSubscriptionInfo`);
-  getSubscriptionInfo(req.body._id)
-    .then(doc => {
-      if(doc && doc !== null && doc !== undefined) {
-        res.json(doc);
-      }
-      else {
-        res.status(400).json({msg:"nothing found"});
-      }
-    })
-    .catch(err => {
-      res.status(400).json({msg:err.message});
-      console.log(err);
-    });
-  // mongoose.disconnect();
-}
-var UpdateSubscriptionInfo = (req, res, next) => {
-  console.log(`POST - ${req.session.views} request a ajax call /updateSubscriptionInfo`);
-  updateSubscriptionInfo(req.body)
-   .then(result => {
-     if(result) {
-       res.json({msg:"ok!"});
-     }
-   })
-   .catch(err => {
-     res.status(400).json({msg:err.message});
-   });
-}
+
+
 module.exports = {
-  GetSubscriptionInfo,
-  UpdateSubscriptionInfo,
-  Unsubscribe,
   SubscribeMany,
   Subscribe,
   UserSubmit,

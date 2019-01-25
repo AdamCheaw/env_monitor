@@ -5,10 +5,10 @@ const changeEditSubView = (doc , id) => {
   var template = Handlebars.compile(scriptHtml);
   //no grouping
   if(doc.groupType && (doc.groupType !== null || doc.groupType !== undefined)){
-    var obj = { title : doc.groupTitle, isGroup : true, id: id };
+    var obj = { title : doc.title, isGroup : true, id: id };
   }
   else {
-    var obj = { title : "modal" ,isGroup : false, id: id };
+    var obj = { title : doc.title ,isGroup : false, id: id };
   }
   var html = template(obj);
   $("#editSub-Modal .modal-content").html("");

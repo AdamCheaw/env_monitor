@@ -20,12 +20,5 @@ router.post('/subscribe', Utils.Subscribe);
 //handle ajax call for user subscribe multiple sensor
 router.post('/subscribeMany', Utils.SubscribeMany);
 
-//handle ajax call for user unsubscribe a subscription
-router.post('/unsubscribe', Utils.Unsubscribe);
 
-//handle ajax call for getting subscription info like condition , option ...
-router.post('/getSubscriptionInfo', Utils.GetSubscriptionInfo);
-
-//handle ajax call for update Subscription Info
-router.post('/updateSubscriptionInfo', Utils.UpdateSubscriptionInfo);
 module.exports = router;

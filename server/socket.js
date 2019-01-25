@@ -50,14 +50,23 @@ var webSocket = (io) => {
           var updateNotMatch = [];
           for(let i = 0;i < results.length;i++) {
             if (io.sockets.connected[results[i].socketID]) {
-              io.to(results[i].socketID).emit('notification', generateNotification(results[i]));
+              io.to(results[i].socketID)
+                .emit('notification', generateNotification(results[i]));
               console.log("socket: emit update msg to socket " + results[i].socketID);
-              if(results[i].previousMatch) {
-                updateMatch.push(results[i]._id);
-              }
-              else {
-                updateNotMatch.push(results[i]._id);
-              }//save the matching flag when notification success
+            }
+            //save the matching flag (already edit)
+            //----------------------------------------
+            if(results[i].previousMatch) {
+              updateMatch.push(results[i]._id);
+            }
+            else {
+              updateNotMatch.push(results[i]._id);
+            }
+            if(results[i].logMsg) {
+              console.log("--------------------------------");
+              console.log(results[i]._id);
+              console.log(results[i].logMsg);
+              console.log("--------------------------------");
             }
           }
           if (updateMatch || updateNotMatch) {

@@ -1,30 +1,17 @@
 var express = require('express');
 var router = express.Router();
-var mongoose = require('mongoose');
-var bodyParser = require('body-parser');
-var SensorData = require('../model/sensor');
-var moment = require('moment');
-const {searchSubList_withSubName} = require('../controllers/SubscribeList');
-// const {userOnConnect} = require('../controllers/user');
+const Utils = require('./utils/observe');
 
+//GET user request real-time observe page
+router.get('/', Utils.ObserverPage);
 
+//handle ajax call for user unsubscribe a subscription
+router.post('/unsubscribe', Utils.Unsubscribe);
 
-router.get('/', (req, res, next) => {
-  if (!req.session.views) {
-    res.render('login');
-    return;
-  }
-  // response current user subscribe 's sensor info
-  searchSubList_withSubName(req.session.views,function(result,subInfo) {
-    if(result != "" || result !== undefined) {
-      res.render('observe',{items:result, session:req.session.views});
-      //console.log(result);
-    }
-    else {
-      res.render('observe',{items:result, session:req.session.views});
-    }
-    //console.log(result);
-  });
-});
+//handle ajax call for getting subscription info like condition , option ...
+router.post('/getSubscriptionInfo', Utils.GetSubscriptionInfo);
+
+//handle ajax call for update Subscription Info
+router.post('/updateSubscriptionInfo', Utils.UpdateSubscriptionInfo);
 
 module.exports = router;

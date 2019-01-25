@@ -43,7 +43,6 @@ router.post('/insert', (req, res, next) => {
           .catch(err => {
             console.log(err);
           });
-
           console.log("new sensor!");
           console.log("receive advertisement request packet from "+req.body.name);
           console.log("ID : "+data._id);
