@@ -45,15 +45,19 @@ var mapValueToCondition = (condition,currentValue) => {
 //matching multiple sensor ,if AT LEAST there is ONE sensor matching condition
 //will return true
 var mapValueToCondition_withOR =
-  (sensors,condition,currentValue,previousMatch) => {
+  (sensors,condition,currentData,previousMatch) => {
   let matchingResult;
   //var match = false;
   //previous did not match ,so just need match current sensor's value
   if(!previousMatch){
-    matchingResult = mapValueToCondition(condition,currentValue);
+    matchingResult = mapValueToCondition(condition,currentData.value);
+    if(matchingResult.match){
+      matchingResult.matchMsg = currentData.sensorName + " " + matchingResult.matchMsg;
+    }
   }
   else {
     for(let i = 0;i < sensors.length;i++) {
+      matchingResult = null;
       if(!sensors[i].onConnect){
         matchingResult = {
           match: true,
@@ -67,7 +71,7 @@ var mapValueToCondition_withOR =
       //if at least there is one sensor matching condition ,
       //not need to check other sensor's value
       if(matchingResult.match) {
-        console.log(`check sensor ${sensors[i].name} : ${matchingResult.match}`);
+        //console.log(`check sensor ${sensors[i].name} : ${matchingResult.match}`);
         matchingResult.matchMsg = sensors[i].name + " " + matchingResult.matchMsg;
         break;
       }
@@ -79,16 +83,26 @@ var mapValueToCondition_withOR =
 //matching multiple sensor ,if ALL sensor matching condition
 //will return true
 var mapValueToCondition_withAND =
-  (sensors,condition,currentValue,previousMatch) => {
+  (sensors,condition,currentData,previousMatch) => {
   let matchingResult;
   // previous is match ,
   // so just need to know current sensor's matching condition
   if(previousMatch) {
-    matchingResult = mapValueToCondition(condition,currentValue);
+    matchingResult = mapValueToCondition(condition,currentData.value);
   }
   else {
     for(let i = 0;i < sensors.length;i++) {
-      matchingResult = mapValueToCondition(condition,sensors[i].temp);
+      matchingResult = null;
+      if(!sensors[i].onConnect){
+        matchingResult = {
+          match: true,
+          matchMsg: `${sensors[i].name} not on connect`
+        };
+      }
+      else {
+        matchingResult = mapValueToCondition(condition,sensors[i].temp);
+      }
+      //console.log("in mapping: "+matchingResult);
       //if at least there is one sensor DID NOT matching condition ,
       //not need to check other sensor's value
       if(!matchingResult.match) {

@@ -3281,6 +3281,19 @@ table td .online,.media .media-body .online {
 .sub-removeBtn:hover , .sub-editBtn:hover {
 	cursor: pointer;
 }
+.center-block {
+  margin :0px auto;
+	text-align: center;
+}
+.page-option {
+	display: flex;
+	justify-content:flex-end;
+
+}
+.page {
+	float:left;
+	margin-left: 10px;
+}
 @media(max-width:767px){
 	body{padding:0!important}
 	.wrapper{padding:20px 15px}

@@ -11,7 +11,7 @@ const {
   updateSubList_PreviousMatchCondition,
   findAllSubscriber_bySensorID
 } = require('../controllers/SubscribeList');
-
+const {saveSubscriptionLogs} = require('../controllers/subscriptionLogs');
 var webSocket = (io) => {
   io.on('connection', (socket) => {
     socket.on('auth',(data) => {
@@ -44,35 +44,43 @@ var webSocket = (io) => {
     socket.on('update', (SensorData) => {
       console.log(`SOCKET - listening a updated event from sensor ${SensorData._id}` );
       console.log("-----------------------------------------------------------");
-      notificationList(SensorData._id,Number(SensorData.temp),(results) => {
+      notificationList(SensorData,(results) => {
         if(results!= "") {
           var updateMatch = [];
           var updateNotMatch = [];
+          var subscriptionLogs = [];
+          //starting send notifications
           for(let i = 0;i < results.length;i++) {
             if (io.sockets.connected[results[i].socketID]) {
               io.to(results[i].socketID)
                 .emit('notification', generateNotification(results[i]));
               console.log("socket: emit update msg to socket " + results[i].socketID);
             }
-            //save the matching flag (already edit)
-            //----------------------------------------
-            if(results[i].previousMatch) {
+            //changing current matching condition to subscription.previousMatch
+            if(results[i].previousMatch && results[i].previousMatch !== undefined) {
               updateMatch.push(results[i]._id);
             }
-            else {
+            else if(!results[i].previousMatch && results[i].previousMatch !== undefined){
               updateNotMatch.push(results[i]._id);
             }
-            if(results[i].logMsg) {
-              console.log("--------------------------------");
-              console.log(results[i]._id);
-              console.log(results[i].logMsg);
-              console.log("--------------------------------");
+
+            if(results[i].subscriptionLog) {
+              // console.log("-------------LogMsg---------------");
+              // console.log(results[i].subscriptionLog);
+              // console.log("xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx");
+              subscriptionLogs.push(results[i].subscriptionLog);
             }
-          }
+          }//end sending notifications
+
           if (updateMatch || updateNotMatch) {
             //update the current notification value to the subscribeList previousValue after emit to user
             updateSubList_PreviousMatchCondition(updateMatch,true);
             updateSubList_PreviousMatchCondition(updateNotMatch,false);
+          }
+
+          if(subscriptionLogs && subscriptionLogs.length){
+            //save the multiple subscription 's logs
+            saveSubscriptionLogs(subscriptionLogs);
           }
 
         }

@@ -2,6 +2,7 @@ var SensorData = require('../model/sensor');
 var UserData = require('../model/user');
 var SubscribeListData = require('../model/SubscribeList');
 var SensorHistory = require('../model/sensorHistory');
+const SubscriptionLogs = require('../model/subscriptionLogs');
 var mongoose = require('mongoose');
 var moment = require('moment');
 
@@ -51,7 +52,22 @@ var initialSetup = () => {
   })
   .exec()
   .then(() => {
-    console.log(`remove before ${start} 's history data `);
+    console.log(`remove before two days ago's history data `);
+  })
+  .catch(err => {
+    console.log(err);
+  });
+
+  //delete subscription logs in three days ago
+  start = new Date(moment().subtract(3, 'days')).toISOString();
+  SubscriptionLogs.deleteMany({
+    date:{
+      $lte:start
+    }
+  })
+  .exec()
+  .then(() => {
+    console.log(`remove before three days ago 's logs `);
   })
   .catch(err => {
     console.log(err);

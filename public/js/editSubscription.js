@@ -16,7 +16,6 @@ const changeEditSubView = (doc , id) => {
 }
 //mapping subscription to edit form modal
 const mapSubscriptionToEditForm = (doc) => {
-
   if(doc.groupType && doc.groupType !== null) { //is grouping
     $('#editSub-Modal .input-condition').parent().parent()
       .removeClass('enabled');

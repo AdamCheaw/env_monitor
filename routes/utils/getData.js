@@ -14,10 +14,6 @@ const {convertCondition} = require('../../server/utils/convert');
 const {getStartAndEnd,avgInInterval,findInterval} = require('../../server/utils/DateAndTime')
 
 var MainPage = (req, res, next) => {
-  if (!req.session.views) {
-    res.render('login');
-    return;
-  }
   console.log(`GET - ${req.session.views} request MainPage`);
   searchAllSensor((sensorData_result) =>{
     //searching the sensor subscribe by this user
@@ -40,10 +36,6 @@ var MainPage = (req, res, next) => {
 }
 var GetSensorInfo = (req, res, next) => {
   //check user login and get session
-  if (!req.session.views) {
-    res.render('login');
-    return;
-  }
   console.log(`GET - ${req.session.views} request sensor info page`);
   searchSensorByID(req.params.sensorId)
     .then(sensorInfo => {
@@ -120,7 +112,7 @@ var GetHistoryData = (req, res, next) => {
   });
   //res.json({msg:"ok"});
 }
-var UserSubmit = (req, res, next) => {
+var UserLogin = (req, res, next) => {
   console.log(`POST - ${req.body.name} try to login`);
   //session = user name
   req.session.views = req.body.name;
@@ -144,6 +136,7 @@ var UserSubmit = (req, res, next) => {
           });
       }
       else {
+        req.session.userID = userID._id;
         res.redirect('/getData');
       }
 
@@ -213,7 +206,7 @@ var SubscribeMany = (req, res, next) => {
 module.exports = {
   SubscribeMany,
   Subscribe,
-  UserSubmit,
+  UserLogin,
   GetHistoryData,
   GetSensorInfo,
   MainPage

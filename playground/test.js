@@ -15,6 +15,17 @@ var testing = (callback) => {
   return callback("123");
 };
 
+// var date = moment().hour(0).minute(0).second(0);
+// console.log(date);
+// date = moment(date).utc().format();
+// console.log(date);
+// console.log(moment(date).hour(12));
+// console.log(moment(date).subtract(1,'days'));
+// console.log(moment(date).hour(12).subtract(1,'days'));
+
+
+
+
 
 // function findUserByName(name){
 //   return new Promise ((resolve, reject) => {

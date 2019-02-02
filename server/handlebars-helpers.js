@@ -1,4 +1,5 @@
 var hbs = require('handlebars');
+var moment = require('moment');
 var filterByCondition = (condition,sensorValue) => {
   for(let i = 0;i < condition.length;i++) {
     if(condition[i].type == "max" && Number(sensorValue) > Number(condition[i].value)) {
@@ -161,5 +162,52 @@ module.exports = {
         return true;
     }
     return false;
+  },
+  loadLogMsg: function(logStatus,logMsg) {
+    let msg;
+    if(logStatus < 1) {
+      msg = `<p class="font-warning">
+                <i class="icon-md icon-warning-sign"></i>
+                ${logMsg}
+             </p>`;
+    }
+    else {
+      msg = `<p class="font-safe">
+                <i class="icon-md icon-ok"></i>
+                ${logMsg}
+             </p>`;
+    }
+    return msg;
+  },
+  // counting how many page can display for ViewLogPage
+  howManyPage: function(total) {
+    let page = total / 30;
+    let select = "";
+    for(let i = 0;i < page;i++) {
+      //ex <option value="1">1</option>...
+
+      select = select +`<li><a href="#">${i+1}</a></li>` ;
+    }
+    return select;
+  },
+  loadSelectDate: function() {
+    // var date1 = moment().hour(0).minute(0).second(0).utc().format();
+    // var date2 = moment(date1).hour(12).utc().format();
+    // var date3 = moment(date1).subtract(1,'days').utc().format();
+    // var date4 = moment(date1).hour(12).subtract(1,'days').utc().format();
+    var dates = [];
+    var date = moment().hour(12).minute(0).second(0).utc().format();
+    var option = "";
+    dates.push(date);
+    for(let i = 1;i < 4;i++) {
+      date = moment(dates[i-1]).subtract(12,'hours').utc().format();
+      dates.push(date);
+    }
+    option += `<option value='${dates[0]}'>today , 12pm ~ 12am</option>`;
+    option += `<option value='${dates[1]}'>today , 12am ~ 12pm</option>`;
+    option += `<option value='${dates[2]}'>yesterday , 12pm ~ 12am</option>`;
+    option += `<option value='${dates[3]}'>yesterday , 12am ~ 12pm</option>`;
+    //console.log(dates);
+    return option;
   }
 }

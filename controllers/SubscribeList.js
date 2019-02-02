@@ -85,9 +85,7 @@ var searchSubList_withSubName = (name, callback) => {
                  _id: thisSensor._id,
                  name: thisSensor.name,
                  temp: thisSensor.temp,
-                 date: moment.parseZone(thisSensor.date).local().format('YYYY MMM Do, h:mm:ssa'),
-                 onConnect: thisSensor.onConnect,
-                 type: thisSensor.type
+                 date: moment.parseZone(thisSensor.date).local().format('YYYY MMM Do, h:mm:ssa'),                 type: thisSensor.type
               };
             });
             var item = {
@@ -102,7 +100,7 @@ var searchSubList_withSubName = (name, callback) => {
             result.push(item);
           }
         })
-        callback(result);
+                callback(result);
         //console.log("searchSubscribeList_withSubscriberName: "+docs);
         return;
       }
@@ -281,8 +279,8 @@ var updateSubList_PreviousMatchCondition = (idArray,isMatch) => {
 }
 
 //generate the notificationList to user when a sensor notifify a new value
-var notificationList = (sensorID,currentValue,callback) => {
-  SubscribeListData.find({ _sensorID: ObjectId(sensorID) })
+var notificationList = (sensorData,callback) => {
+  SubscribeListData.find({ _sensorID: ObjectId(sensorData._id) })
   .populate({
     path:'_sensorID',
     select:'_id name temp date onConnect'
@@ -291,7 +289,7 @@ var notificationList = (sensorID,currentValue,callback) => {
     path:'_subscriber',
     select:'_id socketID onConnect'
   })
-  .select('_id _subscriber _sensorID option condition previousValue groupType previousMatch')
+  .select('_id _subscriber _sensorID option title condition previousValue groupType previousMatch')
   .exec((err,results) => {
 
     if(err) {
@@ -299,8 +297,15 @@ var notificationList = (sensorID,currentValue,callback) => {
       return;
     }
     else {
+      let currentData = {
+        sensorName: sensorData.name,
+        value: sensorData.temp
+      };
+      console.log("current notification Data:");
+      console.log(currentData);
+      console.log();
       //console.log(results);
-      let data = filter_NotificationList(results,currentValue);
+      let data = filter_NotificationList(results,currentData);
       //console.log(data);
       return callback(data);
     }
@@ -312,7 +317,6 @@ var getSubscriptionInfo = (id) => {
   return SubscribeListData.findById(id)
     .select('option condition groupType title')
     .exec();
-  mongoose.disconnect();
 }
 //update subscription info
 var updateSubscriptionInfo = (doc) => {
@@ -344,6 +348,10 @@ var updateSubscriptionInfo = (doc) => {
       });
   });
 }
+var getSubscriptions_bySubscriber = (id) => {
+  return SubscribeListData.find({_subscriber:ObjectId(id)})
+    .select('_id title').exec();
+}
 module.exports = {
   searchSubscribeList_withSensorID,
   searchSubList_withSubName,
@@ -357,5 +365,6 @@ module.exports = {
   updateSubList_PreviousValue,
   updateSubList_PreviousMatchCondition,
   getSubscriptionInfo,
-  updateSubscriptionInfo
+  updateSubscriptionInfo,
+  getSubscriptions_bySubscriber
 };

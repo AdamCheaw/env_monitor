@@ -15,7 +15,7 @@ const test = require('./playground/test');
 const expressValidator = require('express-validator');
 const expressSession = require('express-session');
 const {checkDisconnect} = require('./controllers/sensor');
-const {removeExHistoryData} = require('./controllers/schedule');
+const {removeExHistoryData,removeExSubscriptionLogs} = require('./controllers/schedule');
 const {initialSetup} = require('./controllers/setup');
 
 
@@ -41,7 +41,22 @@ app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(expressValidator());
 app.use(cookieParser());
-app.use(expressSession({secret: 'little cat', saveUninitialized: false, resave: false}));
+app.use(expressSession({
+  key: 'user_id',
+  secret: 'little cat',
+  saveUninitialized: false,
+  resave: false
+}));
+// This middleware will check if user's cookie is still saved in browser and user is not set, then automatically log the user out.
+// This usually happens when you stop your express server after login, your cookie still remains saved in the browser.
+app.use((req, res, next) => {
+    if (req.cookies.user_id && !req.session.userID) {
+        res.clearCookie('user_id');
+    }
+    next();
+});
+// middleware function to check for logged-in users
+
 app.get("/", (req,res,next) => {
   res.redirect('/getData');
 });
@@ -57,5 +72,6 @@ setInterval(function() {
   checkDisconnect();
 }, 60000);//60000
 removeExHistoryData();
+removeExSubscriptionLogs();
 initialSetup();
 module.exports = app;
