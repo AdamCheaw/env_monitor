@@ -20,7 +20,7 @@ router.post('/insert', (req, res, next) => {
         temp: req.body.temp,
         date: currentDate,
         type: req.body.type,
-        //expireTime : 30
+        expireTime : 210, //seconds
         onConnect:true,
         expireDate:moment(currentDate).add(210, 's'),
         previousValue: ""
@@ -62,6 +62,7 @@ router.post('/insert', (req, res, next) => {
       doc.temp = req.body.temp;
       doc.date = new Date();
       doc.onConnect = true;
+      doc.expireTime = 210; //seconds
       doc.expireDate = moment(currentDate).add(210, 's');//210
       previousValue: "";
       //doc.onConnect = true;
@@ -96,7 +97,9 @@ router.post('/insert', (req, res, next) => {
 router.post('/update', (req, res, next) => {
   var currentDate = new Date();
   var id = req.body.sensorId;
-  console.log("received notification message from ("+id+")");
+  console.log();
+  console.log("received notification message from sensor("+id+")");
+  console.log();
   SensorData.findById(id, (err, doc) => {
     if (err) {
       console.error('error, no entry found');

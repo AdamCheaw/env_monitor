@@ -165,23 +165,44 @@ module.exports = {
   },
   loadLogMsg: function(logStatus,logMsg) {
     let msg;
-    if(logStatus < 1) {
+    if(logStatus == 0) {//match condition
       msg = `<p class="font-warning">
                 <i class="icon-md icon-warning-sign"></i>
                 ${logMsg}
              </p>`;
     }
-    else {
+    else if(logStatus == 1){//back to safe
       msg = `<p class="font-safe">
                 <i class="icon-md icon-ok"></i>
                 ${logMsg}
              </p>`;
     }
+    else if(logStatus == 2) {//edit
+      msg = `<p class="font-blue">
+                <i class="icon-md icon-edit"></i><br>
+                ${logMsg}
+             </p>`;
+    }
+    else if(logStatus == 3) {//created
+      msg = `<p class="font-blue">
+                <i class="icon-md icon-pencil"></i>
+                ${logMsg}
+             </p>`;
+    }
+    else if(logStatus == 4) {//deleted
+      msg = `<p class="font-warning">
+                <i class="icon-md icon-remove"></i>
+                ${logMsg}
+             </p>`;
+    }
+    else if(logStatus == -1) {
+
+    }
     return msg;
   },
   // counting how many page can display for ViewLogPage
   howManyPage: function(total) {
-    let page = total / 30;
+    let page = total / 15;
     let select = "";
     for(let i = 0;i < page;i++) {
       //ex <option value="1">1</option>...

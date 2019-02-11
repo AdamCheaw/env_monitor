@@ -11,9 +11,10 @@ const {
   searchSubLogs_byUserID,
   countTotalSubLogs_byUserID,
   searchSubLogs_sortByDate,
-  searchSubLogs_sortBySub
+  searchSubLogs_sortBySub,
+  saveSubscriptionLogs
 } = require('../../controllers/subscriptionLogs');
-
+const {mapToLogMsg} = require('../../server/utils/convert');
 var ObserverPage = (req, res, next) => {
   console.log(`GET - ${req.session.views} request Observe real-time Page`);
   // response current user subscribe 's sensor info
@@ -28,16 +29,28 @@ var ObserverPage = (req, res, next) => {
     //console.log(result);
   });
 }
-var Unsubscribe = (req, res, next) => {
+var Unsubscribe = async (req, res, next) => {
   console.log(`POST - ${req.session.views} request a ajax call /unsubscribe`);
+  var subscription = await getSubscriptionInfo(req.body.subscribeListID);
+
   unsubscribeOne(req.body.subscribeListID,(result) => {
     if(result == "success") {//response to ajax
       res.json({msg:"success"});
     }
     else {
       res.status(400).json({msg:result});
+      return;
     }
-  })
+  });
+  var doc = { //generate delete log
+    _subscription:req.body.subscribeListID,
+    _subscriber:req.session.userID,
+    title: `delete a subscription`,
+    logMsg: subscription.groupType === null ?
+            subscription.title : `group "${subscription.title}"`,
+    logStatus: 4
+  };
+  saveSubscriptionLogs(doc);//save delete log
 }
 var GetSubscriptionInfo = (req, res, next) => {
   console.log(`POST - ${req.session.views} request a ajax call /getSubscriptionInfo`);
@@ -58,7 +71,7 @@ var GetSubscriptionInfo = (req, res, next) => {
 }
 var UpdateSubscriptionInfo = (req, res, next) => {
   console.log(`POST - ${req.session.views} request a ajax call /updateSubscriptionInfo`);
-  updateSubscriptionInfo(req.body)
+  updateSubscriptionInfo(req.body)//option or groupType , condition
    .then(result => {
      if(result) {
        res.json({msg:"ok!"});
@@ -67,6 +80,14 @@ var UpdateSubscriptionInfo = (req, res, next) => {
    .catch(err => {
      res.status(400).json({msg:err.message});
    });
+   var doc = { //generate update subscription log
+     _subscription:req.body._id,
+     _subscriber:req.session.userID,
+     title: `changing a subscription `,
+     logMsg: mapToLogMsg(req.body),
+     logStatus: 2
+   };
+   saveSubscriptionLogs(doc);//save update subscription log
 }
 // using asnc await to response viewLog page
 var ViewLogsPage = async (req, res, next) => {

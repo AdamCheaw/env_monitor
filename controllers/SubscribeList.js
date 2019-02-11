@@ -85,7 +85,9 @@ var searchSubList_withSubName = (name, callback) => {
                  _id: thisSensor._id,
                  name: thisSensor.name,
                  temp: thisSensor.temp,
-                 date: moment.parseZone(thisSensor.date).local().format('YYYY MMM Do, h:mm:ssa'),                 type: thisSensor.type
+                 date: moment.parseZone(thisSensor.date).local().format('YYYY MMM Do, h:mm:ssa'),
+                 type: thisSensor.type,
+                 onConnect: thisSensor.onConnect
               };
             });
             var item = {
@@ -168,7 +170,6 @@ var subscribeOne = (name,userID,sensorID,option,condition,callback) => {
     });
     return;
 }
-
 
 var unsubscribeOne = (subscribeListID,callback) => {
   SubscribeListData.deleteOne({_id:ObjectId(subscribeListID)}, (err) => {
@@ -320,9 +321,9 @@ var getSubscriptionInfo = (id) => {
 }
 //update subscription info
 var updateSubscriptionInfo = (doc) => {
-  let updateData;
+  var updateData;
   //filter update data
-  if(doc.option){
+  if(doc.option) {
     updateData = {
       option : doc.option,
       condition : convertCondition(doc.condition)
@@ -335,11 +336,13 @@ var updateSubscriptionInfo = (doc) => {
     };
   }
   console.log(updateData);
+
   return new Promise((resolve, reject) => {
     SubscribeListData.updateOne({ _id: ObjectId(doc._id) },
       { $set: updateData })
       .exec()
       .then(result => {
+        console.log(result);
         resolve("ok");
       })
       .catch(err => {

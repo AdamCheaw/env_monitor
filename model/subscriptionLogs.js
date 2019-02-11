@@ -6,7 +6,8 @@ var subscriptionLogsSchema = new mongoose.Schema({
   title: { type: String, required: true },
   logMsg: { type: String },
   // -1 = some of the sensor not connnet, 0 = match condition,
-  // 1 = back to normal , 2 = subscriber manipulation subscription
+  // 1 = back to normal , 2 = subscriber manipulation subscription ,
+  // 3 = created a subscription , 4 = deleted a subscription
   logStatus: { type: Number, required: true },
   date: { type: Date, default: Date.now },
   _subscription: {

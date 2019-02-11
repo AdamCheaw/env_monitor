@@ -59,12 +59,13 @@ h1 {
   font-weight: 400;
   font-size: 1.2em;
   color:#595959;
+  line-height: 20px;
   text-transform: uppercase;
 }
 .timeline .event {
   border-bottom: 1px dashed #d9d9d9;
   padding-bottom: 25px;
-  margin-bottom: 10px;
+  margin-bottom: 20px;
   position: relative;
 
 }
@@ -89,7 +90,7 @@ h1 {
   font-size: 0.9em;
   min-width: 120px;
   font-family: 'Open Sans', Arial, sans-serif;
-  top: 10px;
+  top: 0px;
   font-style: italic;
 }
 .timeline .event:after {
@@ -100,7 +101,7 @@ h1 {
   height: 11px;
   width: 11px;
   content: "";
-  top: 15px;
+  top: 5px;
 }
 /* Extra small devices (phones, 600px and down) */
 @media only screen and (max-width: 600px) {...}

@@ -16,23 +16,6 @@ var checkDisconnect = () => {
   })
     .select("_id")
     .exec()
-    // //find disconnect sensor and callback
-    // .then(docs => {
-    //   if(docs && docs != "")
-    //   {
-    //     console.log("Sensor Disconnect: "+docs);
-    //     var socket = io('http://localhost:3000');
-    //     socket.emit('sensor disconnect', {disconnect_SID:docs});
-    //     console.log('emit an event to server about Sensor Disconnect');
-    //
-    //     //return docs;
-    //   }
-    //   else {
-    //     console.log("no sensor disconnect");
-    //
-    //   }
-    // })
-    //according to result (sensor._id) change the onConnect to false
     .then(result => {
       if(result && result != "")
       {
@@ -99,7 +82,7 @@ var searchAllSensor = (callback) => {
     })
 }
 var searchSensorByID = (sensorID) => {
-  return SensorData.find({_id:ObjectId(sensorID)}).select('name type onConnect').exec();
+  return SensorData.find({_id:ObjectId(sensorID)}).select('name type onConnect temp').exec();
 }
 
 module.exports = {checkDisconnect,searchAllSensor,searchSensorByID};

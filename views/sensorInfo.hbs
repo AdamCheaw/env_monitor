@@ -19,12 +19,21 @@
                     {{{findIcon sensorInfo.type}}}
                   </h4>
 
+
                   <p><small class="muted">Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse</small></p>
+                  <div class="pull-right">
+                    {{#if sensorInfo.onConnect}}
+                      <h1 class="font-blue showValue">{{sensorInfo.temp}}</h1>
+                    {{else}}
+                      <i class="font-yellow icon-question-sign showValue"></i>
+                    {{/if}}
+                  </div>
                   {{#if sensorInfo.onConnect}}
                     <b class="ac-online" >online</b>
                   {{else}}
                     <b class="ac-offline" >offline</b>
                   {{/if}}
+
                   {{!-- <div class="media-option btn-group shaded-icon">
                       <button class="btn btn-small">
                           <i class="icon-envelope"></i>

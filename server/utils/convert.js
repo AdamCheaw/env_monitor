@@ -20,4 +20,35 @@ var convertCondition = (data) => {
   return result;
 };
 
-module.exports = {convertCondition};
+var mapToLogMsg = (data) => {
+  var result = "";
+  if(data.option) {
+    result += `option : ${data.option} <br>`;
+  }
+  else if(data.groupType) {
+    result += `grouping type : ${data.groupType} <br>`;
+  }
+  if(data.condition.length > 0){
+    result += "condition : ";
+    data.condition.forEach(item => {
+      switch (true) {
+        case item.type == "max":
+          result += `<br> - greater than ${item.value}`;
+          break;
+        case item.type == "min":
+          result += `<br> - lower than ${item.value}`;
+          break;
+        case item.type == "equal":
+          result += `<br> - equal to ${item.value}`;
+          break;
+        case item.type == "between":
+          result += `<br> - between to  ${item.minValue} ~ ${item.maxValue}`;
+          break;
+      }
+
+    });
+  }
+  return result;
+}
+
+module.exports = {convertCondition , mapToLogMsg};

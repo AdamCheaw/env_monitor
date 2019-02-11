@@ -3294,6 +3294,10 @@ table td .online,.media .media-body .online {
 	float:left;
 	margin-left: 10px;
 }
+i.showValue ,.showValue{
+	font-size: 40px;
+	line-height: 15px
+}
 @media(max-width:767px){
 	body{padding:0!important}
 	.wrapper{padding:20px 15px}

@@ -10,6 +10,7 @@ const {
   subscribeOne,searchSubList_withSubName,
   unsubscribeMany,subscribeMany,findSubscribeBefore,
 } = require('../../controllers/SubscribeList');
+const {saveSubscriptionLogs} = require('../../controllers/subscriptionLogs');
 const {convertCondition} = require('../../server/utils/convert');
 const {getStartAndEnd,avgInInterval,findInterval} = require('../../server/utils/DateAndTime')
 
@@ -187,9 +188,24 @@ var SubscribeMany = (req, res, next) => {
           //subscribe new
           return subscribeMany(req.session.views,userID,req.body.subscription);
         })
-        .then(result => {
+        .then(results => {
           res.json({msg:"success"});
-          console.log(result);
+          var docs = results.map(doc => {
+            return {
+              _subscription:doc._id,
+              _subscriber:req.session.userID,
+              title: `created a subscription`,
+              logMsg: doc.groupType === null? doc.title:`group "${doc.title}"`,
+              logStatus: 3
+            }
+          });
+          console.log();
+          console.log(docs);
+          console.log();
+          //save the subscription logs
+          //about user created the subscription info
+          saveSubscriptionLogs(docs);
+          //console.log(results);
         })
         .catch(err => {
           throw new Error(err.message);
