@@ -1,6 +1,6 @@
 var hbs = require('handlebars');
 var moment = require('moment');
-var filterByCondition = (condition,sensorValue) => {
+const filterByCondition = (condition,sensorValue) => {
   for(let i = 0;i < condition.length;i++) {
     if(condition[i].type == "max" && Number(sensorValue) > Number(condition[i].value)) {
       return true;
@@ -26,6 +26,22 @@ var filterByCondition = (condition,sensorValue) => {
   }
   return false;
 }
+const mappingConditionToStr = (condition) => {
+  if(condition.type == "max"){
+    return `greater than ${condition.value}`;
+  }
+  else if(condition.type == "min"){
+    return `lower than ${condition.value}`;
+  }
+  else if(condition.type == "equal"){
+    return `equal to ${condition.value}`;
+  }
+  else if(condition.type == "precision"){}
+  else if(condition.type == "between"){
+    return `in between ${condition.minValue} ~ ${condition.maxValue}`;
+  }
+}
+
 module.exports = {
   ifeq: function(a, b, options){
     if (a === b) {
@@ -42,15 +58,13 @@ module.exports = {
       for(var i = 0;i < condition.length;i++) {
         if(condition[i].type == "max" && Number(sensorValue) > Number(condition[i].value)) {
           value = new hbs.SafeString(
-            '<span class="font-warning"><i class="icon-md icon-warning-sign"></i> '
-            + sensorValue
+            '<span class="font-warning"><i class="icon-warning-sign"></i> '
             + '</span>');
           break;
         }
         else if (condition[i].type == "min" && Number(sensorValue) < Number(condition[i].value)) {
           value = new hbs.SafeString(
-            '<span class="font-warning"><i class="icon-md icon-warning-sign"></i> '
-            + sensorValue
+            '<span class="font-warning"><i class="icon-warning-sign"></i> '
             + '</span>');
           break;
         }
@@ -59,8 +73,7 @@ module.exports = {
         }
         else if (condition[i].type == "equal" && Number(sensorValue) == Number(condition[i].value)) {
           value = new hbs.SafeString(
-            '<span class="font-warning"><i class="icon-md icon-warning-sign"></i> '
-            + sensorValue
+            '<span class="font-warning"><i class="icon-warning-sign"></i> '
             + '</span>');
           break;
         }
@@ -71,8 +84,7 @@ module.exports = {
                 )
         {
           value = new hbs.SafeString(
-            '<span class="font-warning"><i class="icon-md icon-warning-sign"></i> '
-            + sensorValue
+            '<span class="font-warning"><i class="icon-warning-sign"></i> '
             + '</span>');
           break;
         }
@@ -94,19 +106,22 @@ module.exports = {
   loadGroupValue: (sensors, groupType, condition) => {
     var value;
     if(groupType == "AND") {
+      let safeNum = 0;
       value = '<span class="font-warning"><i class="icon-warning-sign "></i></span>';
       //compare all sensor with multiple condition
       for(let i = 0;i < sensors.length;i++) {
         //if a single sensor disconnect , return noSafe mode
         if(!sensors[i].onConnect) {
-          value = '<span class="font-warning"><i class="icon-warning-sign"></i></span>'
+          value = '<span class="font-yellow"><i class="icon-question-sign"></i></span>'
           break;
         }
         //if a single sensor did not match condition , return safe mode
         if(!filterByCondition(condition,sensors[i].temp)){
-          value = '<span class="font-safe"><i class="icon-star "></i></span>';
-          break;
+          safeNum += 1;
         }
+      }
+      if(safeNum === sensors.length) {
+        value = '<span class="font-safe"><i class="icon-star "></i></span>';
       }
 
     }
@@ -115,7 +130,7 @@ module.exports = {
       for(let i = 0;i < sensors.length;i++) {
         //if a single sensor disconnect , return noSafe mode
         if(!sensors[i].onConnect) {
-          value = '<span class="font-warning"><i class="icon-warning-sign "></i></span>'
+          value = '<span class="font-yellow"><i class="icon-question-sign "></i></span>'
           break;
         }
         //if a single sensor match a condition , return noSafe mode
@@ -126,6 +141,18 @@ module.exports = {
       }
     }
     return value;
+  },
+  loadCondition: function(conditions) {
+    var html = "";
+    conditions.forEach((condition,index,arr) => {
+      if(index == arr.length -1){
+        html += mappingConditionToStr(condition);
+      }
+      else {
+        html += mappingConditionToStr(condition) + " , ";
+      }
+    });
+    return html;
   },
   toJSON: function(object) {
     return JSON.stringify(object);
@@ -165,7 +192,7 @@ module.exports = {
   },
   loadLogMsg: function(logStatus,logMsg) {
     let msg;
-    if(logStatus == 0) {//match condition
+    if(logStatus <= 0) {//match condition or disconnect
       msg = `<p class="font-warning">
                 <i class="icon-md icon-warning-sign"></i>
                 ${logMsg}
@@ -179,7 +206,7 @@ module.exports = {
     }
     else if(logStatus == 2) {//edit
       msg = `<p class="font-blue">
-                <i class="icon-md icon-edit"></i><br>
+                <i class="icon-md icon-edit"></i>
                 ${logMsg}
              </p>`;
     }
@@ -195,9 +222,9 @@ module.exports = {
                 ${logMsg}
              </p>`;
     }
-    else if(logStatus == -1) {
-
-    }
+    // else if(logStatus == -1) {
+    //
+    // }
     return msg;
   },
   // counting how many page can display for ViewLogPage

@@ -51,9 +51,8 @@ const changeSubscriptionLogs = (data) => {
     let html = ""
     data.forEach(doc => {
       let color;
-      if(doc.logStatus == -1){//sensor disconnect
-      }
-      else if(doc.logStatus == 0){//match condition
+
+      if(doc.logStatus <= 0){//match condition
         fontColor = "font-warning";
         logMsg = `<i class="icon-md icon-warning-sign"></i> ${doc.logMsg}`
       }
@@ -64,7 +63,7 @@ const changeSubscriptionLogs = (data) => {
       }
       else if(doc.logStatus == 2){//changing subscription condition..
         fontColor = "font-blue";
-        logMsg = `<i class="icon-md icon-edit"></i><br> ${doc.logMsg}`
+        logMsg = `<i class="icon-md icon-edit"></i> ${doc.logMsg}`
       }
       else if(doc.logStatus == 3){//created subscription
         fontColor = "font-blue";

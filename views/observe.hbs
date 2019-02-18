@@ -48,20 +48,30 @@
                         </div>
                         <div class="row-fluid">
                           <div class="span10">
-                            <h3 class="media-title">
+                            <h3 class="media-title mb-1">
                                 {{title}}
                             </h3>
-                            <br/>
                             {{!-- <p><small class="muted">Lab B24 Outdoor</small></p> --}}
-                            <strong>Group Type</strong>
+                            <p>option : {{this.option}}<br/>
+                               grouping type : {{this.groupType}}<br/>
+                            {{#if this.condition}}
+                              condition : {{loadCondition this.condition}}
+                                {{!-- {{#each this.condition}}
+                                  - {{this.type}}<br/>
+                                {{/each}} --}}
+                            {{/if}}
+                            {{!-- <strong>Group Type</strong>
 						                 -
-						                <span>{{this.groupType}}</span>
+						                <span>{{this.groupType}}</span> --}}
                           </div>
                           <div class="span2">
                             <div class="pull-right">
                               <h3 class="sensor-value">{{{loadGroupValue this._sensorID this.groupType this.condition}}}</h3>
                             </div>
                           </div>
+
+                        </div>
+                        <div class="row-fluid">
                           <a class="btn btn-mini btn-collapse" data-toggle="collapse" href="#collapse-{{this._id}}"
                              role="button" aria-expanded="false" aria-controls="collapse-{{this._id}}">
                              <i class="icon-chevron-down"></i>
@@ -73,14 +83,17 @@
                                 <th>Name</th>
                                 <th>Status</th>
                                 <th>last updated</th>
-                                <th>value</th>
                               </tr>
                               </thead>
 
                               <tbody>
                                 {{#each this._sensorID}}
                                 <tr id="table-row-{{this._id}}">
-                                  <td>{{this.name}}</td>
+                                  <td>
+                                    <a href="getData/{{this._id}}">
+                                      {{this.name}}
+                                    </a>
+                                  </td>
                                   <td class="status">
                                     {{#if this.onConnect}}
                                       <b class="online">online</b>
@@ -89,13 +102,6 @@
                                     {{/if}}
                                   </td>
                                   <td class="date">{{this.date}}</td>
-                                  <td class="font-md value">
-                                    {{#if this.onConnect}}
-                                    {{loadValue this.temp ../this.option ../this.condition}}
-                                    {{else}}
-                                    <span class="font-yellow"><i class="icon-question-sign"></i></span>
-                                    {{/if}}
-                                  </td>
                                 </tr>
                                 {{/each}}
                               </tbody>
@@ -127,16 +133,24 @@
                         </div>
                         <div class="row-fluid">
                         <div class="span10">
-                          <h3 class="media-title">
-                              {{this._sensorID.[0].name}}
+                          <h3 class="media-title mb-1">
+                              <a href="getData/{{this._sensorID.[0]._id}}">{{this._sensorID.[0].name}}</a>
                           </h3>
-                          <p><small class="muted">Lorem ipsum dolor sit amet.</small></p>
+                          {{!-- <p><small class="muted">Lorem ipsum dolor sit amet.</small></p> --}}
+                          <p>option : {{this.option}}<br/>
+                          {{#if this.condition}}
+                            condition : {{loadCondition this.condition}}
+                              {{!-- {{#each this.condition}}
+                                - {{this.type}}<br/>
+                              {{/each}} --}}
+                          {{/if}}
+                          </p>
                           {{#if this._sensorID.[0].onConnect}}
                           <b class="online">online</b>
                           {{else}}
                           <b class="offline">offline</b>
                           {{/if}}
-                          <span>{{this._sensorID.[0].date}}</span>
+                          <span class="ml-2">{{this._sensorID.[0].date}}</span>
 
                         </div><!-- end span6 -->
                         <div class="span2">

@@ -19,7 +19,8 @@ var filter_NotificationList = (results,currentData) => {
             _id: sensor._id,
             name: sensor.name,
             temp: sensor.temp,
-            date: sensor.date
+            date: sensor.date,
+            onConnect: sensor.onConnect
           };
         }),
         groupType: result.groupType,
@@ -76,7 +77,10 @@ var filter_NotificationList = (results,currentData) => {
       );
       //console.log(matchingResult);
       //compare every condition in the subscription
-      if(matchingResult.match !== result.previousMatch) {
+      if(matchingResult.notOnConnect !== undefined){
+        return;
+      }
+      else if(matchingResult.match !== result.previousMatch) {
         let statusLog;
         if(!matchingResult.match) {
           matchingResult.matchMsg = "back to normal";
@@ -123,7 +127,11 @@ var filter_NotificationList = (results,currentData) => {
       //console.log(matchingResult);
       //the sensor currentValue matching 's condition
       //different than previous matching 's condition
-      if(matchingResult.match !== result.previousMatch) {
+      if(matchingResult.notOnConnect !== undefined){
+        console.log("sensor not onConnect");
+        return;
+      }
+      else if(matchingResult.match !== result.previousMatch) {
         let statusLog;
         if(matchingResult.matchMsg === null) {
           matchingResult.matchMsg = "back to normal";
@@ -159,30 +167,6 @@ var filter_NotificationList = (results,currentData) => {
         };
       }
     }
-    //end result.option == "advanced" && result.groupType == "OR"
-    //when previousMatch is true and current condition did not matching
-    //need to notification user condition is back to normal
-    // if(result.previousMatch) {
-    //   doc = {
-    //     _id: result._id,
-    //     socketID : result._subscriber.socketID,
-    //     onConnect : result._subscriber.onConnect,
-    //     option : result.option,
-    //     condition : result.condition,
-    //     _sensorID: result._sensorID.map(sensor => {
-    //       return {
-    //         _id: sensor._id,
-    //         name: sensor.name,
-    //         temp: sensor.temp,
-    //         date: sensor.date,
-    //         onConnect:sensor.onConnect
-    //       };
-    //     }),
-    //     groupType: result.groupType,
-    //     previousMatch: false
-    //   };
-    // }
-    //if doc had assign notification info ,save to the data
     if(doc._id) {
       data.push(doc);
     }

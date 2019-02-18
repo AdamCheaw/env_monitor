@@ -28,31 +28,44 @@ const filterByCondition = (condition,sensorValue) => {
 //changing single subscription 's view
 const changeOneSubscriptionView = (docs) => {
   let html = "";
+  let onConnectStatus;
   if(docs.option == "default") {
     html = `<span class="font-blue">${docs._sensorID[0].temp}</span>`;
   }
   else if(docs.option == "advanced") {
     if(filterByCondition(docs.condition,docs._sensorID[0].temp)){
-      html = `<span class="font-warning"><i class="icon-warning-sign icon-md"></i> ${docs._sensorID[0].temp}</span>`;
+      html = `<span class="font-warning"><i class="icon-warning-sign"></i> </span>`;
     }
     else {
       html = '<span class="font-safe"><i class="icon-star font-lg"></i></span>';
     }
   }
+  if(docs._sensorID[0].onConnect) {
+    onConnectStatus = "online";
+  }
+  else if(!docs._sensorID[0].onConnect) {
+    onConnectStatus = "offline";
+  }
   //change Subscription value
   $("#subscription-"+docs._id+" .sensor-value").html(html);
+  //change onConnect status
+  $("#subscription-"+docs._id+" .media-body .span10 b")
+    .removeClass().addClass(onConnectStatus).text(onConnectStatus);
+
+  //$("#subscription-"+docs._id+" .sensor-value").html(html);
+
 }
 //changing group subscription 's table info
 const changeTableView = (docs) => {
   let condition = docs.condition;
   docs._sensorID.forEach(doc => {
     let value = date = status = "";
-    if(filterByCondition(condition,doc.temp)) {
-      value = `<span class="font-warning"><i class="icon-warning-sign font-md"></i> ${doc.temp}</span>`;
-    }
-    else {
-      value = `<span class="font-safe"><i class="icon-star font-md"></i></span>`;
-    }
+    // if(filterByCondition(condition,doc.temp)) {
+    //   value = `<span class="font-warning"><i class="icon-warning-sign"></i></span>`;
+    // }
+    // else {
+    //   value = `<span class="font-safe"><i class="icon-star font-md"></i></span>`;
+    // }
     if(doc.onConnect){
       status = '<b class="online">online</b>';
     }
@@ -60,7 +73,7 @@ const changeTableView = (docs) => {
       status = '<b class="offline">offline</b>';
     }
     date = moment.parseZone(doc.date).local().format('YYYY MMM Do, h:mm:ssa');
-    $(`#table-row-${doc._id} .value`).html(value);
+    // $(`#table-row-${doc._id} .value`).html(value);
     $(`#table-row-${doc._id} .date`).html(date);
     $(`#table-row-${doc._id} .status`).html(status);
   });
@@ -71,18 +84,21 @@ const changeGroupStatus = (docs) => {
   var isSafe
   if(docs.groupType == "AND") {
     //all the sensor value need to match with condition
+    let safeNum = 0;
     isSafe = false;
     for(let i = 0;i < sensors.length;i++) {
       if(!sensors[i].onConnect) {
-        isSafe = false;
+        isSafe = null;
         break;
       }
-      //if a single sensor did not match condition , return safe mode
+      //if a single sensor did not match condition , safeNum +1
       //console.log(filterByCondition(docs.condition,sensors[i].temp));
       if(!filterByCondition(docs.condition,sensors[i].temp)) {
-        isSafe = true;
-        break;
+        safeNum += 1;
       }
+    }
+    if(safeNum === sensors.length){
+      isSafe = true;
     }
     console.log("check finish");
   }
@@ -91,7 +107,7 @@ const changeGroupStatus = (docs) => {
     isSafe = true;
     for(let i = 0;i < sensors.length;i++) {
       if(!sensors[i].onConnect) {
-        isSafe = false;
+        isSafe = null;
         break;
       }
       //if a single sensor matching condition , return no safe mode
@@ -101,7 +117,11 @@ const changeGroupStatus = (docs) => {
       }
     }
   }
-  if(isSafe) {
+  if(isSafe === null) {
+    html = '<span class="font-yellow"><i class="icon-question-sign"></i></span>';
+    $("#subscription-"+docs._id+" .sensor-value").html(html);
+  }
+  else if(isSafe) {
     html = '<span class="font-safe"><i class="icon-star"></i></span>';
     $("#subscription-"+docs._id+" .sensor-value").html(html);
   }
@@ -119,8 +139,8 @@ const handleSensorDisconnect = (doc) => {
     $(`#subscription-${doc._id} #table-row-${doc.sensorID} .status`)
       .html('<b class="offline">offline</b>');
     //change status icon
-    $(`#subscription-${doc._id} #table-row-${doc.sensorID} .value`)
-      .html('<span class="font-yellow"><i class="icon-question-sign"></i></span>');
+    $("#subscription-"+doc._id+" .media-body .span2 .sensor-value")
+      .html('<span class="font-yellow"><i class="icon-question-sign"></i></span>')
   }
   else {
     $("#subscription-"+doc._id+" .media-body .span10 b")
@@ -264,22 +284,33 @@ socket.on('connect', function () {
   socket.emit('auth',{name});
 
 });
-socket.on('notification', function(SensorData) {
-  if(SensorData.groupType == 'AND') {
-    changeGroupStatus(SensorData);
-    changeTableView(SensorData);
+socket.on('notification', function(subscription) {
+  if(subscription.groupType == 'AND') {
+    changeGroupStatus(subscription);
+    changeTableView(subscription);
   }
-  else if(SensorData.groupType == 'OR') {
-    changeTableView(SensorData);
-    changeGroupStatus(SensorData);
+  else if(subscription.groupType == 'OR') {
+    changeTableView(subscription);
+    changeGroupStatus(subscription);
   }
   else {
-    changeOneSubscriptionView(SensorData);
+    changeOneSubscriptionView(subscription);
   }
 
   console.log("listen a notification");
-  console.log(SensorData);
+  console.log(subscription);
 });
+socket.on('sensor connect', function(subscription) {
+  console.log("a sensor is connect");
+  console.log(subscription);
+  if(subscription.groupType == 'AND' || subscription.groupType == 'OR') {
+    changeGroupStatus(subscription);
+    changeTableView(subscription);
+  }
+  else {
+    changeOneSubscriptionView(subscription);
+  }
+})
 socket.on('sensor disconnect', function(data) {
   handleSensorDisconnect(data)
   // var html = "<b class=\"offline\" >offline</b>";

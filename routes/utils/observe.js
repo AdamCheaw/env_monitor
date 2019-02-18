@@ -79,15 +79,24 @@ var UpdateSubscriptionInfo = (req, res, next) => {
    })
    .catch(err => {
      res.status(400).json({msg:err.message});
+     return;
    });
-   var doc = { //generate update subscription log
-     _subscription:req.body._id,
-     _subscriber:req.session.userID,
-     title: `changing a subscription `,
-     logMsg: mapToLogMsg(req.body),
-     logStatus: 2
-   };
-   saveSubscriptionLogs(doc);//save update subscription log
+  getSubscriptionInfo(req.body._id)
+    .then(result => {
+      var doc = { //generate update subscription log
+        _subscription:req.body._id,
+        _subscriber:req.session.userID,
+        title: `changing a subscription `,
+        logMsg: mapToLogMsg(req.body,result.title),
+        logStatus: 2
+      };
+      saveSubscriptionLogs(doc);//save update subscription log
+    })
+    .catch(err => {
+      console.log(err);
+      return;
+    });
+
 }
 // using asnc await to response viewLog page
 var ViewLogsPage = async (req, res, next) => {

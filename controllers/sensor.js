@@ -84,5 +84,15 @@ var searchAllSensor = (callback) => {
 var searchSensorByID = (sensorID) => {
   return SensorData.find({_id:ObjectId(sensorID)}).select('name type onConnect temp').exec();
 }
+var searchOneSensor_byID = (sensorID) => {
+  return SensorData.findOne({_id:ObjectId(sensorID)}).exec();
+}
+var searchOneSensor_byName = (sensorName) => {
+  return SensorData.findOne({"name":sensorName}).exec();
+}
 
-module.exports = {checkDisconnect,searchAllSensor,searchSensorByID};
+module.exports = {
+  checkDisconnect,searchAllSensor,
+  searchSensorByID,searchOneSensor_byName,
+  searchOneSensor_byID
+};

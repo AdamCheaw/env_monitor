@@ -15,11 +15,11 @@ var ObjectId = require('mongodb').ObjectID;
 var testing = (callback) => {
   return callback("123");
 };
-
-SubscriptionLog.aggregate( [ { $group : { _id : "$_subscription" } } ] )
-  .exec().then(results => {
-    console.log(results);
-  });
+// 
+// SubscriptionLog.aggregate( [ { $group : { _id : "$_subscription" } } ] )
+//   .exec().then(results => {
+//     console.log(results);
+//   });
 
 // var date = moment().hour(0).minute(0).second(0);
 // console.log(date);

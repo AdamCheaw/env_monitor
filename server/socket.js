@@ -5,6 +5,7 @@ const {
 } = require('./utils/generate');
 const {subscribe,unsubscribe} = require('./utils/subscribe_event');
 const {userOnConnect,userDisconnect} = require('../controllers/user');
+const {searchSensorByID} = require('../controllers/sensor');
 const {
   searchSubscribeList_withSensorID,
   notificationList,
@@ -88,28 +89,77 @@ var webSocket = (io) => {
 
       //io.emit('notification',generateData(data));
     });
+    socket.on('sensor connect', async (data) => {
+      console.log(`SOCKET - listening Sensor ${data._id} onConnect`);
+      //save sensor onConnect logs with related subscriber
+      var subscriptionLogs = [];//save sensor onConnect to logs
+      // find related subscriptions
+      let subscriptions = await findAllSubscriber_bySensorID(data._id);
+      subscriptions.forEach(subscription => {
+        let socketID = subscription._subscriber.socketID;
+        let onConnect = subscription._subscriber.onConnect;
+        //subscriber is connect with socket
+        //emit sensor onConnect msg to subscriber
+        if(onConnect && io.sockets.connected[socketID]) {
+          io.to(socketID).emit('sensor connect',generateNotification(subscription));
+        }
+        subscriptionLogs.push({
+          title: (subscription.groupType === null) ?
+           subscription.title:`group "${subscription.title}"`,
+          logMsg: data.name + " is connect",
+          logStatus: 1,
+          _subscription: subscription._id,
+          _subscriber: subscription._subscriber
+        });
+      });//end subscriptions.forEach
+      if(subscriptionLogs && subscriptionLogs.length) {
+        saveSubscriptionLogs(subscriptionLogs);//save sensor onConnect logs
+      }
+    })
     socket.on('sensor disconnect',(data) => {
       console.log("SOCKET - listening Sensor Disconnect event "+data.disconnect_SID);
       //multiple sensor id,because will have multiple sensor disconnect in a min
+      var subscriptionLogs = [];
       data.disconnect_SID.forEach(sensorID => {
-        findAllSubscriber_bySensorID(sensorID)
-          .then(docs => {
-            //emit disconnect event to all subscriber
-            docs.forEach(doc => {
-              let socketID = doc._subscriber.socketID;
-              let onConnect = doc._subscriber.onConnect;
-              //subscriber is connect with socket
-              if(onConnect && io.sockets.connected[socketID]) {
-                io.to(socketID).emit('sensor disconnect',
-                  generateSensorDisconnectData(doc,sensorID)
-                );
-              }
-            })
+        searchSensorByID(sensorID)//find sensor infomation
+          .then(sensor => {
+            console.log();
+            console.log(sensor);
+            console.log();
+            findAllSubscriber_bySensorID(sensorID)
+              .then(docs => {
+                //emit disconnect event to all subscriber
+                docs.forEach(doc => {
+                  let socketID = doc._subscriber.socketID;
+                  let onConnect = doc._subscriber.onConnect;
+                  //subscriber is connect with socket
+                  if(onConnect && io.sockets.connected[socketID]) {
+                    io.to(socketID).emit('sensor disconnect',
+                      generateSensorDisconnectData(doc,sensorID)
+                    );
+                  }
+                  subscriptionLogs.push({
+                    title: (doc.groupType === null) ? doc.title:`group "${doc.title}"`,
+                    logMsg: sensor[0].name + " is disconnect",
+                    logStatus: -1,
+                    _subscription: doc._id,
+                    _subscriber: doc._subscriber
+                  });
+                });
+                if(subscriptionLogs && subscriptionLogs.length) {
+                  console.log(subscriptionLogs);
+                  saveSubscriptionLogs(subscriptionLogs);//save sensor disconnect logs
+                }
+              })
+              .catch(err => {
+                console.log(err);
+              });
           })
           .catch(err => {
             console.log(err);
           });
-      })
+      });//end disconnect sensors loops
+
     })
     socket.on('disconnect', () => {
       console.log('SOCKET - User was disconnected');

@@ -9,7 +9,7 @@ var saveSubscriptionLogs = (data) => {
       console.log();
     })
     .catch(err => {
-      console.log(err);
+      console.log(err); 
     })
 }
 var searchSubLogs_byUserID = (userID,skip,limit) => {

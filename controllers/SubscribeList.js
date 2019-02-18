@@ -61,7 +61,11 @@ var findAllSubscriber_bySensorID = (sensorID) => {
       //match:{onConnect:true},
       select:'socketID _id onConnect'
     })
-    .select('_subscriber groupType _id')
+    .populate({
+      path:'_sensorID',
+      select:'_id temp onConnect data'
+    })
+    .select('_id _subscriber _sensorID option condition groupType title ')
     .exec();
 }
 

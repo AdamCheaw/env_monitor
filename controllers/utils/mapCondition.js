@@ -60,9 +60,9 @@ var mapValueToCondition_withOR =
       matchingResult = null;
       if(!sensors[i].onConnect){
         matchingResult = {
-          match: true,
-          matchMsg: `${sensors[i].name} not on connect`
+          notOnConnect: true
         };
+        break;
       }
       else {
         matchingResult = mapValueToCondition(condition,sensors[i].temp);
@@ -95,9 +95,9 @@ var mapValueToCondition_withAND =
       matchingResult = null;
       if(!sensors[i].onConnect){
         matchingResult = {
-          match: true,
-          matchMsg: `${sensors[i].name} not on connect`
+          notOnConnect: true
         };
+        break;
       }
       else {
         matchingResult = mapValueToCondition(condition,sensors[i].temp);
