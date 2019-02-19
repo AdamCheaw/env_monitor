@@ -15,9 +15,15 @@ function startSending()
     temp : temp
   };
   postData(`http://${IP}:${port}/sensors/update`, data)
-  .then(res => {return res.json();})
+  .then(res => {
+    console.log(res);
+    return res.json();}
+  )
   .then(data => {console.log(data);}) // JSON-string from `response.json()` call
-  .catch(error => console.log(error));
+  .catch(error => {
+    console.log("something went wrong");
+    console.log(error)
+  });
   if(i > 0)
   {
     setTimeout(startSending ,second);
@@ -56,6 +62,7 @@ $('#input-submit').click(function(e){
   //postData(`http://localhost:3000/sensors/insert`, data)
   postData(`http://${IP}:${port}/sensors/insert`, data)
   .then(res => {
+    console.log(res);
     return res.json();
   })
   .then(data => {
@@ -64,5 +71,8 @@ $('#input-submit').click(function(e){
       setTimeout(startSending , getRandomValue(10,60) * 1000);
     }
   })
-  .catch(error => console.log(error));
+  .catch(error => {
+    console.log("something went wrong");
+    console.log(error);
+  });
 });

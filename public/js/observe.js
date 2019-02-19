@@ -94,11 +94,9 @@ const changeGroupStatus = (docs) => {
       //if a single sensor did not match condition , safeNum +1
       //console.log(filterByCondition(docs.condition,sensors[i].temp));
       if(!filterByCondition(docs.condition,sensors[i].temp)) {
-        safeNum += 1;
+        isSafe = true;
+        break;
       }
-    }
-    if(safeNum === sensors.length){
-      isSafe = true;
     }
     console.log("check finish");
   }

@@ -5,7 +5,8 @@ var ObjectId = require('mongodb').ObjectID;
 const {
   searchSubList_withSubName,getSubscriptionInfo,
   updateSubscriptionInfo,unsubscribeOne,
-  getSubscriptions_bySubscriber
+  getSubscriptions_bySubscriber,
+  getSubscription_relatedSensorInfo
 } = require('../../controllers/SubscribeList');
 const {
   searchSubLogs_byUserID,
@@ -81,6 +82,38 @@ var UpdateSubscriptionInfo = (req, res, next) => {
      res.status(400).json({msg:err.message});
      return;
    });
+  // getSubscription_relatedSensorInfo(req.body._id)
+  //   .then(result => {
+  //     var doc = { //generate update subscription log
+  //       _subscription:req.body._id,
+  //       _subscriber:req.session.userID,
+  //       title: `changing a subscription `,
+  //       logMsg: mapToLogMsg(req.body,result.title),
+  //       logStatus: 2
+  //     };
+  //     saveSubscriptionLogs(doc);//save update subscription log
+  //     var matchResult = checkMatchCondition (
+  //       result._sensorID,result.option,result.groupType,result.condition
+  //     );
+  //
+  //     if(matchResult.match === null){//sensor disconnect or can not do matching
+  //
+  //     }
+  //     //matchCondition is differrent than previous matchCondition
+  //     else if(matchResult.match !== result.previousMatch) {
+  //       updateSubList_PreviousMatchCondition([req.body._id],matchResult.match);
+  //       if(matchResult.match) {
+  //
+  //       }
+  //       else {
+  //
+  //       }
+  //     }
+  //   })
+  //   .catch(err => {
+  //     console.log(err);
+  //     return;
+  //   })
   getSubscriptionInfo(req.body._id)
     .then(result => {
       var doc = { //generate update subscription log

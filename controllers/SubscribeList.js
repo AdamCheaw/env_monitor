@@ -323,6 +323,16 @@ var getSubscriptionInfo = (id) => {
     .select('option condition groupType title')
     .exec();
 }
+//get subscription related sensor's info
+var getSubscription_relatedSensorInfo = (id) => {
+  return SubscribeListData.findById(id)
+    .populate({
+      path: '_sensorID',
+      select:'_id temp onConnect'
+    })
+    .select('previousMatch option condition groupType title')
+    .exec();
+}
 //update subscription info
 var updateSubscriptionInfo = (doc) => {
   var updateData;
@@ -373,5 +383,6 @@ module.exports = {
   updateSubList_PreviousMatchCondition,
   getSubscriptionInfo,
   updateSubscriptionInfo,
-  getSubscriptions_bySubscriber
+  getSubscriptions_bySubscriber,
+  getSubscription_relatedSensorInfo
 };

@@ -117,12 +117,11 @@ module.exports = {
         }
         //if a single sensor did not match condition , return safe mode
         if(!filterByCondition(condition,sensors[i].temp)){
-          safeNum += 1;
+          value = '<span class="font-safe"><i class="icon-star "></i></span>';
+          break;
         }
       }
-      if(safeNum === sensors.length) {
-        value = '<span class="font-safe"><i class="icon-star "></i></span>';
-      }
+
 
     }
     else if(groupType == "OR") {

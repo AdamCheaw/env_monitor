@@ -109,6 +109,9 @@ const SensorUpdated = async (req, res, next) => {
     sensor.expireDate = moment(currentDate).add(210, 's');//210
     //doc.onConnect = true;
     sensor.save();
+    res.status(200).json({
+      message: "receive request packet!"
+    });
     let socket = io('http://localhost:3000');
     if(!sensorPreviousConnect) {//sensor is offline before
       socket.emit('sensor connect', generateSensorData(sensor,""));
