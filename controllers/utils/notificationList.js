@@ -87,7 +87,7 @@ var filter_NotificationList = (results,currentData) => {
           statusLog = 1;
         }
         else if(matchingResult.match){
-          matchingResult.matchMsg = "All sensors" + " " + matchingResult.matchMsg;
+          matchingResult.matchMsg = "All sensor is match condition";
           statusLog = 0;
         }
         doc = {

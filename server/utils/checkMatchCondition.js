@@ -33,45 +33,54 @@ var mapValueWithCondition = (condition,currentValue) => {
       break;
     }
   }
-  let matchingResult = { match,matchMsg };
-  return matchingResult;
+  let matchResult = { match,matchMsg };
+  return matchResult;
 }
 
 
 var checkMatchCondition = (sensors,option,groupType,condition)  => {
   if(option == "default") {
-    return false;
+    return {
+      match : null,
+      matchMsg : null
+    };
   }
   else if(option == "advanced" && groupType == null){
     if(!sensors[0].onConnect) {
-      return null
+      return {
+        match : null,
+        matchMsg : null
+      };
     }
     else {
-      let matchResult = mapValueWithCondition(condition,sensor[0].temp);
-      matchResult.matcgMsg = sensors[0].name + " " + matchResult.matcgMsg;
+      let matchResult = mapValueWithCondition(condition,sensors[0].temp);
+      matchResult.matchMsg = `${sensors[0].name}  ${matchResult.matchMsg}`;
       return matchResult;
     }
   }
   else if(option == "advanced" && groupType == "OR"){
+    var matchNum = 0;
+    var matchMsg = "";
     for(let i = 0;i < sensors.length;i++) {//check all sensors
-      let matchNum = 0;
-      var matchMsg;
       //if a single sensor match condition return false
       if(!sensors[i].onConnect) {//at least a sensor not connect return null
-        return null;
-        break;
+        return {
+          match : null,
+          matchMsg : null
+        };
       }
       let matchResult = mapValueWithCondition(condition,sensors[i].temp);
-      if(matchResult.match) {//if true match number + 1
+      if(matchResult.match && matchMsg == "") {//if true ,match number + 1
         matchNum += 1;
+        matchMsg = sensors[i].name + " " + matchResult.matchMsg;
       }
     }//end sensors loop
-    if(matchNum > 0) {//at least 1 sensor match condition return true
+    if(matchNum > 0 ) {//at least 1 sensor match condition return true
       let matchResult = {
         match : true,
-        matchMsg : "sensors is match condition"
+        matchMsg : matchMsg
       };
-      return matchingResult;
+      return matchResult;
     }
     else {
       return {
@@ -81,12 +90,14 @@ var checkMatchCondition = (sensors,option,groupType,condition)  => {
     }
   }
   else if(option == "advanced" && groupType == "AND"){
+    var matchNum = 0;
     for(let i = 0;i < sensors.length;i++) {//check all sensors
-      let matchNum = 0;
       //if a single sensor match condition return false
       if(!sensors[i].onConnect) {//at least a sensor not connect return null
-        return null;
-        break;
+        return {
+          match : null,
+          matchMsg : null
+        };
       }
       let matchResult = mapValueWithCondition(condition,sensors[i].temp);
       if(matchResult.match) {//if true match number + 1
@@ -98,7 +109,7 @@ var checkMatchCondition = (sensors,option,groupType,condition)  => {
         match : true,
         matchMsg : "all sensors is match condition"
       };
-      return matchingResult;
+      return matchResult;
     }
     else {
       return {
@@ -108,7 +119,10 @@ var checkMatchCondition = (sensors,option,groupType,condition)  => {
     }
   }
   console.log("can't check matching condition");
-  return null;
+  return{
+    match : null,
+    matchMsg : null
+  };
 }
 
 module.exports = {

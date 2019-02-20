@@ -328,7 +328,7 @@ var getSubscription_relatedSensorInfo = (id) => {
   return SubscribeListData.findById(id)
     .populate({
       path: '_sensorID',
-      select:'_id temp onConnect'
+      select:'_id name temp onConnect'
     })
     .select('previousMatch option condition groupType title')
     .exec();

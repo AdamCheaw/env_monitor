@@ -29,29 +29,32 @@ const filterByCondition = (condition,sensorValue) => {
 const changeOneSubscriptionView = (docs) => {
   let html = "";
   let onConnectStatus;
-  if(docs.option == "default") {
-    html = `<span class="font-blue">${docs._sensorID[0].temp}</span>`;
-  }
-  else if(docs.option == "advanced") {
-    if(filterByCondition(docs.condition,docs._sensorID[0].temp)){
-      html = `<span class="font-warning"><i class="icon-warning-sign"></i> </span>`;
-    }
-    else {
-      html = '<span class="font-safe"><i class="icon-star font-lg"></i></span>';
-    }
-  }
+  let date = moment.parseZone(docs.date).local().format('YYYY MMM Do, h:mm:ssa');
   if(docs._sensorID[0].onConnect) {
     onConnectStatus = "online";
+    if(docs.option == "default") {
+      html = `<span class="font-blue">${docs._sensorID[0].temp}</span>`;
+    }
+    else if(docs.option == "advanced") {
+      if(filterByCondition(docs.condition,docs._sensorID[0].temp)){
+        html = `<span class="font-warning"><i class="icon-warning-sign"></i> </span>`;
+      }
+      else {
+        html = '<span class="font-safe"><i class="icon-star font-lg"></i></span>';
+      }
+    }
   }
   else if(!docs._sensorID[0].onConnect) {
     onConnectStatus = "offline";
+    html = '<span class="font-yellow"><i class="icon-question-sign"></i></span>'
   }
   //change Subscription value
   $("#subscription-"+docs._id+" .sensor-value").html(html);
   //change onConnect status
   $("#subscription-"+docs._id+" .media-body .span10 b")
     .removeClass().addClass(onConnectStatus).text(onConnectStatus);
-
+  //change last updated 's date
+  $("#subscription-"+docs._id+" .media-body .span10 span").text(date);
   //$("#subscription-"+docs._id+" .sensor-value").html(html);
 
 }
@@ -81,22 +84,23 @@ const changeTableView = (docs) => {
 //changing group subscription 's status (safe or not safe) symbol
 const changeGroupStatus = (docs) => {
   let sensors = docs._sensorID;
-  var isSafe
+  var isSafe;
+  let matchNum = 0;
   if(docs.groupType == "AND") {
     //all the sensor value need to match with condition
-    let safeNum = 0;
-    isSafe = false;
+    isSafe = true;
     for(let i = 0;i < sensors.length;i++) {
       if(!sensors[i].onConnect) {
         isSafe = null;
         break;
       }
-      //if a single sensor did not match condition , safeNum +1
-      //console.log(filterByCondition(docs.condition,sensors[i].temp));
-      if(!filterByCondition(docs.condition,sensors[i].temp)) {
-        isSafe = true;
-        break;
+      //a sensor match condition , matchNum +1
+      if(filterByCondition(docs.condition,sensors[i].temp)) {
+        matchNum += 1;
       }
+    }
+    if(matchNum === sensors.length && isSafe !== null){
+      isSafe = false;
     }
     console.log("check finish");
   }
@@ -108,11 +112,13 @@ const changeGroupStatus = (docs) => {
         isSafe = null;
         break;
       }
-      //if a single sensor matching condition , return no safe mode
+      //if a single sensor matching condition ,matchNum + 1
       if(filterByCondition(docs.condition,sensors[i].temp)) {
-        isSafe = false;
-        break;
+        matchNum += 1;
       }
+    }
+    if(matchNum > 0 && isSafe !== null) {
+      isSafe = false;
     }
   }
   if(isSafe === null) {
@@ -128,7 +134,6 @@ const changeGroupStatus = (docs) => {
     html = '<span class="font-warning"><i class="icon-warning-sign "></i></span>';
     $("#subscription-"+docs._id+" .sensor-value").html(html);
   }
-
 }
 //when sensor disconnect , change status to offline
 const handleSensorDisconnect = (doc) => {
