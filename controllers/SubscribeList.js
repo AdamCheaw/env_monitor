@@ -6,6 +6,7 @@ var express = require('express');
 var ObjectId = require('mongodb').ObjectID;
 var moment = require('moment');
 const {convertCondition} = require('../server/utils/convert');
+const {aggregatedConditions} = require('../server/utils/aggregatedConditions');
 const {filter_NotificationList} = require('./utils/notificationList');
 // find all subscriber subscribe this sensor
 var searchSubscribeList_withSensorID = (sensorID,callback) => {
@@ -320,7 +321,7 @@ var notificationList = (sensorData,callback) => {
 //get subscription info
 var getSubscriptionInfo = (id) => {
   return SubscribeListData.findById(id)
-    .select('option condition groupType title')
+    .select('option condition groupType title _sensorID')
     .exec();
 }
 //get subscription related sensor's info
@@ -349,7 +350,8 @@ var updateSubscriptionInfo = (doc) => {
       condition : convertCondition(doc.condition)
     };
   }
-  console.log(updateData);
+  //console.log(updateData);
+  
 
   return new Promise((resolve, reject) => {
     SubscribeListData.updateOne({ _id: ObjectId(doc._id) },

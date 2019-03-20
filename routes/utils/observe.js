@@ -7,7 +7,7 @@ const {
   updateSubscriptionInfo,unsubscribeOne,
   updateSubList_PreviousMatchCondition,
   getSubscriptions_bySubscriber,
-  getSubscription_relatedSensorInfo
+  getSubscription_relatedSensorInfo,
 } = require('../../controllers/SubscribeList');
 const {
   searchSubLogs_byUserID,
@@ -17,7 +17,9 @@ const {
   saveSubscriptionLogs
 } = require('../../controllers/subscriptionLogs');
 const {mapToLogMsg} = require('../../server/utils/convert');
-const {checkMatchCondition} = require('../../server/utils/checkMatchCondition')
+const {checkMatchCondition} = require('../../server/utils/checkMatchCondition');
+const {aggregatedConditions} = require('../../server/utils/aggregatedConditions');
+const SubscribeListData = require('../../model/SubscribeList');
 
 var ObserverPage = (req, res, next) => {
   console.log(`GET - ${req.session.views} request Observe real-time Page`);
@@ -134,21 +136,38 @@ var UpdateSubscriptionInfo = (req, res, next) => {
       console.log(err);
       return;
     })
-  // getSubscriptionInfo(req.body._id)
-  //   .then(result => {
-  //     var doc = { //generate update subscription log
-  //       _subscription:req.body._id,
-  //       _subscriber:req.session.userID,
-  //       title: `changing a subscription `,
-  //       logMsg: mapToLogMsg(req.body,result.title),
-  //       logStatus: 2
-  //     };
-  //     saveSubscriptionLogs(doc);//save update subscription log
-  //   })
-  //   .catch(err => {
-  //     console.log(err);
-  //     return;
-  //   });
+  //on testing
+  console.log();
+  console.log("---start aggregate condition ---");
+  getSubscriptionInfo(req.body._id)
+    .then(result => {
+      //console.log(result);
+      result._sensorID.forEach(sensor => {
+        SubscribeListData.find({_sensorID:ObjectId(sensor)})
+          .select('condition')
+          .then(results => {
+            var allConditions = []
+            results.forEach(doc => {//merge multiple array of object into one array
+              if(doc.condition && doc.condition.length) {
+                allConditions = allConditions.concat(...doc.condition);
+              }
+            });
+            console.log(sensor);
+            console.log(allConditions);
+            let preConditions = [
+            {
+              type:"max",
+              value:null
+            },
+            {
+              type:"min",
+              value:null
+            }];
+            console.log(aggregatedConditions(preConditions,allConditions));
+          })
+      });
+
+    })
 
 }
 // using async await to response viewLog page
