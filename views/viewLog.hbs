@@ -69,12 +69,25 @@
                 <div class="row-fluid">
                   <div id="content">
                     <!-- <h1>Timeline (Saira + Chivo Fonts)</h1> -->
-                    <ul class="timeline">
+                    <ul class="timeline" >
                       {{#each items}}
                         <li class="event" data-date="{{this.date}}">
-                          <h2><strong>{{this.title}}</strong></h2>
-                          <!-- load subscriptionLog msg  -->
-                          {{{loadLogMsg this.logStatus this.logMsg}}}
+                          <div class="row-fluid">
+                            <div class="span5">
+                              <h2><strong>{{this.title}}</strong></h2>
+                            </div>
+                            <div class="span7">
+                              <!-- load subscriptionLog msg  -->
+                              {{!-- ex:
+                              <p class="font-safe">
+                                <i class="icon-md icon-ok"></i>
+                                ${logMsg}
+                              </p> --}}
+                              {{{loadLogMsg this.logStatus this.logMsg}}}
+                            </div>
+                          </div>
+
+
                         </li>
                       {{/each}}
                     </ul>
@@ -97,10 +110,16 @@
 </script>
 <script id="logMsg-temp" type="text/x-handlebars-template">
   <li class="event" data-date="\{{date}}">
-    <h2><strong> \{{title}} </strong></h2>
-    <p class="\{{color}}">
-      \{{{logMsg}}}
-    </p>
+    <div class="row-fluid">
+      <div class="span5">
+        <h2><strong> \{{title}} </strong></h2>
+      </div>
+      <div class="span7">
+        <p class="\{{color}}">
+          \{{{logMsg}}}
+        </p>
+      </div>
+    </div>
   </li>
 </script>
 <script id="warning-logMsg-temp" type="text/x-handlebars-template">

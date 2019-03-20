@@ -31,29 +31,32 @@ h1 {
   background: white;
   color: #595959;
   font-family: 'Open Sans', Arial, sans-serif;
-  margin: 50px auto;
+  margin: 30px 50px 50px 325px;
   /* margin-left: 200px; */
   /* letter-spacing: 0.5px; */
   position: relative;
   line-height: 0.2em;
   font-size: 1.03em;
-  padding: 50px;
+  padding: 30px;
   list-style: none;
   text-align: left;
   font-weight: 100;
-  max-width: 30%;
+  max-width: 50%;
 }
-.timeline p {
-  font-size: 1.2em;
-}
+
 .timeline h1 {
   font-family: 'Open Sans', Arial, sans-serif;
   /* letter-spacing: 1.2px; */
   font-weight: 100;
   font-size: 1.4em;
 }
+.timeline p {
+  /* float:right; */
+  font-size: 1.2em;
+}
 .timeline h2,
 .timeline h3 {
+  /* float: left; */
   font-family: 'Open Sans', Arial, sans-serif;
   letter-spacing: 0.8px;
   font-weight: 400;
@@ -64,7 +67,9 @@ h1 {
 }
 .timeline .event {
   border-bottom: 1px dashed #d9d9d9;
-  padding-bottom: 25px;
+  /* border-bottom:  */
+  /* border:1px dashed #d9d9d9; */
+  padding-bottom: 20px;
   margin-bottom: 20px;
   position: relative;
 
@@ -81,7 +86,7 @@ h1 {
   top: 0;
 }
 .timeline .event:before {
-  left: -217.5px;
+  left: -200.5px;
   color: #20799a;
   content: attr(data-date);
   display: block;
@@ -95,7 +100,7 @@ h1 {
 }
 .timeline .event:after {
   box-shadow: 0 0 0 4px #20799a;
-  left: -57.85px;
+  left: -37.85px;
   background: white;
   border-radius: 50%;
   height: 11px;
@@ -114,8 +119,8 @@ h1 {
 /* Large devices (laptops/desktops, 992px width less) */
 @media(max-width: 992px) {
   .timeline {
-    margin-left:180px;
-    max-width:50%;
+    margin-left:250px;
+    max-width:60%;
   }
 }
 /* Medium devices (landscape tablets, 768px width less */

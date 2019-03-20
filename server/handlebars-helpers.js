@@ -94,8 +94,8 @@ module.exports = {
           );
         }
       }
-    }
-    else {
+    }//end advanced option
+    else {// option = default
       value = new hbs.SafeString(
         '<span class="font-blue">'
         + sensorValue
