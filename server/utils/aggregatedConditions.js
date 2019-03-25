@@ -1,4 +1,8 @@
 const aggregatedConditions = (preResults,conditions) => {
+  if(Array.isArray(conditions) && conditions.length === 0)
+  {//when default
+    return [];//return empty condition
+  }
   var results = preResults;
   conditions.sort((a,b) => {//sorting
     var A = arrangePriority(a.type);
@@ -30,6 +34,12 @@ const aggregatedConditions = (preResults,conditions) => {
       }
     }
   }
+  if((results[0].value !== null) &&
+     (results[1].value !== null) &&
+     (results[0].value <= results[0].value))// when max <= min
+  {
+    return [];//return default condition
+  }
   // console.log(results);
   return results;
 }
@@ -37,12 +47,15 @@ const aggregatedConditions = (preResults,conditions) => {
 const convertToMaxOrMin = (preCondition,condition) => {
   var result;
   if(condition.type == "max"){
+    condition.value = Number(condition.value);
     result = condition;
   }
   else if(condition.type == "min"){
+    condition.value = Number(condition.value);
     result = condition;
   }
   else if(condition.type == "equal") {
+    condition.value = Number(condition.value);
     if(preCondition[0].value === null && preCondition[1].value === null){
       result = (condition.value > 50 ?
                 {type:"max",value:condition.value - 1}:
@@ -76,6 +89,8 @@ const convertToMaxOrMin = (preCondition,condition) => {
     }
   }
   else if(condition.type == "between") {
+    condition.minValue = Number(condition.minValue);
+    condition.maxValue = Number(condition.maxValue);
     if(preCondition[0].value === null && preCondition[1].value === null) {
       result = (condition.minValue > 50 ?
                    {type:"max",value:condition.minValue}:

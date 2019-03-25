@@ -90,9 +90,39 @@ var searchOneSensor_byID = (sensorID) => {
 var searchOneSensor_byName = (sensorName) => {
   return SensorData.findOne({"name":sensorName}).exec();
 }
+var searchMultiSensorPubCondition_byID = (docs) => {
+  var ids = docs.map(doc => {
+    return ObjectId(doc.sensorID);
+  });
+  console.log(ids);
+  ids = [].concat.apply([], ids);
+  console.log(ids);
+  return SensorData.find({
+    _id: {
+      $in: ids
+    }
+  }).select('_id publishCondition').exec();
+}
+var updateMultiSensor_PubCondition = (docs) => {
+  //initial multiple "updateOne" operation array
+  var operations = docs.map(doc => {
+    return {
+      "updateOne": {
+          "filter": { "_id": doc.sensorID } ,
+          "update": { "$set": { "publishCondition": doc.condition } }
+      }
+    }
+  });
+  //Performs multiple operations with controls for order of execution
+  SensorData.bulkWrite(operations, {"ordered": true, w: 1})
+    .then(result => console.log("update multiple sensor publish condition success!"))
+    .catch(err => console.log(err));
+}
 
 module.exports = {
   checkDisconnect,searchAllSensor,
   searchSensorByID,searchOneSensor_byName,
-  searchOneSensor_byID
+  searchOneSensor_byID,
+  searchMultiSensorPubCondition_byID,
+  updateMultiSensor_PubCondition
 };

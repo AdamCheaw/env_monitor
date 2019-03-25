@@ -22,30 +22,30 @@ var ObjectId = require('mongodb').ObjectID;
 //     console.log(results);
 //   });
 
-SubscribeList.find({_sensorID:ObjectId('5bb468b805713b20a538d270')})
-  .select('condition')
-  .then(results =>{
-    var allConditions = []
-    results.forEach(result => {//merge multiple array of object into one array
-      if(result.condition && result.condition.length) {
-        allConditions = allConditions.concat(...result.condition);
-      }
-    });
-    console.log(allConditions);
-    let preConditions = [
-    {
-      type:"max",
-      value:null
-    },
-    {
-      type:"min",
-      value:null
-    }];
-    console.log(aggregatedConditions(preConditions,allConditions));
-  })
-  .catch(err => {
-    console.log(err);
-  })
+// SubscribeList.find({_sensorID:ObjectId('5bb468b805713b20a538d270')})
+//   .select('condition')
+//   .then(results =>{
+//     var allConditions = []
+//     results.forEach(result => {//merge multiple array of object into one array
+//       if(result.condition && result.condition.length) {
+//         allConditions = allConditions.concat(...result.condition);
+//       }
+//     });
+//     console.log(allConditions);
+//     let preConditions = [
+//     {
+//       type:"max",
+//       value:null
+//     },
+//     {
+//       type:"min",
+//       value:null
+//     }];
+//     console.log(aggregatedConditions(preConditions,allConditions));
+//   })
+//   .catch(err => {
+//     console.log(err);
+//   })
 
 
 

@@ -10,7 +10,8 @@ var SensorDataSchema = new mongoose.Schema({
   onConnect: {type: Boolean, requires: true},
   expireDate: {type: Date, requires: true},
   type: {type: String, requires: true},
-  previousValue :{type: String}
+  previousValue :{type: String},
+  publishCondition : {type: Schema.Types.Mixed,default:[]}
 },{collection: 'sensor-data'});
 
 module.exports = mongoose.model('SensorData', SensorDataSchema);

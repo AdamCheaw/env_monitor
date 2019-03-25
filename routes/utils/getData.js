@@ -5,13 +5,18 @@ var moment = require('moment');
 var ObjectId = require('mongodb').ObjectID;
 const {searchSensorHistory} = require('../../controllers/sensorHistory');
 const {findUserID,createUser} = require('../../controllers/user');
-const {searchAllSensor,searchSensorByID} = require('../../controllers/sensor');
+const {
+  searchAllSensor,searchSensorByID,searchMultiSensorPubCondition_byID,
+  updateMultiSensor_PubCondition
+} = require('../../controllers/sensor');
 const {
   subscribeOne,searchSubList_withSubName,
   unsubscribeMany,subscribeMany,findSubscribeBefore,
 } = require('../../controllers/SubscribeList');
 const {saveSubscriptionLogs} = require('../../controllers/subscriptionLogs');
 const {convertCondition} = require('../../server/utils/convert');
+const {destructureSubCondition} = require('../../server/utils/manipulateData');
+const {aggregatedConditions} = require('../../server/utils/aggregatedConditions');
 const {getStartAndEnd,avgInInterval,findInterval} = require('../../server/utils/DateAndTime')
 
 var MainPage = (req, res, next) => {
@@ -169,7 +174,7 @@ var Subscribe = (req, res, next) => {
 
   })
 }
-var SubscribeMany = (req, res, next) => {
+var SubscribeMany = async (req, res, next) => {
   console.log(`POST - ${req.session.views} request a ajax call /subscribeMany`);
   findSubscribeBefore(req.session.views,req.body.subscription)//find exist subscription
     .then(exist => {
@@ -199,9 +204,9 @@ var SubscribeMany = (req, res, next) => {
               logStatus: 3
             }
           });
-          console.log();
-          console.log(docs);
-          console.log();
+          // console.log();
+          // console.log(docs);
+          // console.log();
           //save the subscription logs
           //about user created the subscription info
           saveSubscriptionLogs(docs);
@@ -215,7 +220,62 @@ var SubscribeMany = (req, res, next) => {
     .catch(err => {
       res.status(400).json({msg:err.message});
       console.log(err);
+      return;
     });
+    //testing
+    //aggregate sensor publish condition according user subscription
+    //filter user subscribe option = "advanced"
+    //convert group subscription into single subscription
+    var subscriptions = destructureSubCondition(req.body.subscription);
+    //find all related sensor 's current publish condition
+    var sensors = await searchMultiSensorPubCondition_byID(subscriptions);
+    var results = [];
+    for(let i = 0;i < subscriptions.length;i++) {
+      if(sensors[i].publishCondition && sensors[i].publishCondition.length){
+        var condition = aggregatedConditions(
+          sensors[i].publishCondition, subscriptions[i].condition
+        );
+      }
+      else {
+        let preConditions = [
+          {type:"max",value:null},
+          {type:"min",value:null}
+        ];
+        var condition = aggregatedConditions(preConditions,subscriptions[i].condition);
+      }
+      console.log("id - ",subscriptions[i].sensorID);
+      console.log(condition);
+      results.push({
+        sensorID: subscriptions[i].sensorID,
+        condition: condition
+      });
+    }
+    updateMultiSensor_PubCondition(results);
+    //console.log(results);
+    // searchMultiSensor_byID(req.body.subscription)
+    //   .then(results => {
+    //     console.log("result: "+results);
+    //     var subscriptions = req.body.subscription;
+    //     for(let i = 0;i < subscriptions.length;i++){
+    //       if(!results[i].publishCondition && !results[i].publishCondition.length){
+    //         let preConditions = [
+    //           {type:"max",value:null},
+    //           {type:"min",value:null}
+    //         ];
+    //
+    //       }
+    //       else {
+    //
+    //       }
+    //     }
+    //     results.forEach(doc => {
+    //
+    //     })
+    //   })
+    //   .catch(err => {
+    //     console.log(err);
+    //   });
+
 }
 
 

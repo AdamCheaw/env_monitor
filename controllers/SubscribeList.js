@@ -351,7 +351,7 @@ var updateSubscriptionInfo = (doc) => {
     };
   }
   //console.log(updateData);
-  
+
 
   return new Promise((resolve, reject) => {
     SubscribeListData.updateOne({ _id: ObjectId(doc._id) },
@@ -371,6 +371,10 @@ var getSubscriptions_bySubscriber = (id) => {
   return SubscribeListData.find({_subscriber:ObjectId(id)})
     .select('_id title').exec();
 }
+var getSubCondition_bySID = (id) => {
+  return SubscribeListData.find({_sensorID:ObjectId(id)})
+    .select('_id condition').exec();
+}
 module.exports = {
   searchSubscribeList_withSensorID,
   searchSubList_withSubName,
@@ -386,5 +390,6 @@ module.exports = {
   getSubscriptionInfo,
   updateSubscriptionInfo,
   getSubscriptions_bySubscriber,
-  getSubscription_relatedSensorInfo
+  getSubscription_relatedSensorInfo,
+  getSubCondition_bySID
 };
