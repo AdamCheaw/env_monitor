@@ -71,7 +71,7 @@ app.use("/Observe", observePage);
 app.use("/API/sensor", sensorAPI);
 app.use("/API/subscription",subscriptionAPI);
 app.use("/sensors", publisher);
-//app.use("/test", test);
+app.use("/test", test);
 setInterval(function() {
   checkDisconnect();
 }, 60000);//60000

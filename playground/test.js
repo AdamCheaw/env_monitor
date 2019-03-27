@@ -3,6 +3,7 @@ var router = express.Router();
 var bodyParser = require('body-parser');
 var moment = require('moment');
 var mongoose = require('mongoose');
+const jwt = require('jsonwebtoken');
 // var SubscribeList = require('../model/SubscribeList');
 // var {aggregatedConditions} = require('../server/utils/aggregatedConditions');
 // var SensorData = require('../model/sensor');
@@ -13,43 +14,52 @@ var mongoose = require('mongoose');
 // const {findUserID} = require('../controllers/user');
 // const {searchSubList_withSubName,notificationList,updateSubList_PreviousMatchCondition,findSubscribeBefore} = require('../controllers/SubscribeList');
 var ObjectId = require('mongodb').ObjectID;
-// var testing = (callback) => {
-//   return callback("123");
-// };
-//
-// SubscriptionLog.aggregate( [ { $group : { _id : "$_subscription" } } ] )
-//   .exec().then(results => {
-//     console.log(results);
-//   });
 
-// SubscribeList.find({_sensorID:ObjectId('5bb468b805713b20a538d270')})
-//   .select('condition')
-//   .then(results =>{
-//     var allConditions = []
-//     results.forEach(result => {//merge multiple array of object into one array
-//       if(result.condition && result.condition.length) {
-//         allConditions = allConditions.concat(...result.condition);
-//       }
-//     });
-//     console.log(allConditions);
-//     let preConditions = [
-//     {
-//       type:"max",
-//       value:null
-//     },
-//     {
-//       type:"min",
-//       value:null
-//     }];
-//     console.log(aggregatedConditions(preConditions,allConditions));
-//   })
-//   .catch(err => {
-//     console.log(err);
-//   })
+const checkAuth = (req,res,next) => {
+  try {
+        const token = req.headers.authorization.split(" ")[1];
+        const decoded = jwt.verify(token, "secret");
+        console.log(`token : ${token}`);
+        console.log(`decoded : ${decoded}`);
+        req.userData = decoded;
+        next();
+    } catch (error) {
+        return res.status(401).json({
+            message: 'Auth failed'
+        });
+    }
+}
+router.use('/check', checkAuth, (req,res,next) => {
+  console.log(req.userData);
+  res.json(
+    {
+      msg : "received",
+      userData : req.userData
+    }
+  );
+});
+router.use('/login',  (req,res,next) => {
+  console.log(req.body);
+  const token = jwt.sign(
+    {
+      name: req.body.name,
+      pwd: req.body.pwd
+    },
+    "secret",
+    {
+      expiresIn: "1h"
+    }
+  );
+  console.log(token);
+  return res.status(200).json({
+    message: "Auth successful",
+    token: token
+  });
+});
 
 
 
 
 
 
-// module.exports = router;
+ module.exports = router;
