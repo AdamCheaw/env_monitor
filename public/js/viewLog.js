@@ -84,26 +84,6 @@ const changeSubscriptionLogs = (data) => {
         date: doc.date
       };
       html = html + template(obj);
-      // if(doc.logStatus < 1) {
-      //   var scriptHtml = $("#warning-logMsg-temp")[0].innerHTML;
-      //   var template = Handlebars.compile(scriptHtml);
-      //   var obj = {
-      //     title: doc.title,
-      //     logMsg: doc.logMsg,
-      //     date: doc.date
-      //   };
-      //   html = html + template(obj);
-      // }
-      // else {
-      //   var scriptHtml = $("#safe-logMsg-temp")[0].innerHTML;
-      //   var template = Handlebars.compile(scriptHtml);
-      //   var obj = {
-      //     title: doc.title,
-      //     logMsg: doc.logMsg,
-      //     date: doc.date
-      //   };
-      //   html = html + template(obj);
-      // }
     });
     $(".timeline").html("").html(html);
   }
@@ -144,7 +124,7 @@ const enabled_PreAndNextBtn = () => {
 const requestSubscriptionLogs = (data) => {
   $.ajax({
       type        : 'POST', // define the type of HTTP verb we want to use (POST for our form)
-      url         : '/observe/getSubscriptionLogs', // the url where we want to POST
+      url         : '/API/subscription/getSubscriptionLogs', // the url where we want to POST
       data        : data, // our data object
       dataType    : 'json', // what type of data do we expect back from the server
       encode          : true,

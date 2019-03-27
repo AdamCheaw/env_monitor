@@ -3,25 +3,21 @@ var bodyParser = require('body-parser');
 var moment = require('moment');
 var ObjectId = require('mongodb').ObjectID;
 const {
-  searchSubList_withSubName,getSubscriptionInfo,
+  getSubscriptionInfo,findSubscribeBefore,
   updateSubscriptionInfo,unsubscribeOne,
   updateSubList_PreviousMatchCondition,
-  getSubscriptions_bySubscriber,
   getSubscription_relatedSensorInfo,
-  getSubCondition_bySID
-} = require('../../controllers/SubscribeList');
+  getSubCondition_bySID,subscribeMany
+} = require('../../model/action/SubscribeList');
+const {findUserID} = require('../../model/action/user')
+const {saveSubscriptionLogs} = require('../../model/action/subscriptionLogs');
 const {
-  searchSubLogs_byUserID,
-  countTotalSubLogs_byUserID,
-  searchSubLogs_sortByDate,
-  searchSubLogs_sortBySub,
-  saveSubscriptionLogs
-} = require('../../controllers/subscriptionLogs');
-const {updateMultiSensor_PubCondition} = require('../../controllers/sensor')
+  updateMultiSensor_PubCondition,searchMultiSensorPubCondition_byID
+} = require('../../model/action/sensor')
 const {mapToLogMsg} = require('../../server/utils/convert');
 const {checkMatchCondition} = require('../../server/utils/checkMatchCondition');
 const {aggregatedConditions} = require('../../server/utils/aggregatedConditions');
-const SubscribeListData = require('../../model/SubscribeList');
+const {destructureSubCondition} = require('../../server/utils/manipulateData');
 //function
 const aggregateMultiSensor_PubCondition = async (docs) => {
   var results = [];
@@ -53,21 +49,86 @@ const aggregateMultiSensor_PubCondition = async (docs) => {
   //update multiple sensor publish condition in DB
   updateMultiSensor_PubCondition(results);
 }
+
 //export module
-var ObserverPage = (req, res, next) => {
-  console.log(`GET - ${req.session.views} request Observe real-time Page`);
-  // response current user subscribe 's sensor info
-  searchSubList_withSubName(req.session.views,function(result,subInfo) {
-    if(result != "" || result !== undefined) {
-      res.render('observe',{items:result, session:req.session.views});
-      //console.log(result);
+var SubscribeMany = async (req, res, next) => {
+  console.log(`POST - ${req.session.views} request a ajax call /subscribeMany`);
+  findSubscribeBefore(req.session.views,req.body.subscription)//find exist subscription
+    .then(exist => {
+      if(exist && exist.length)
+      {
+        console.log("exist : "+exist);
+        throw new Error("sensor already subscribe before");
+      }
+      findUserID(req.session.views)//find user ID
+        .then(userID => {
+          if(!userID)
+          {
+            console.log("did not found userID");
+            throw new Error("did not found userID");
+          }
+          //subscribe new
+          return subscribeMany(req.session.views,userID,req.body.subscription);
+        })
+        .then(results => {
+          res.json({msg:"success"});
+          var docs = results.map(doc => {
+            return {
+              _subscription:doc._id,
+              _subscriber:req.session.userID,
+              title: `created a subscription`,
+              logMsg: doc.groupType === null? doc.title:`group "${doc.title}"`,
+              logStatus: 3
+            }
+          });
+          // console.log();
+          // console.log(docs);
+          // console.log();
+          //save the subscription logs
+          //about user created the subscription info
+          saveSubscriptionLogs(docs);
+          //console.log(results);
+        })
+        .catch(err => {
+          throw new Error(err.message);
+          console.log(err);
+        });
+    })
+    .catch(err => {
+      res.status(400).json({msg:err.message});
+      console.log(err);
+      return;
+    });
+    //convert group subscription into single subscription
+    var subscriptions = destructureSubCondition(req.body.subscription);
+    //find all related sensor 's current publish condition
+    var sensors = await searchMultiSensorPubCondition_byID(subscriptions);
+    var results = [];
+    //aggregate sensor publish condition according user subscriptions
+    for(let i = 0;i < subscriptions.length;i++) {
+      if(sensors[i].publishCondition && sensors[i].publishCondition.length){
+        var condition = aggregatedConditions(
+          sensors[i].publishCondition, subscriptions[i].condition
+        );
+      }
+      else {
+        let preConditions = [
+          {type:"max",value:null},
+          {type:"min",value:null}
+        ];
+        var condition = aggregatedConditions(preConditions,subscriptions[i].condition);
+      }
+      console.log("id - ",subscriptions[i].sensorID);
+      console.log(condition);
+      results.push({
+        sensorID: subscriptions[i].sensorID,
+        condition: condition
+      });
     }
-    else {
-      res.render('observe',{items:result, session:req.session.views});
-    }
-    //console.log(result);
-  });
+    //update multiple sensor publish condition in DB
+    updateMultiSensor_PubCondition(results);
 }
+
 var Unsubscribe = async (req, res, next) => {
   console.log(`POST - ${req.session.views} request a ajax call /unsubscribe`);
   var subscription = await getSubscriptionInfo(req.body.subscribeListID);
@@ -109,7 +170,6 @@ var GetSubscriptionInfo = (req, res, next) => {
       res.status(400).json({msg:err.message});
       console.log(err);
     });
-  // mongoose.disconnect();
 }
 var UpdateSubscriptionInfo = async (req, res, next) => {
   console.log(`POST - ${req.session.views} request a ajax call /updateSubscriptionInfo`);
@@ -140,7 +200,7 @@ var UpdateSubscriptionInfo = async (req, res, next) => {
     // console.log();
     // console.log(matchResult);
     // console.log();
-    //testing aggregate
+    //aggregate related sensor publish condition
     aggregateMultiSensor_PubCondition(result);
     var matchResult = checkMatchCondition (
       result._sensorID,result.option,result.groupType,result.condition
@@ -177,108 +237,11 @@ var UpdateSubscriptionInfo = async (req, res, next) => {
     console.log(err);
   }
 }
-// using async await to response viewLog page
-var ViewLogsPage = async (req, res, next) => {
-  console.log(`GET - ${req.session.views} request a viewLogs page`);
-  try {
-    let results = await searchSubLogs_byUserID(req.session.userID,0,15);
-    let subscriptionLogs = results.map(doc => {
-      return {
-        _id: doc._id,
-        title: doc.title,
-        logMsg: doc.logMsg,
-        logStatus:doc.logStatus,
-        date: moment.parseZone(doc.date).local().format('YYYY MMM Do, h:mm:ssa'),
-      };
-    });
-    subscriptionLogs.reverse();//reverse the logs for suitable timeline
-    let total = await countTotalSubLogs_byUserID({
-      _subscriber:ObjectId(req.session.userID)
-    });
-    let allSubscription = await getSubscriptions_bySubscriber(req.session.userID);
-    //console.log(allSubscription);
-    allSubscription = allSubscription.map(sub => {
-      return {
-         _id: sub._id,
-         title: sub.title
-       };
-     });
-    res.render('viewLog', {
-      items:subscriptionLogs,
-      total:total,
-      session:req.session.views,
-      subscriptions:JSON.stringify(allSubscription)
-    });
-  }
-  catch (err) {
-    console.log(err);
-    res.send("404 not found");
-  }
-}
-var GetSubscriptionLogs = async (req,res,next) => {
-  try {
-    var skip = (req.body.page - 1) * 15;
-    if(req.body.sort == "date") {
-      var results = await searchSubLogs_sortByDate(
-        req.session.userID,skip,15,req.body.start,req.body.end
-      );
-      var total = await countTotalSubLogs_byUserID({
-        _subscriber:ObjectId(req.session.userID),
-        date: {
-          $gte: req.body.start,
-          $lte: req.body.end
-        }
-      });
-    }
-    else if(req.body.sort == "subscription") {
-      var results = await searchSubLogs_sortBySub(
-        req.session.userID,skip,15,req.body.option
-      );
-      var total = await countTotalSubLogs_byUserID({
-        _subscriber:ObjectId(req.session.userID),
-        _subscription:ObjectId(req.body.option)
-      });
-    }
-    else {
-      var results = await searchSubLogs_byUserID(
-        req.session.userID,skip,15
-      );
-      var total = await countTotalSubLogs_byUserID({
-        _subscriber:ObjectId(req.session.userID)
-      });
-    }
-    //var date = moment().subtract(3,"days");
-    //
-    let subscriptionLogs = results.map(doc => {
-      return {
-        _id: doc._id,
-        title: doc.title,
-        logMsg: doc.logMsg,
-        logStatus:doc.logStatus,
-        date: moment.parseZone(doc.date).local().format('YYYY MMM Do, h:mm:ssa'),
-      };
-    });
-    subscriptionLogs.reverse();//reverse the logs for suitable timeline
-    //console.log(subscriptionLogs);
-    if(subscriptionLogs && subscriptionLogs !== null && subscriptionLogs !== undefined) {
-      let response = { total,subscriptionLogs}
-      res.json(response);
-    }
-    else {
-      res.status(400).json({msg:"nothing found"});
-    }
-  }
-  catch (err) {
-    console.log(err);
-    res.status(400).json({msg:err.message});
-  }
-}
+
 
 module.exports = {
-  ObserverPage,
+  SubscribeMany,
   GetSubscriptionInfo,
   UpdateSubscriptionInfo,
-  Unsubscribe,
-  ViewLogsPage,
-  GetSubscriptionLogs
+  Unsubscribe
 }

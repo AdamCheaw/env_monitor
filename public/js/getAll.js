@@ -297,7 +297,7 @@ $(document).ready(function(){
       if(docs.length > 0) { //calling ajax to post subscription
         $.ajax({
             type        : 'POST',
-            url         : '/getData/subscribeMany',
+            url         : '/API/subscription/subscribe',
             data        : { subscription:docs },
             dataType    : 'json',
             // encode      : true,

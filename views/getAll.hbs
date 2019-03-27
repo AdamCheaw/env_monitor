@@ -215,7 +215,7 @@
                         {{#if this.onConnect }}
                         <tr id="{{this._id}}">
                           <td>{{@index}}</td>
-                          <td class="sensor-name"><a href="getData/{{this._id}}">{{this.name}}</a></td>
+                          <td class="sensor-name"><a href="Web/{{this._id}}">{{this.name}}</a></td>
                           <td>{{{findIcon this.type}}}</td>
                           <td>{{limitStr "Lorem ipsum dolor sit amet, consectetur adipisicing elit," 0 50}}</td>
                           <td><b class="online" >online</b></td>
@@ -229,7 +229,7 @@
                         {{else}}
                         <tr id="{{this._id}}">
                           <td>{{@index}}</td>
-                          <td class="sensor-name"><a href="getData/{{this._id}}">{{this.name}}</a></td>
+                          <td class="sensor-name"><a href="Web/{{this._id}}">{{this.name}}</a></td>
                           <td>{{{findIcon this.type}}}</td>
                           <td>{{limitStr "Lorem ipsum dolor sit amet, consectetur adipisicing elit," 0 50}}</td>
                           <td><b class="offline" >offline</b></td>

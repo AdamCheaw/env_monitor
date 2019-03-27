@@ -3,16 +3,16 @@ const {
   generateNotification,
   generateSensorDisconnectData
 } = require('./utils/generate');
-const {subscribe,unsubscribe} = require('./utils/subscribe_event');
-const {userOnConnect,userDisconnect} = require('../controllers/user');
-const {searchSensorByID} = require('../controllers/sensor');
+// const {subscribe,unsubscribe} = require('./utils/subscribe_event');
+const {userOnConnect,userDisconnect} = require('../model/action/user');
+const {searchSensorByID} = require('../model/action/sensor');
 const {
   searchSubscribeList_withSensorID,
   notificationList,
   updateSubList_PreviousMatchCondition,
   findAllSubscriber_bySensorID
-} = require('../controllers/SubscribeList');
-const {saveSubscriptionLogs} = require('../controllers/subscriptionLogs');
+} = require('../model/action/SubscribeList');
+const {saveSubscriptionLogs} = require('../model/action/subscriptionLogs');
 var webSocket = (io) => {
   io.on('connection', (socket) => {
     socket.on('auth',(data) => {

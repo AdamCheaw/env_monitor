@@ -1,16 +1,14 @@
 var mongoose = require('mongoose');
 var ObjectId = require('mongodb').ObjectID;
 var bodyParser = require('body-parser');
-var SensorData = require('../../model/sensor');
-var sensorHistory = require('../../model/sensorHistory');
-var {findAllSubscriber_bySensorID} = require('../../controllers/SubscribeList');
-var {saveSubscriptionLogs} = require('../../controllers/subscriptionLogs');
-var {searchOneSensor_byName,searchOneSensor_byID} = require('../../controllers/sensor');
+var SensorData = require('../../model/schema/sensor');
+var sensorHistory = require('../../model/schema/sensorHistory');
+var {findAllSubscriber_bySensorID} = require('../../model/action/SubscribeList');
+var {saveSubscriptionLogs} = require('../../model/action/subscriptionLogs');
+var {searchOneSensor_byName,searchOneSensor_byID} = require('../../model/action/sensor');
 var moment = require('moment');
-// var emitter = require('socket.io-emitter')({ host: 'localhost', port: '6379' });
 var io = require('socket.io-client');
 const {generateSensorData} = require('../../server/utils/generate');
-
 const SensorRegister = async (req, res, next) => {
   try {
     let sensor = await searchOneSensor_byName(req.body.name);
@@ -136,65 +134,6 @@ const SensorUpdated = async (req, res, next) => {
       error: err
     });
   }
-  // var currentDate = new Date();
-  // var id = req.body.sensorId;
-  //
-  // SensorData.findById(id, (err, doc) => {
-  //   if (err) {
-  //     console.error('error, no entry found');
-  //     res.status(404).json({
-  //       error: err
-  //     });
-  //     return;
-  //   }
-  //   //save in history data
-  //   var record = new sensorHistory({
-  //     name: doc.name,
-  //     value: req.body.temp,
-  //     date: currentDate,
-  //     _sensorID : ObjectId(doc._id),
-  //   });
-  //   record.save()
-  //   .catch(err => {
-  //     console.log(err);
-  //   });
-  //   //update the sensor Data
-  //   doc.previousValue = doc.temp;
-  //   doc.temp = req.body.temp;
-  //   doc.date = currentDate;
-  //   doc.onConnect = true;
-  //   doc.expireDate = moment(currentDate).add(210, 's');//210
-  //   //doc.onConnect = true;
-  //   doc.save()
-  //   .then(doc => {
-  //     if(doc) {
-  //       res.status(200).json({
-  //         message: "updated success!"
-  //       });
-  //       var socket = io('http://localhost:3000');
-  //       socket.emit('update', generateSensorData(doc,""));
-  //       console.log('emit an update event to server about data change');
-  //     }
-  //   })
-  //   .catch(err => {
-  //     console.log(err);
-  //     res.status(500).json({
-  //       error: "updated failed!"
-  //     });
-  //   });
-  //
-  //   //  console.log(doc.name+" updated data");
-  //   // // console.log("ID : "+req.body.sensorId);
-  //   // // console.log("Temp : "+req.body.temp);
-  //   //  console.log("Date : "+moment.parseZone(doc.date).local().format('YYYY MMM Do h:mm:ss a'));
-  //   //  console.log("...................................................................");
-  // })
-  // .catch(err => {
-  //   console.log(err);
-  //   res.status(500).json({
-  //     error: err
-  //   });
-  // });
 };
 
 module.exports = {

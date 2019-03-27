@@ -145,7 +145,7 @@ $(document).ready(function() {
     //chart.destroy();
     $.ajax({
         type        : 'POST', // define the type of HTTP verb we want to use (POST for our form)
-        url         : '/getData/getHistoryData', // the url where we want to POST
+        url         : '/API/sensor/getHistoryData', // the url where we want to POST
         data        : data, // our data object
         dataType    : 'json', // what type of data do we expect back from the server
         encode          : true,

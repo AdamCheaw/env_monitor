@@ -6,17 +6,19 @@ const favicon = require('serve-favicon');
 const logger = require('morgan');
 const cookieParser = require('cookie-parser');
 const bodyParser = require('body-parser');
-const compression = require('compression')
-const sensor = require('./routes/sensor');
-const user = require('./routes/user');
-const observer = require('./routes/observer');
+const compression = require('compression');
+const webPage = require('./routes/User/WEB/web');
+const observePage = require('./routes/User/WEB/observe');
+const publisher = require('./routes/Sensor/');
+const sensorAPI = require('./routes/User/API/sensor');
+const subscriptionAPI = require('./routes/User/API/subscription');
 const hbs = require('express-handlebars');
 const test = require('./playground/test');
 const expressValidator = require('express-validator');
 const expressSession = require('express-session');
-const {checkDisconnect} = require('./controllers/sensor');
-const {removeExHistoryData,removeExSubscriptionLogs} = require('./controllers/schedule');
-const {initialSetup} = require('./controllers/setup');
+const {checkDisconnect} = require('./model/action/sensor');
+const {removeExHistoryData,removeExSubscriptionLogs} = require('./model/action/schedule');
+const {initialSetup} = require('./model/action/setup');
 
 
 app.engine('hbs',
@@ -58,15 +60,17 @@ app.use((req, res, next) => {
 // middleware function to check for logged-in users
 
 app.get("/", (req,res,next) => {
-  res.redirect('/getData');
+  res.redirect('/Web');
 });
 app.get("/logout", (req,res,next) => {
   req.session.destroy();
   res.render('login');
 });
-app.use("/sensors", sensor);
-app.use("/getData", user);
-app.use("/observe", observer);
+app.use("/Web", webPage);
+app.use("/Observe", observePage);
+app.use("/API/sensor", sensorAPI);
+app.use("/API/subscription",subscriptionAPI);
+app.use("/sensors", publisher);
 //app.use("/test", test);
 setInterval(function() {
   checkDisconnect();
