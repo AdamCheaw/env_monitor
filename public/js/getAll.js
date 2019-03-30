@@ -301,11 +301,10 @@ $(document).ready(function(){
             data        : { subscription:docs },
             dataType    : 'json',
             // encode      : true,
-            beforeSend: function(){
-              // $.LoadingOverlay("show", {
-              //   image       : "",
-              //   fontawesome : "fa fa-cog fa-spin"
-              // });
+            beforeSend: function(xhr){
+              if (localStorage.token) {
+                  xhr.setRequestHeader('Authorization', 'Bearer ' + localStorage.token);
+              }
               $(".subscription-container #subscrition-submitBtn").attr('disabled', 'disabled').text('Sending');
             },
             complete: function(){
@@ -319,12 +318,20 @@ $(document).ready(function(){
               swal("Yours subscribe is success", " ", "success")
                 .then(() => {
                   window.location.reload();
-                })
+                });
             },
             error: function(data){
-              let msg = JSON.parse(data.responseText);
-              $(".subscription-container #subscrition-submitBtn").removeAttr('disabled').text('Submit');
-              swal("something went wrong", msg.msg, "error")
+              if(data.status == 401){
+                swal("invalid request", " please login to our system again...", "error")
+                  .then(() => {
+                    window.location.href = '/logout';
+                  });
+              }
+              else if(data.status == 406) {
+                let msg = JSON.parse(data.responseText);
+                $(".subscription-container #subscrition-submitBtn").removeAttr('disabled').text('Submit');
+                swal("something went wrong", msg.msg, "error")
+              }
             }
         })
       }

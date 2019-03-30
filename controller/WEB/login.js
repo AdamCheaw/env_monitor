@@ -1,6 +1,7 @@
-var mongoose = require('mongoose');
-var bodyParser = require('body-parser');
-var expressSession = require('express-session');
+const mongoose = require('mongoose');
+const bodyParser = require('body-parser');
+const expressSession = require('express-session');
+const jwt = require('jsonwebtoken');
 const {findUserID,createUser} = require('../../model/action/user');
 var UserLogin = (req, res, next) => {
   console.log(`POST - ${req.body.name} try to login`);
@@ -14,9 +15,23 @@ var UserLogin = (req, res, next) => {
           .then(result => {
             if(result)
             {
+
+              const token = jwt.sign(
+                {
+                  _id: result._id,
+                },
+                "secret",
+                {
+                  expiresIn: "1h"
+                }
+              );
+              req.session.userID = result._id;
               console.log(result);
-              res.redirect('/getData');
-              return;
+              console.log(token);
+              return res.status(200).json({
+                message: "login successful",
+                token: token
+              });
             }
           })
           .catch(err => {
@@ -26,13 +41,24 @@ var UserLogin = (req, res, next) => {
           });
       }
       else {
+        const token = jwt.sign(
+          {
+            _id: userID._id,
+          },
+          "secret",
+          {
+            expiresIn: "1h"
+          }
+        );
         req.session.userID = userID._id;
-        res.redirect('/Web');
+        console.log(token);
+        return res.status(200).json({
+          message: "login successful",
+          token: token
+        });
       }
 
     })
-
-  console.log(req.session);
   //console.log("sessionID: "+req.session.id);
 }
 module.exports = {

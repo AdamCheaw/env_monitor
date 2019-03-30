@@ -1,25 +1,18 @@
-var express = require('express');
-var router = express.Router();
+const express = require('express');
+const router = express.Router();
 const MainPageController = require("../../../controller/WEB/main-page");
 const SensorInfoController = require("../../../controller/WEB/historyData-page");
 const LoginController = require("../../../controller/WEB/login");
-var sessionChecker = (req, res, next) => {
-  if (!req.session.userID || !req.cookies.user_id || !req.session.views) {
-    res.render('login');
-    return;
-  }
-  else {
-    next();
-  }
-};
+const {checkSession} = require("../../../server/checkAuth");
+
 //main page
-router.get('/', sessionChecker, MainPageController.MainPage);
+router.get('/',checkSession,MainPageController.MainPage);
 
 //handle sensor Info page
-router.get('/:sensorId', sessionChecker, SensorInfoController.GetSensorInfo);
+router.get('/:sensorId',checkSession,SensorInfoController.GetSensorInfo);
 
 //handle user login
-router.post('/submit', LoginController.UserLogin);
+router.post('/login', LoginController.UserLogin);
 
 
 module.exports = router;

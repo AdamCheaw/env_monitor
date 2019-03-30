@@ -175,11 +175,10 @@ $(document).ready(function() {
           data        : data, // our data object
           dataType    : 'json', // what type of data do we expect back from the server
           encode          : true,
-          beforeSend: function(){
-            // $.LoadingOverlay("show", {
-            //   image       : "",
-            //   fontawesome : "fa fa-cog fa-spin"
-            // });
+          beforeSend: function(xhr){
+            if (localStorage.token) {
+                xhr.setRequestHeader('Authorization', 'Bearer ' + localStorage.token);
+            }
           },
           complete: function(){
              // $.LoadingOverlay("hide");
@@ -190,8 +189,16 @@ $(document).ready(function() {
             $("#subscription-"+idClicked).parent().parent().remove();
             toastr.success('unsubscribe success!')
           },
-          error: function(){
-            toastr.error('unsubscribe failed!')
+          error: function(err){
+            if(err.status == 401){
+              swal("invalid request", " please login to our system again...", "error")
+                .then(() => {
+                  window.location.href = '/logout';
+                });
+            }
+            else {
+              toastr.error('unsubscribe failed!');
+            }
           }
       })
 
@@ -215,11 +222,14 @@ $(document).ready(function() {
         data        : data, // our data object
         dataType    : 'json', // what type of data do we expect back from the server
         encode          : true,
-        beforeSend: function(){
+        beforeSend: function(xhr){
           $.LoadingOverlay("show", {
             image       : "",
             fontawesome : "fa fa-cog fa-spin"
           });
+          if (localStorage.token) {
+              xhr.setRequestHeader('Authorization', 'Bearer ' + localStorage.token);
+          }
         },
         complete: function(){
            $.LoadingOverlay("hide");
@@ -232,8 +242,16 @@ $(document).ready(function() {
           $("#editSub-Modal").modal("show");
           console.log(data);
         },
-        error: function(){
-          toastr.error('something went wrong!')
+        error: function(err){
+          if(err.status == 401){
+            swal("invalid request", " please login to our system again...", "error")
+              .then(() => {
+                window.location.href = '/logout';
+              });
+          }
+          else {
+            toastr.error('something went wrong!');
+          }
         }
       });
     }
@@ -255,8 +273,11 @@ $(document).ready(function() {
         data        : afterEdit, // our data object
         dataType    : 'json', // what type of data do we expect back from the server
         encode          : true,
-        beforeSend: function(){
+        beforeSend: function(xhr){
           $("#editSub-Modal .edit-submit").attr('disabled','disabled').text('Sending');
+          if (localStorage.token) {
+              xhr.setRequestHeader('Authorization', 'Bearer ' + localStorage.token);
+          }
         },
         complete: function(){
            // $.LoadingOverlay("hide");
@@ -271,8 +292,16 @@ $(document).ready(function() {
             })
           console.log(data);
         },
-        error: function(){
-          toastr.error('something went wrong!')
+        error: function(err){
+          if(err.status == 401){
+            swal("invalid request", " please login to our system again...", "error")
+              .then(() => {
+                window.location.href = '/logout';
+              });
+          }
+          else {
+            toastr.error('something went wrong!');
+          }
         }
       });
     }
@@ -323,6 +352,8 @@ socket.on('sensor disconnect', function(data) {
   console.log("sensor disconnect :"+data._id);
 });
 socket.on('disconnect', function () {
-  console.log('Disconnected from server');
-  alert("Disconnected from server");
+  swal("Disconnected from server","", "error")
+    .then(() => {
+      window.location.href = '/logout';
+    });
 });

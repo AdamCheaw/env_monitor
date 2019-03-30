@@ -32,7 +32,7 @@
   <div class="container">
     <div class="row">
       <div class="module module-login span4 offset4">
-        <form class="form-vertical" action="/Web/submit" method="post">
+        <form class="form-vertical">
           <div class="module-head">
             <h3>Sign In</h3>
           </div>
@@ -51,7 +51,7 @@
           <div class="module-foot">
             <div class="control-group">
               <div class="controls clearfix">
-                <button type="submit" class="btn btn-primary pull-right">Login</button>
+                <button type="submit" id="login" class="btn btn-primary pull-right">Login</button>
                 <label class="checkbox">
                   <input type="checkbox"> Remember me
                 </label>
@@ -64,5 +64,5 @@
   </div>
 </div>
 <!--/.wrapper-->
-
 {{>footer}}
+<script src="js/login.js" charset="utf-8"></script>

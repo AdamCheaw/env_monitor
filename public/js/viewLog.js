@@ -59,7 +59,6 @@ const changeSubscriptionLogs = (data) => {
       else if(doc.logStatus == 1){//back to safe
         fontColor = "font-safe";
         logMsg = `<i class="icon-md icon-ok"></i> ${doc.logMsg}`
-
       }
       else if(doc.logStatus == 2){//changing subscription condition..
         fontColor = "font-blue";
@@ -128,16 +127,17 @@ const requestSubscriptionLogs = (data) => {
       data        : data, // our data object
       dataType    : 'json', // what type of data do we expect back from the server
       encode          : true,
-      beforeSend: function(){
-        console.log("sending ajax");
+      beforeSend: function(xhr){
         $.LoadingOverlay("show", {
           image       : "",
           fontawesome : "fa fa-cog fa-spin"
         });
+        if (localStorage.token) {
+            xhr.setRequestHeader('Authorization', 'Bearer ' + localStorage.token);
+        }
       },
       complete: function(){
          $.LoadingOverlay("hide");
-         console.log("ajax send finish");
       },
       success: function(data){
         //changing timeline content after received data
@@ -146,19 +146,19 @@ const requestSubscriptionLogs = (data) => {
         if(data.total && data.total > 0 && data.subscriptionLogs.length > 0){
           changePageNum(data.total);
           enabled_PreAndNextBtn();
-          // if((data.total / 15) <= 1) {
-          //   $("#page-previous").attr('disabled', 'disabled');
-          // }
-          // else {
-          //   $("#page-previous").removeAttr('disabled');
-          // }
         }
-
-        ///console.log(data.total);
       },
       error: function(err){
-        let msg = JSON.parse(err.responseText);
-        swal("something went wrong", msg.msg, "error")
+        if(err.status == 401) {
+          swal("invalid request", " please login to our system again...", "error")
+            .then(() => {
+              window.location.href = '/logout';
+            });
+        }
+        else {
+          let msg = JSON.parse(err.responseText);
+          swal("something went wrong", msg.msg, "error")
+        }
       }
   });
 }
@@ -195,22 +195,6 @@ $(document).ready(function() {
     requestSubscriptionLogs(inputValue);
     $("#page-btn").text(page);//changing current page number
     enabled_PreAndNextBtn();
-    // //get the last page number
-    // var lastPage = $("#page-num li:last-child").children().text();
-    // if(page == 1) {//if current page equal to first page
-    //   //disabled the page previous btn
-    //
-    //   $("#page-previous").attr('disabled', 'disabled');
-    // }
-    // else if(page == lastPage) {//if current page equal to last page
-    //   //disabled the page next btn
-    //   $("#page-next").attr('disabled', 'disabled');
-    // }
-    // else {
-    //   //enabled all the page btn
-    //   $("#page-previous").removeAttr('disabled');
-    //   $("#page-next").removeAttr('disabled');
-    // }
   });
   //user click previous Page
   $("#page-previous").click(function() {
@@ -219,17 +203,6 @@ $(document).ready(function() {
     requestSubscriptionLogs(inputValue);
     $("#page-btn").text(inputValue.page);
     enabled_PreAndNextBtn();
-    // if(inputValue.page == 1){//if current page equal to first page
-    //   //disabled the page previous btn
-    //   console.log("dasdsd :"+$("#page-previous").html());
-    //   $("#page-previous").attr('disabled', 'disabled');
-    //   $("#page-next").removeAttr('disabled');
-    // }
-    // else {
-    //   //enabled all the page btn
-    //   $("#page-previous").removeAttr('disabled');
-    //   $("#page-next").removeAttr('disabled');
-    // }
   });
   //user click next page
   $("#page-next").click(function() {
@@ -238,15 +211,6 @@ $(document).ready(function() {
     requestSubscriptionLogs(inputValue);
     $("#page-btn").text(inputValue.page);//changing current page number
     enabled_PreAndNextBtn();
-    // var lastPage = $("#page-num li:last-child").children().text();
-    // if(inputValue.page == lastPage) {//if current page equal to last page
-    //   $("#page-next").attr('disabled', 'disabled');
-    //   $("#page-previous").removeAttr('disabled');
-    // }
-    // else {
-    //   //enabled all the page btn
-    //   $("#page-previous").removeAttr('disabled');
-    //   $("#page-next").removeAttr('disabled');
-    // }
+
   });
 });

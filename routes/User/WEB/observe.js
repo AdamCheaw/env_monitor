@@ -1,21 +1,14 @@
-var express = require('express');
-var router = express.Router();
+const express = require('express');
+const router = express.Router();
 const ObserveController = require("../../../controller/WEB/observe-page");
 const SubLogController = require("../../../controller/WEB/subscriptionLog-page");
-var sessionChecker = (req, res, next) => {
-  if (!req.session.userID || !req.cookies.user_id || !req.session.views) {
-    res.render('login');
-    return;
-  }
-  else {
-    next();
-  }
-};
+const {checkSession} = require("../../../server/checkAuth");
+
 //GET user request real-time observe page
-router.get('/', sessionChecker, ObserveController.ObserverPage);
+router.get('/', checkSession, ObserveController.ObserverPage);
 
 //GET user request subscriptionLogs page
-router.get('/viewLog', sessionChecker, SubLogController.ViewLogsPage);
+router.get('/viewLog', checkSession, SubLogController.ViewLogsPage);
 
 
 module.exports = router;

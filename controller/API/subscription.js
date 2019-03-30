@@ -53,49 +53,32 @@ const aggregateMultiSensor_PubCondition = async (docs) => {
 //export module
 var SubscribeMany = async (req, res, next) => {
   console.log(`POST - ${req.session.views} request a ajax call /subscribeMany`);
-  findSubscribeBefore(req.session.views,req.body.subscription)//find exist subscription
+  console.log(req.userData._id);
+  findSubscribeBefore(req.userData._id,req.body.subscription)//find exist subscription
     .then(exist => {
-      if(exist && exist.length)
-      {
+      if(exist && exist.length){
         console.log("exist : "+exist);
         throw new Error("sensor already subscribe before");
       }
-      findUserID(req.session.views)//find user ID
-        .then(userID => {
-          if(!userID)
-          {
-            console.log("did not found userID");
-            throw new Error("did not found userID");
-          }
-          //subscribe new
-          return subscribeMany(req.session.views,userID,req.body.subscription);
-        })
-        .then(results => {
-          res.json({msg:"success"});
-          var docs = results.map(doc => {
-            return {
-              _subscription:doc._id,
-              _subscriber:req.session.userID,
-              title: `created a subscription`,
-              logMsg: doc.groupType === null? doc.title:`group "${doc.title}"`,
-              logStatus: 3
-            }
-          });
-          // console.log();
-          // console.log(docs);
-          // console.log();
-          //save the subscription logs
-          //about user created the subscription info
-          saveSubscriptionLogs(docs);
-          //console.log(results);
-        })
-        .catch(err => {
-          throw new Error(err.message);
-          console.log(err);
-        });
+      return subscribeMany(req.session.views,req.userData._id,req.body.subscription);
+    })
+    .then(results => {
+      res.json({msg:"success"});
+      var docs = results.map(doc => {
+        return {
+          _subscription:doc._id,
+          _subscriber:req.userData._id,
+          title: `created a subscription`,
+          logMsg: doc.groupType === null? doc.title:`group "${doc.title}"`,
+          logStatus: 3
+        }
+      });
+      //save the subscription logs
+      //about user created the subscription info
+      saveSubscriptionLogs(docs);
     })
     .catch(err => {
-      res.status(400).json({msg:err.message});
+      res.status(406).json({msg:err.message});
       console.log(err);
       return;
     });
@@ -132,7 +115,7 @@ var SubscribeMany = async (req, res, next) => {
 var Unsubscribe = async (req, res, next) => {
   console.log(`POST - ${req.session.views} request a ajax call /unsubscribe`);
   var subscription = await getSubscriptionInfo(req.body.subscribeListID);
-
+  // data = {_id:subscribeListID}
   unsubscribeOne(req.body.subscribeListID,(result) => {
     if(result == "success") {//response to ajax
       res.json({msg:"success"});
@@ -144,16 +127,15 @@ var Unsubscribe = async (req, res, next) => {
   });
   var doc = { //generate delete log
     _subscription:req.body.subscribeListID,
-    _subscriber:req.session.userID,
+    _subscriber:req.userData._id,
     title: `delete a subscription`,
-    logMsg: subscription.groupType === null ?
+    logMsg: (subscription.groupType === null) ?
             subscription.title : `group "${subscription.title}"`,
     logStatus: 4
   };
   saveSubscriptionLogs(doc);//save delete log
   //aggregate related sensor's publishCondition
   aggregateMultiSensor_PubCondition(subscription);
-
 }
 var GetSubscriptionInfo = (req, res, next) => {
   console.log(`POST - ${req.session.views} request a ajax call /getSubscriptionInfo`);
@@ -191,7 +173,7 @@ var UpdateSubscriptionInfo = async (req, res, next) => {
     var result = await getSubscription_relatedSensorInfo(req.body._id);
     var doc = { //generate update subscription log
       _subscription:req.body._id,
-      _subscriber:req.session.userID,
+      _subscriber:req.userData._id,
       title: `changing a subscription `,
       logMsg: mapToLogMsg(req.body,result.title),
       logStatus: 2
@@ -214,7 +196,7 @@ var UpdateSubscriptionInfo = async (req, res, next) => {
       if(matchResult.match) {//safe
         var doc = { //generate update subscription log
           _subscription:req.body._id,
-          _subscriber:req.session.userID,
+          _subscriber:req.userData._id,
           title: (result.groupType === null) ? result.title : `group "${result.title}"`,
           logMsg: matchResult.matchMsg,
           logStatus: 0
@@ -223,7 +205,7 @@ var UpdateSubscriptionInfo = async (req, res, next) => {
       else {//match condition
         var doc = { //generate update subscription log
           _subscription:req.body._id,
-          _subscriber:req.session.userID,
+          _subscriber:req.userData._id,
           title: (result.groupType === null) ? result.title : `group "${result.title}"`,
           logMsg: "back to normal",
           logStatus: 1

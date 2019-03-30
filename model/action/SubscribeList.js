@@ -238,7 +238,7 @@ const unsubscribeMany = (userName,sensorID) => {
   }).exec();
 }
 //find the sensor already subscribe by user before
-const findSubscribeBefore = (userName,subscription) => {
+const findSubscribeBefore = (subscriberID,subscription) => {
   var sensorIDArray = [];
   subscription.forEach(doc => {
     doc._sensorID.forEach(sensorID => {
@@ -246,7 +246,7 @@ const findSubscribeBefore = (userName,subscription) => {
     });
   });
   return SubscribeListData.find({
-    subscriberName:userName,
+    _subscriber: ObjectId(subscriberID),
     _sensorID: { $in:sensorIDArray }
   }).select("_id").exec();
 }

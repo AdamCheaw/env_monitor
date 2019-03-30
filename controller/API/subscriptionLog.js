@@ -17,7 +17,7 @@ var GetSubscriptionLogs = async (req,res,next) => {
         req.session.userID,skip,15,req.body.start,req.body.end
       );
       var total = await countTotalSubLogs_byUserID({
-        _subscriber:ObjectId(req.session.userID),
+        _subscriber:ObjectId(req.userData._id),
         date: {
           $gte: req.body.start,
           $lte: req.body.end
@@ -26,19 +26,19 @@ var GetSubscriptionLogs = async (req,res,next) => {
     }
     else if(req.body.sort == "subscription") {
       var results = await searchSubLogs_sortBySub(
-        req.session.userID,skip,15,req.body.option
+        req.userData._id,skip,15,req.body.option
       );
       var total = await countTotalSubLogs_byUserID({
-        _subscriber:ObjectId(req.session.userID),
+        _subscriber:ObjectId(req.userData._id),
         _subscription:ObjectId(req.body.option)
       });
     }
     else {
       var results = await searchSubLogs_byUserID(
-        req.session.userID,skip,15
+        req.userData._id,skip,15
       );
       var total = await countTotalSubLogs_byUserID({
-        _subscriber:ObjectId(req.session.userID)
+        _subscriber:ObjectId(req.userData._id)
       });
     }
     //var date = moment().subtract(3,"days");

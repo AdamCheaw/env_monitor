@@ -64,7 +64,7 @@ app.get("/", (req,res,next) => {
 });
 app.get("/logout", (req,res,next) => {
   req.session.destroy();
-  res.render('login');
+  res.redirect('/Web');
 });
 app.use("/Web", webPage);
 app.use("/Observe", observePage);
