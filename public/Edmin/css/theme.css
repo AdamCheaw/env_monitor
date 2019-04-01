@@ -2370,6 +2370,7 @@ filter:progid:DXImageTransform.Microsoft.gradient(startColorstr='#fff5f5f5', end
   .mx-sm-auto {
     margin-left: auto !important;
   }
+
 }
 
 @media (min-width: 768px) {
@@ -3121,14 +3122,14 @@ filter:progid:DXImageTransform.Microsoft.gradient(startColorstr='#fff5f5f5', end
     margin-left: auto !important;
   }
 }
-table td .offline ,.media .media-body .offline {
+table td .offline ,.media .media-body .offline ,.list .offline{
 	background-color:#e63900;
 	padding:1px 5px;
 	border:1px solid #e63900;
 	border-radius:2px;
 	color:white;
 }
-table td .online,.media .media-body .online {
+table td .online,.media .media-body .online ,.list .online{
 	background-color:#47d147;
 	padding:1px 5px;
 	border:1px solid #47d147;
@@ -3217,7 +3218,37 @@ table td .online,.media .media-body .online {
 	padding:2px 8px;
 	margin-bottom: 10px;
 }
-
+#subscription-1 .sub-info{
+	grid-area: content;
+}
+#subscription-1 .operation-btns{
+	grid-area: topRight;
+	text-align: right;
+	padding-top: 10px;
+}
+#subscription-1 .sensor-value{
+	grid-area: right;
+	text-align: right;
+	padding-top:25px;
+}
+#subscription-1 .sensor-value i {
+	font-size:40px;
+	/* margin-toppx; */
+}
+#subscription-1 .table {
+	grid-area:table
+}
+#subscription-1 .subscription-list .list{
+	display: grid;
+	grid-template-areas:
+		'content content content content topRight topRight'
+		'content content content content right right'
+		'content content content content right right'
+		'table table table table table table';
+	grid-template-columns: 70% auto;
+	border-bottom:1px dashed #cccccc;
+	padding:10px 10px 11px 10px;
+}
 #subscription-board {
 	margin:5px;
 	overflow-x: hidden;
@@ -3306,5 +3337,47 @@ i.showValue ,.showValue{
 	}
 	.subscription-container .card .card-body .dl-horizontal dd{
 		margin-left:0px;
+	}
+}
+@media(max-width:576px) {
+	#subscription-1 .sub-info{
+		grid-area: content;
+		text-align: justify;
+		grid-column: 1 / 2;
+		/* border:1px solid black; */
+	}
+	#subscription-1 .sub-info .date {
+		display: block;
+		margin-left:-15px;
+	}
+	#subscription-1 .operation-btns{
+		grid-area: btns;
+		text-align: right;
+		padding-top: 0px;
+	}
+	#subscription-1 .sensor-value{
+		grid-area: value;
+		align-self:center;
+		justify-self:end;
+		/* padding-top:25px; */
+	}
+	#subscription-1 .sensor-value i {
+		/* vertical-align: middle; */
+		font-size:40px;
+		/* margin-toppx; */
+	}
+	#subscription-1 .table {
+		grid-area:table;
+	}
+	#subscription-1 .subscription-list .list{
+		display: grid;
+		grid-template-areas:
+			'btns btns btns'
+			'content content value'
+			'content content value'
+			'table table table';
+		grid-template-columns: 70% auto;
+		/* border-bottom:1px dashed #cccccc; */
+		/* padding:10px 10px 11px 10px; */
 	}
 }

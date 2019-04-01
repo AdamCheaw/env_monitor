@@ -186,7 +186,7 @@ $(document).ready(function() {
              // $("#myModal").modal("hide");
           },
           success: function(data){
-            $("#subscription-"+idClicked).parent().parent().remove();
+            $("#subscription-"+idClicked).remove();
             toastr.success('unsubscribe success!')
           },
           error: function(err){
