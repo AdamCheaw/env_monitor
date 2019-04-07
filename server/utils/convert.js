@@ -1,42 +1,39 @@
 var convertCondition = (data) => {
   var result = [];
-  if (data && data.length) {
+  if(data && data.length) {
     data.forEach(item => {
-      if(item.type == "max" || item.type == "min" || item.type == "equal"){
-        result.push({type:item.type, value:Number(item.value)});
-      }
-      else if (item.type == "between"){
+      if(item.type == "greater" || item.type == "lower" || item.type == "equal") {
+        result.push({ type: item.type, value: Number(item.value) });
+      } else if(item.type == "between") {
         result.push({
-          type:item.type,
-          minValue:Number(item.minValue),
-          maxValue:Number(item.maxValue),
+          type: item.type,
+          minValue: Number(item.minValue),
+          maxValue: Number(item.maxValue),
         })
-      }
-      else {
-        result.push({type:item.type, value:item.value});
+      } else {
+        result.push({ type: item.type, value: item.value });
       }
     });
   }
   return result;
 };
 
-var mapToLogMsg = (data,title) => {
+var mapToLogMsg = (data, title) => {
   var result = (data.groupType === undefined) ?
-    ` ${title} <br/>`:` group "${title}" <br/>`;
+    ` ${title} <br/>` : ` group "${title}" <br/>`;
   if(data.option) {
     result += `option : ${data.option} <br/>`;
-  }
-  else if(data.groupType) {
+  } else if(data.groupType) {
     result += `grouping type : ${data.groupType} <br/>`;
   }
-  if(data.condition && data.condition.length){
+  if(data.condition && data.condition.length) {
     result += "condition : ";
     data.condition.forEach(item => {
       switch (true) {
-        case item.type == "max":
+        case item.type == "greater":
           result += `<br/> - greater than ${item.value}`;
           break;
-        case item.type == "min":
+        case item.type == "lower":
           result += `<br/> - lower than ${item.value}`;
           break;
         case item.type == "equal":
@@ -52,4 +49,4 @@ var mapToLogMsg = (data,title) => {
   return result;
 }
 
-module.exports = {convertCondition , mapToLogMsg};
+module.exports = { convertCondition, mapToLogMsg };

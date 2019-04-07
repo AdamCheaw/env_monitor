@@ -1,4 +1,3 @@
-
 {{>header}}
 <div class="wrapper">
   <div class="container">
@@ -8,96 +7,94 @@
           <!--/.module-->
           <div class="module">
             <div class="module-head">
-                <h3>
-                    Subscribe Form</h3>
+              <h3> Subscribe Form</h3>
             </div>
             <div class="module-body">
-
               <div class="row-fluid">
                 <div class="span6 mt-2">
                   <div class="row-fluid">
                     {{!-- list all sensors to pick by user --}}
                     <div class="span6">
-                        <div class="control-group" >
-                          <label class="control-label" style="margin-left:5px;">Sensors</label>
-                          <div class="vertical-menu span11" id="vertical-menu1">
-                            {{#each items.data }}
-                              <a href="#">{{this.name}}</a>
-                            {{/each}}
-                          </div>
-                        </div>
-                        {{!-- groupType option  --}}
-                        <div class="control-group" id="">
-                          <label class="control-label mt-md-3">Group</label>
-                          <div class="controls">
-                            <label class="radio inline">
-                              <input type="radio" name="group-optionsRadios" id="radios-none" value="none" checked="">
-                              none
-                            </label>
-                            <label class="radio inline">
-                              <input type="radio" name="group-optionsRadios" id="radios-and" value="AND">
-                              AND
-                            </label>
-                            <label class="radio inline">
-                              <input type="radio" name="group-optionsRadios" id="radios-or" value="OR">
-                              OR
-                            </label>
-                          </div>
-                          <br/>
-                          {{!-- end groupType option  --}}
-                          {{!-- group title 's input field --}}
-                          <div id="group-input" class="enabled">
-                            <label class="control-label">Group 's title</label>
-                            <div class="controls" id="">
-                              <input type="text" id="group-title-input" list="group-title" class="span11"/>
-                              <datalist id="group-title">
-                                {{!-- <option value=""></option> --}}
-                              </datalist>
-                            </div>
-                            <br/>
-                          </div>
-
+                      <div class="control-group">
+                        <label class="control-label" style="margin-left:5px;">Sensors</label>
+                        <div class="vertical-menu span11" id="vertical-menu1">
+                          {{#each items.data }}
+                            <a href="#" id="sensor-{{this._id}}">{{this.name}}</a>
+                          {{/each}}
                         </div>
                       </div>
+                      {{!-- groupType option  --}}
+                      <div class="control-group">
+                        <label class="control-label">Sensor Name <span style="color:red">*</span></label>
+                        <div class="controls" id="">
+                          <input type="text" name="" id="autocomplete-dynamic" class="span11" />
+                        </div>
+                        <br/>
+                        <label class="control-label">Group</label>
+                        <div class="controls">
+                          <label class="radio inline">
+                            <input type="radio" name="group-optionsRadios" id="radios-none" value="none" checked="">
+                            none
+                          </label>
+                          <label class="radio inline">
+                            <input type="radio" name="group-optionsRadios" id="radios-and" value="AND">
+                            AND
+                          </label>
+                          <label class="radio inline">
+                            <input type="radio" name="group-optionsRadios" id="radios-or" value="OR">
+                            OR
+                          </label>
+                        </div>
+                        <br />
+                        {{!-- end groupType option  --}}
+                      </div>
+                    </div>
                     <!-- form to setting the subscription -->
                     <div class="span6">
                       <div id="form1" class="form-vertical">
-                          <div class="control-group" >
-                            <label class="control-label">Name</label>
-                            <div class="controls" id="">
-
-                              <input type="text" name="" id="autocomplete-dynamic" class="span11"/>
+                        <div class="control-group">
+                          <label class="control-label">Title <span style="color:red">*</span></label>
+                          <div class="controls" id="">
+                            <input type="text" id="title-input" list="title" class="span11" placeholder="write a title"/>
+                            <datalist id="title">
+                              {{!-- <option value=""></option> --}}
+                            </datalist>
+                          </div>
+                          <br />
+                          <label class="control-label">Description <span>(optional)</span></label>
+                          <div class="controls">
+                            <textarea
+                              id="description"
+                              class="span11"
+                              rows="3"
+                              placeholder="write down description about this subscription"
+                            ></textarea>
+                          </div>
+                          <br/>
+                          <label class="control-label">Option</label>
+                          <div class="controls">
+                            <label class="radio inline">
+                              <input type="radio" name="form1-optionsRadios" id="Radios1" value="default" checked=""> Default </label>
+                            <label class="radio inline">
+                              <input type="radio" name="form1-optionsRadios" id="Radios2" value="advanced"> Advanced </label>
+                          </div>
+                          <br />
+                          <div id="advanced-block" class="enabled">
+                            <label class="control-label" for="basicinput1">Greater than <input type="checkbox" value="" class="unlock-input"></label>
+                            <div class="controls" id="i1-1">
+                              <input type="text" id="form1_greaterValue" placeholder="" class="span11 input-condition" disabled>
                             </div>
-                            <br/>
-                            <label class="control-label">Option</label>
-      											<div class="controls">
-      												<label class="radio inline">
-      													<input type="radio" name="form1-optionsRadios" id="Radios1" value="default" checked="">
-      													Default
-      												</label>
-      												<label class="radio inline">
-      													<input type="radio" name="form1-optionsRadios" id="Radios2" value="advanced">
-      													Advanced
-      												</label>
-      											</div>
-                            <br/>
-                            <div id="advanced-block" class="enabled">
-                              <label class="control-label" for="basicinput1">Greater than <input type="checkbox" value="" class="unlock-input"></label>
-                              <div class="controls" id="i1-1">
-                                <input type="text" id="form1_maxValue" placeholder="" class="span11 input-condition" disabled>
-
-                              </div>
-                              <br/>
-                              <label class="control-label" for="basicinput2">Lower than <input type="checkbox" value="" class="unlock-input"></label>
-                              <div class="controls" id="i1-2">
-                                <input type="text" id="form1_minValue" placeholder="" class="span11 input-condition" disabled>
-                              </div>
-                              <br/>
-                              <label class="control-label" for="basicinput2">Equal to <input type="checkbox" value="" class="unlock-input"></label>
-                              <div class="controls" id="i1-3">
-                                <input type="text" id="form1_equalValue" placeholder="" class="span11 input-condition" disabled>
-                              </div>
-                              <br/>
+                            <br />
+                            <label class="control-label" for="basicinput2">Lower than <input type="checkbox" value="" class="unlock-input"></label>
+                            <div class="controls" id="i1-2">
+                              <input type="text" id="form1_lowerValue" placeholder="" class="span11 input-condition" disabled>
+                            </div>
+                            <br />
+                            <label class="control-label" for="basicinput2">Equal to <input type="checkbox" value="" class="unlock-input"></label>
+                            <div class="controls" id="i1-3">
+                              <input type="text" id="form1_equalValue" placeholder="" class="span11 input-condition" disabled>
+                            </div>
+                            {{!-- <br/>
                               <label class="control-label" for="selectOption1">Precision <input type="checkbox" value="" class="unlock-input"></label>
                               <div class="controls" id="o1-1">
                                 <select tabindex="1" id="form1_precisionValue" data-placeholder="Select here.." class="span11 input-condition" disabled >
@@ -105,53 +102,46 @@
                                   <option value="0">0</option>
                                   <option value="1">1</option>
                                 </select>
-                              </div>
-                              <br/>
-                              <label class="control-label" for="basicinput3">Between <input type="checkbox" value="" class="unlock-input-between"></label>
-
-                              <div class="row-fluid">
-                                <div class="span6">
-                                  <div class="controls">
-                                    <div class="input-prepend">
-            													<span class="add-on">min </span>
-                                      <input class="span9 input-condition-between" type="text" id="form1_b_minValue" disabled>
-            												</div>
+                              </div> --}}
+                            <br />
+                            <label class="control-label" for="basicinput3">Between <input type="checkbox" value="" class="unlock-input-between"></label>
+                            <div class="row-fluid">
+                              <div class="span6">
+                                <div class="controls">
+                                  <div class="input-prepend">
+                                    <span class="add-on">min </span>
+                                    <input class="span9 input-condition-between" type="text" id="form1_b_minValue" disabled>
                                   </div>
-
-                                </div>
-                                <div class="span6">
-                                  <div class="controls">
-                                    <div class="input-prepend">
-            													<span class="add-on">max</span>
-                                      <input class="span9 input-condition-between" type="text" id="form1_b_maxValue" disabled>
-            												</div>
-                                  </div>
-
                                 </div>
                               </div>
-                              {{!-- end row-fluid --}}
+                              <div class="span6">
+                                <div class="controls">
+                                  <div class="input-prepend">
+                                    <span class="add-on">max</span>
+                                    <input class="span9 input-condition-between" type="text" id="form1_b_maxValue" disabled>
+                                  </div>
+                                </div>
+                              </div>
                             </div>
-
+                            {{!-- end row-fluid --}}
                           </div>
-
-                          <div class="control-group ">
-      												<button type="button" class="btn btn-success pull-right" id="form1-add"> ADD <i class="icon-plus-sign"></i></button>
-      										</div>
-                          <br/>
+                        </div>
+                        <div class="control-group ">
+                          <button type="button" class="btn btn-success pull-right" id="form1-add"> ADD <i class="icon-plus-sign"></i></button>
+                        </div>
+                        <br />
                       </div>
                       {{!-- end form1 --}}
                     </div>
                     {{!-- end span6 --}}
-
                   </div>
                 </div>
                 {{!-- show current subscription --}}
                 <div class="span6">
                   <h4 class="align-center">Subscription</h4>
                   <div class="subscription-container">
-
                     <div id="subscription-board">
-                      <div class="span12" >
+                      <div class="span12">
                         {{!-- subscription template will append here --}}
                       </div>
                     </div>
@@ -159,118 +149,82 @@
                     <div class="pull-right">
                       <button type="button" class="btn btn-danger" id="subscription-clearBtn">Clear</button>
                       <button type="button" class="btn btn-info" id="subscription-submitBtn">Submit</button>
-  						      </div>
+                    </div>
                   </div>
-
                 </div>
-                {{!-- <div class="span5">
-                  <form id="form2" class="form-vertical">
-                    <div class="control-group" >
-                      <div class="controls" id="" >
-                        <label class="control-label">Subscription </label>
-                        <textarea class="span12" id="form2-subscription"rows="17" style="" spellCheck="false" disabled></textarea>
-                      </div>
-                    </div>
-                    <div class="control-group">
-                      <div class="controls pull-right">
-                        <button type="button" class="btn btn-danger" id="form2-clearBtn">Clear</button>
-                        <button type="button" class="btn btn-info" id="form2-submitBtn">Submit</button>
-                      </div>
-                    </div>
-                  </form>
-                </div> --}}
               </div>
-
             </div>
           </div>
-
           {{!-- show all sensor  --}}
           <div class="module">
-              <div class="module-head">
-                  <h3>
-                      All Sensors</h3>
-              </div>
-              <div class="module-option clearfix">
-
-                  <div class="pull-left">
-							       <button type="button" class="btn btn-primary">Submit</button>
-                     <a href="/observe" class="btn btn-info">Observe Window</a>
-						      </div>
-              </div>
-              <div class="module-body">
-
-                  <table class="table table-condensed table-striped datatable-1" id="sub-table" >
-                    <thead>
-                    <tr >
-                      <th>#</th>
-                      <th>Name</th>
-                      <th>Type</th>
-                      <th>Descrition</th>
-                      <th>Status</th>
-                      <th>Action</th>
-                    </tr>
-                    </thead>
-                    <tbody>
-                    {{#each items.data }}
-                        {{#if this.onConnect }}
-                        <tr id="{{this._id}}">
-                          <td>{{@index}}</td>
-                          <td class="sensor-name"><a href="Web/{{this._id}}">{{this.name}}</a></td>
-                          <td>{{{findIcon this.type}}}</td>
-                          <td>{{limitStr "Lorem ipsum dolor sit amet, consectetur adipisicing elit," 0 50}}</td>
-                          <td><b class="online" >online</b></td>
-
-                          <td class="setting">
-                            <a class="btn-icon btn-success sub-btn" id="btn-{{ this._id }}"><i class="icon-eye-open "></i></a>
-                            {{!-- <i class="icon-eye-open sub-btn" id="btn-{{ this._id }}"></i> --}}
-
-                          </td>
-                        </tr>
-                        {{else}}
-                        <tr id="{{this._id}}">
-                          <td>{{@index}}</td>
-                          <td class="sensor-name"><a href="Web/{{this._id}}">{{this.name}}</a></td>
-                          <td>{{{findIcon this.type}}}</td>
-                          <td>{{limitStr "Lorem ipsum dolor sit amet, consectetur adipisicing elit," 0 50}}</td>
-                          <td><b class="offline" >offline</b></td>
-
-                          <td class="setting">
-                            <a class="enabled btn-icon btn-success sub-btn" id="btn-{{ this._id }}"><i class="icon-eye-open"></i></a>
-                          </td>
-                        </tr>
-                        {{/if}}
-                    {{/each}}
-                    </tbody>
-                  </table>
-              </div>
-
+            <div class="module-head">
+              <h3> All Sensors</h3>
+            </div>
+            <div class="module-body">
+              <table class="table table-condensed table-striped datatable-1" id="sub-table">
+                <thead>
+                  <tr>
+                    <th>#</th>
+                    <th>Name</th>
+                    <th>Type</th>
+                    <th>Descrition</th>
+                    <th>Status</th>
+                    <th>Action</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {{#each items.data }}
+                    {{#if this.onConnect }}
+                      <tr id="{{this._id}}">
+                        <td>{{@index}}</td>
+                        <td class="sensor-name"><a href="Web/{{this._id}}">{{this.name}}</a></td>
+                        <td>{{{findIcon this.type}}}</td>
+                        <td>{{limitStr "Lorem ipsum dolor sit amet, consectetur adipisicing elit," 0 50}}</td>
+                        <td><b class="online">online</b></td>
+                        <td class="setting">
+                          <a class="btn-icon btn-success sub-btn" id="btn-{{ this._id }}"><i class="icon-eye-open "></i></a>
+                          {{!-- <i class="icon-eye-open sub-btn" id="btn-{{ this._id }}"></i> --}}
+                        </td>
+                      </tr>
+                    {{else}}
+                      <tr id="{{this._id}}">
+                        <td>{{@index}}</td>
+                        <td class="sensor-name"><a href="Web/{{this._id}}">{{this.name}}</a></td>
+                        <td>{{{findIcon this.type}}}</td>
+                        <td>{{limitStr "Lorem ipsum dolor sit amet, consectetur adipisicing elit," 0 50}}</td>
+                        <td><b class="offline">offline</b></td>
+                        <td class="setting">
+                          <a class="enabled btn-icon btn-success sub-btn" id="btn-{{ this._id }}"><i class="icon-eye-open"></i></a>
+                        </td>
+                      </tr>
+                    {{/if}}
+                  {{/each}}
+                </tbody>
+              </table>
+            </div>
           </div>
         </div>
-          <!--/.content-->
+        <!--/.content-->
       </div>
       <!--/.span9-->
     </div>
   </div>
 </div>
-
-
 {{>footer}}
 {{>editForm}}
-
 <script>
   var sub_result = {{{subscribe_sensor}}};
   var allSensor = {{{toJSON items}}};
 </script>
 {{!-- subscription template  --}}
-<script id="subscription-temp" type="text/x-handlebars-template">
-  <div class="card" >
+<script id="subscription-temp" type="text/x-handlebars-template"> <div class="card" >
     <div class="card-header" id="heading-\{{index}}">
       <h5 class="mb-0">
         <div class="sub-removeBtn ml-1 pull-right" id="sub-removeBtn-\{{index}}" ><i class="icon-remove font-warning"></i></div>
         <div class="sub-editBtn ml-1 pull-right" id="sub-editBtn-\{{index}}" ><i class="icon-edit font-safe"></i></div>
 
         <a class="" data-toggle="collapse" data-target="#sub-\{{index}}" aria-expanded="false" aria-controls="sub-\{{index}}">
-          \{{name}}
+          \{{title}}
         </a>
       </h5>
     </div>
@@ -287,6 +241,13 @@
             \{{option}}
           </dd>
           <hr/>
+          \{{#if description}}
+          <dt>Description</dt>
+          <dd>
+            \{{description}}
+          </dd>
+          <hr/>
+          \{{/if}}
           \{{#if condition}}
           <dt>Condition</dt>
           <dd>
@@ -304,26 +265,20 @@
   </div>
 </script>
 {{!-- subscriptions group template --}}
-<script id="subscriptionGroup-temp" type="text/x-handlebars-template">
-  <div class="card" >
+<script id="subscriptionGroup-temp" type="text/x-handlebars-template"> <div class="card" >
     <div class="card-header" id="heading-\{{index}}">
       <h5 class="mb-0">
         <div class="sub-removeBtn ml-1 pull-right" id="sub-removeBtn-\{{index}}" ><i class="icon-remove font-warning"></i></div>
         <div class="sub-editBtn ml-1 pull-right" id="sub-editBtn-\{{index}}" ><i class="icon-edit font-safe"></i></div>
 
         <a class="" data-toggle="collapse" data-target="#sub-\{{index}}" aria-expanded="false" aria-controls="sub-\{{index}}">
-          \{{groupTitle}}
+          \{{title}}
         </a><b class="label orange ml-1">\{{sensorName.length}}</b>
       </h5>
     </div>
     <div id="sub-\{{index}}" class="collapse" aria-labelledby="heading-\{{index}}" data-parent="#subscription-board">
       <div class="card-body">
         <dl class="dl-horizontal">
-          <dt>Group Title</dt>
-          <dd>
-            \{{groupTitle}}
-          </dd>
-          <hr/>
           <dt>Option</dt>
           <dd>
             \{{option}}
@@ -332,6 +287,13 @@
           <dt>Group Type</dt>
           <dd>\{{groupType}}</dd>
           <hr/>
+          \{{#if description}}
+          <dt>Description</dt>
+          <dd>
+            \{{description}}
+          </dd>
+          <hr/>
+          \{{/if}}
           <dt>Condition</dt>
           <dd>
             <ul class="list-style-num">

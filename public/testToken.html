@@ -1,118 +1,119 @@
 <!DOCTYPE html>
 <html lang="en">
+
+
 <head>
-    <head>
-        <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
-        <meta name="viewport" content="width=device-width, initial-scale=1.0">
-        <title>Edmin</title>
-        <link type="text/css" href="../Edmin/bootstrap/css/bootstrap.min.css" rel="stylesheet">
-        <link type="text/css" href="../Edmin/bootstrap/css/bootstrap-responsive.min.css" rel="stylesheet">
-        <link type="text/css" href="../Edmin/css/theme.css" rel="stylesheet">
-        <link type="text/css" href="../Edmin/images/icons/css/font-awesome.css" rel="stylesheet">
-        <link type="text/css" href='http://fonts.googleapis.com/css?family=Open+Sans:400italic,600italic,400,600'
-            rel='stylesheet'>
-    </head>
-    <body>
+  <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Edmin</title>
+  <link type="text/css" href="../Edmin/bootstrap/css/bootstrap.min.css" rel="stylesheet">
+  <link type="text/css" href="../Edmin/bootstrap/css/bootstrap-responsive.min.css" rel="stylesheet">
+  <link type="text/css" href="../Edmin/css/theme.css" rel="stylesheet">
+  <link type="text/css" href="../Edmin/images/icons/css/font-awesome.css" rel="stylesheet">
+  <link type="text/css" href='http://fonts.googleapis.com/css?family=Open+Sans:400italic,600italic,400,600' rel='stylesheet'>
+</head>
 
-        <!-- /navbar -->
-        <div class="wrapper">
-            <div class="container">
-                <div class="row">
-                    <div class="span3">
+<body>
 
-                    </div>
-                    <!--/.span9-->
-                    <div class="span6">
-                      <div class="content">
-                        <div class="module">
-                            <div class="module-head">
-                                <h3>POST</h3>
-                            </div>
-                            <div class="module-body">
-                              <div class="form-horizontal row-fluid">
-                                <div class="control-group">
-            											<label class="control-label" for="basicinput">Name</label>
-            											<div class="controls">
-            												<input type="text" id="userName" name="userName" placeholder="" class="span12">
-            											</div>
-            										</div>
-                                <div class="control-group">
-            											<label class="control-label" for="basicinput">Password</label>
-            											<div class="controls">
-            												<input type="text" id="pwd" name="pwd" placeholder="" class="span12">
-            											</div>
-            										</div>
-                                <div class="control-group ">
-            											<div class="controls pull-right">
-                                    <button type="button" class="btn btn-danger" id="logout">log out</button>
-                                    <button type="button" class="btn btn-info" id="checkToken">checkToken</button>
-            												<button type="button" class="btn btn-primary" id="submit">Submit</button>
-            											</div>
-            										</div>
-                              </div>
-                            </div>
-                        </div>
-                      </div>
-                        <!--/.content-->
-                    </div>
-                    <!--/.span12-->
-                </div>
-            </div>
-            <!--/.container-->
+  <!-- /navbar -->
+  <div class="wrapper">
+    <div class="container">
+      <div class="row">
+        <div class="span3">
+
         </div>
-        <!--/.wrapper-->
-        <script src="../Edmin/scripts/jquery-1.9.1.min.js" type="text/javascript"></script>
-        <script src="../Edmin/scripts/jquery-ui-1.10.1.custom.min.js" type="text/javascript"></script>
-        <script src="../Edmin/bootstrap/js/bootstrap.min.js" type="text/javascript"></script>
-        <!-- <script src="../Edmin/scripts/common.js" type="text/javascript"></script> -->
-        <script type="text/javascript">
-          $('#submit').click(function(e){
-            var name = $("#userName").val();
-            var pwd = $("#pwd").val();
-            var data = {
-              "name" : name,
-              "pwd" : pwd
-            };
-            $.ajax({
-              type: "POST",
-              url: "/test/login",
-              data: data,
-              dataType : 'json',
-              success: function(data) {
-                localStorage.token = data.token;
-                alert('Got a token from the server! Token: ' + data.token);
-              },
-              error: function() {
-                alert("Login Failed");
-              }
-            });
-          });
-          $('#checkToken').click(function(e){
-            // var name = $("userName").val();
-            // var pwd = $("pwd").val();
-            // var data = {
-            //   "name" : name,
-            //   "pwd" : pwd
-            // };
-            $.ajax({
-              type: "GET",
-              url: "/test/check",
-              beforeSend: function(xhr) {
-                if (localStorage.token) {
-                    xhr.setRequestHeader('Authorization', 'Bearer ' + localStorage.token);
-                }
-              },
-              success: function(data) {
-                alert("check sucess");
-              },
-              error: function(error) {
-                alert("error");
-              }
-            });
-          });
-          $('#logout').click(function(e){
-            localStorage.removeItem("token");
-            console.log("log out");
-          })
-        </script>
-    </body>
+        <!--/.span9-->
+        <div class="span6">
+          <div class="content">
+            <div class="module">
+              <div class="module-head">
+                <h3>POST</h3>
+              </div>
+              <div class="module-body">
+                <div class="form-horizontal row-fluid">
+                  <div class="control-group">
+                    <label class="control-label" for="basicinput">Name</label>
+                    <div class="controls">
+                      <input type="text" id="userName" name="userName" placeholder="" class="span12">
+                    </div>
+                  </div>
+                  <div class="control-group">
+                    <label class="control-label" for="basicinput">Password</label>
+                    <div class="controls">
+                      <input type="text" id="pwd" name="pwd" placeholder="" class="span12">
+                    </div>
+                  </div>
+                  <div class="control-group ">
+                    <div class="controls pull-right">
+                      <button type="button" class="btn btn-danger" id="logout">log out</button>
+                      <button type="button" class="btn btn-info" id="checkToken">checkToken</button>
+                      <button type="button" class="btn btn-primary" id="submit">Submit</button>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+          <!--/.content-->
+        </div>
+        <!--/.span12-->
+      </div>
+    </div>
+    <!--/.container-->
+  </div>
+  <!--/.wrapper-->
+  <script src="../Edmin/scripts/jquery-1.9.1.min.js" type="text/javascript"></script>
+  <script src="../Edmin/scripts/jquery-ui-1.10.1.custom.min.js" type="text/javascript"></script>
+  <script src="../Edmin/bootstrap/js/bootstrap.min.js" type="text/javascript"></script>
+  <!-- <script src="../Edmin/scripts/common.js" type="text/javascript"></script> -->
+  <script type="text/javascript">
+    $('#submit').click(function(e) {
+      var name = $("#userName").val();
+      var pwd = $("#pwd").val();
+      var data = {
+        "name": name,
+        "pwd": pwd
+      };
+      $.ajax({
+        type: "POST",
+        url: "/test/login",
+        data: data,
+        dataType: 'json',
+        success: function(data) {
+          localStorage.token = data.token;
+          alert('Got a token from the server! Token: ' + data.token);
+        },
+        error: function() {
+          alert("Login Failed");
+        }
+      });
+    });
+    $('#checkToken').click(function(e) {
+      // var name = $("userName").val();
+      // var pwd = $("pwd").val();
+      // var data = {
+      //   "name" : name,
+      //   "pwd" : pwd
+      // };
+      $.ajax({
+        type: "GET",
+        url: "/test/check",
+        beforeSend: function(xhr) {
+          if (localStorage.token) {
+            xhr.setRequestHeader('Authorization', 'Bearer ' + localStorage.token);
+          }
+        },
+        success: function(data) {
+          alert("check sucess");
+        },
+        error: function(error) {
+          alert("error");
+        }
+      });
+    });
+    $('#logout').click(function(e) {
+      localStorage.removeItem("token");
+      console.log("log out");
+    })
+  </script>
+</body>

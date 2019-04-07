@@ -1,14 +1,13 @@
 //changing edit subscription modal's view
-const changeEditSubView = (doc , id) => {
+const changeEditSubView = (doc, id) => {
   // console.log(doc);
   var scriptHtml = $("#editSubscription-temp")[0].innerHTML;
   var template = Handlebars.compile(scriptHtml);
   //no grouping
-  if(doc.groupType && (doc.groupType !== null || doc.groupType !== undefined)){
-    var obj = { title : doc.title, isGroup : true, id: id };
-  }
-  else {
-    var obj = { title : doc.title ,isGroup : false, id: id };
+  if(doc.groupType && (doc.groupType !== null || doc.groupType !== undefined)) {
+    var obj = { title: doc.title, isGroup: true, id: id };
+  } else {
+    var obj = { title: doc.title, isGroup: false, id: id };
   }
   var html = template(obj);
   $("#editSub-Modal .modal-content").html("");
@@ -28,8 +27,7 @@ const mapSubscriptionToEditForm = (doc) => {
       $("#editSub-Modal #radio-OR").prop("checked", true);
 
     }
-  }
-  else if(doc.option && doc.option !== null) {  //not grouping
+  } else if(doc.option && doc.option !== null) { //not grouping
     //default radio is "default"
     if(doc.option == "advanced") {
       //switching radios
@@ -45,12 +43,12 @@ const mapSubscriptionToEditForm = (doc) => {
     doc.condition.forEach(doc => {
       //fill in the condition according condition type
       switch (doc.type) {
-        case "max":
-          $("#editSub-Modal #input-max").val(doc.value).prop('disabled', false)
+        case "greater":
+          $("#editSub-Modal #input-greater").val(doc.value).prop('disabled', false)
             .parent().prev().children().prop('checked', true);
           break;
-        case "min":
-          $("#editSub-Modal #input-min").val(doc.value).prop('disabled', false)
+        case "lower":
+          $("#editSub-Modal #input-lower").val(doc.value).prop('disabled', false)
             .parent().prev().children().prop('checked', true);
           break;
         case "precision":
@@ -77,17 +75,17 @@ const mapSubscriptionToEditForm = (doc) => {
 //getting edit form condition value
 const getEditFormCondition = () => {
   let condition = [];
-  if($("#editSub-Modal #input-max").val()) {
+  if($("#editSub-Modal #input-greater").val()) {
     var data = {
-      type: "max",
-      value: Number($("#editSub-Modal #input-max").val())
+      type: "greater",
+      value: Number($("#editSub-Modal #input-greater").val())
     };
     condition.push(data);
   }
-  if($("#editSub-Modal #input-min").val()) {
+  if($("#editSub-Modal #input-lower").val()) {
     var data = {
-      type: "min",
-      value: Number($("#editSub-Modal #input-min").val())
+      type: "lower",
+      value: Number($("#editSub-Modal #input-lower").val())
     };
     condition.push(data);
   }
@@ -120,22 +118,20 @@ const getEditFormSubmit = () => {
   let afterEdit;
   if($("#editSub-Modal input[name='groupType']:checked").val()) {
     afterEdit = {
-      groupType : $("#editSub-Modal input[name='groupType']:checked").val(),
-      condition : getEditFormCondition()
+      groupType: $("#editSub-Modal input[name='groupType']:checked").val(),
+      condition: getEditFormCondition()
     };
-  }
-  else if($("#editSub-Modal input[name='option']:checked").val()) {
+  } else if($("#editSub-Modal input[name='option']:checked").val()) {
     let option = $("#editSub-Modal input[name='option']:checked").val();
     if(option == "default") {
       afterEdit = {
-        option : option,
-        condition : []
+        option: option,
+        condition: []
       };
-    }
-    else {
+    } else {
       afterEdit = {
-        option : option,
-        condition : getEditFormCondition()
+        option: option,
+        condition: getEditFormCondition()
       };
     }
   }
@@ -143,33 +139,31 @@ const getEditFormSubmit = () => {
 }
 $(document).ready(function() {
   //unlock or lock the input condition
-  $("#editSub-Modal").on('change','.unlock-input',function(){
+  $("#editSub-Modal").on('change', '.unlock-input', function() {
     if(this.checked) {
       $(this).parent().next().children(".input-condition").prop('disabled', false);
-    }
-    else {
+    } else {
       $(this).parent().next().children(".input-condition").prop('disabled', true);
       $(this).parent().next().children(".input-condition").val('');
     }
   });
-  $("#editSub-Modal").on('change','.unlock-input-btw',function(){
+  $("#editSub-Modal").on('change', '.unlock-input-btw', function() {
     if(this.checked) {
       $('#editSub-Modal .input-condition-between').prop('disabled', false);
-    }
-    else {
+    } else {
       $('#editSub-Modal .input-condition-between').prop('disabled', true);
       $('#editSub-Modal .input-condition-between').val('');
     }
   });
   //when option radio-default being click
-  $('#editSub-Modal').on('click','#radio-default',function() {
+  $('#editSub-Modal').on('click', '#radio-default', function() {
     $('#editSub-Modal .input-condition').parent().parent()
       .addClass('enabled');
     $('#editSub-Modal .unlock-input-btw').parent().parent()
       .addClass('enabled');
   });
   //when option radio-advanced being click
-  $('#editSub-Modal').on('click','#radio-advanced',function() {
+  $('#editSub-Modal').on('click', '#radio-advanced', function() {
     $('#editSub-Modal .input-condition').parent().parent()
       .removeClass('enabled');
     $('#editSub-Modal .unlock-input-btw').parent().parent()

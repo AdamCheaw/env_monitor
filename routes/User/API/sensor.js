@@ -1,13 +1,16 @@
 const express = require('express');
 const router = express.Router();
-const sensorHistoryController = require('../../../controller/API/sensorHistory');
+const SensorHistoryController = require('../../../controller/API/sensorHistory');
+const SensorController = require('../../../controller/API/sensor');
 
 
 // router.get('/', sensor);
 
-// url : {...}/API/sensor/getHistory
+// url : {...}/API/sensor/getHistoryData/sadas13as4sa6dsa6
 //handle ajax call for HistoryData
-router.post('/getHistoryData', sensorHistoryController.GetHistoryData);
+router.post('/getHistoryData/:sensorID', SensorHistoryController.GetHistoryData);
 
-
+// url : {...}/API/sensor/
+//API get all sensor
+router.get('/', SensorController.GetAllSensor);
 module.exports = router;

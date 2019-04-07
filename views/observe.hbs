@@ -1,25 +1,46 @@
-
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/3.7.0/animate.min.css">
 {{>header}}
 <div class="wrapper">
   <div class="container">
     <div class="row">
       <div class="span3">
-        <div class="sidebar">
-            <ul class="widget widget-menu unstyled">
-              <li class="active"><a href="/Web"><i class="menu-icon icon-list-alt"></i>Sensors
-              </a></li>
-              <li><a href="task.html"><i class="menu-icon icon-tasks"></i>Tasks <b class="label orange pull-right">
-                  19</b> </a></li>
-              <li><a class="collapsed" data-toggle="collapse" href="#togglePages1"><i class="menu-icon icon-desktop">
-                </i><i class="icon-chevron-down pull-right"></i><i class="icon-chevron-up pull-right">
-                </i>observe window </a>
-                  <ul id="togglePages1" class="collapse unstyled">
-                      <li><a href="/Observe"><i class="icon-table"></i> Table</a></li>
-                      <li><a href="other-user-profile.html"><i class="icon-map-marker"></i> Graph</a></li>
-                  </ul>
-              </li>
-            </ul>
-            <!--/.widget-nav-->
+        {{!-- sidebar --}}
+        <div class="module">
+          <div class="module-head">
+            <h3>Description</h3>
+          </div>
+          <div class="module-body">
+            <dl class="">
+              <dt class="pl-2">
+                <span class="font-safe">
+                  <i class="icon-star" style="font-size:16px"></i>
+                  Safe
+                </span>
+              </dt>
+              <dd class="mb-3">
+                <p>sensor in this subscription is currently in a safe condition</p>
+              </dd>
+              <dt class="pl-2">
+                <span class="font-warning">
+                  <i class="icon-warning-sign" style="font-size:16px"></i>
+                  Warning
+                </span>
+              </dt>
+              <dd class="mb-3">
+                <p>sensor in this subscription is reach threshold conditions</p>
+              </dd>
+
+              <dt class="pl-2">
+                <span class="font-yellow">
+                  <i class="icon-question-sign" style="font-size:16px"></i>
+                  Unable
+                </span>
+              </dt>
+              <dd class="mb-3">
+                <p>sensor in this subscription unable to connect</p>
+              </dd>
+            </dl>
+          </div>
         </div>
         <!--/.sidebar-->
       </div>
@@ -27,132 +48,168 @@
       <div class="span9">
         <div class="content">
 
+          <!--*******************-->
+          <div class="module">
+            <div class="module-head">
+              <h3 style="float:left">Observer Window</h3>
+              <img src="Edmin/images/Radio-200px.gif" style="height:25px;width:25px;margin:0px 5px">
+            </div>
+            <div class="module-body pb-5" id="subscription-1">
+              <div class="subscription-list">
+                {{#each items }}
+                  {{#if this.groupType}}
+                    <div class="list" id="subscription-{{this._id}}">
+                      <div class="sub-info">
+                        <h3 class="mb-1">
+                          {{this.title}}
+                        </h3>
+                        <p>
+                          {{#if this.description}}
+                            description :
+                            {{this.description}}<br/>
+                          {{/if}}
+                          grouping type :
+                          {{this.groupType}}<br />
 
-        <!--*******************-->
-        <div class="module">
-          <div class="module-head">
-            <h3 style="float:left">Observer Window</h3>
-            <img src="Edmin/images/Radio-200px.gif" style="height:25px;width:25px;margin:0px 5px">
-          </div>
-          <div class="module-body pb-5" id="subscription-1">
-            <div class="subscription-list">
-              {{#each items }}
-                {{#if this.groupType}}
-                <div class="list" id="subscription-{{this._id}}">
-                  <div class="sub-info" >
-                    <h3 class="mb-1">
-                        {{this.title}}
-                    </h3>
-                    <p>
-                      grouping type : {{this.groupType}}<br/>
-                      {{#if this.condition}}
-                      condition : {{loadCondition this.condition}}
-                      {{/if}}
-                    </p>
-                    <a class="btn btn-mini btn-collapse" data-toggle="collapse" href="#collapse-{{this._id}}"
-                       role="button" aria-expanded="false" aria-controls="collapse-{{this._id}}">
-                       <i class="icon-chevron-down"></i>
-                    </a>
-                  </div>
-                  <div class="operation-btns" >
-                    <button type="button" class="btn btn-mini btn-xs editBtn"
-                      id="editBtn-{{this._id}}">
-                      <i class="media-icon icon-edit"></i>
-                    </button>
-                    <button type="button" class="btn btn-mini btn-xs unsubBtn"
-                      id="unsubBtn-{{this._id}}">
-                      <i class="media-icon icon-remove"></i>
-                    </button>
-                  </div>
-                  <div class="sensor-value"  >
-                    {{#if this._sensorID.[0].onConnect}}
-                    {{loadValue this._sensorID.[0].temp this.option this.condition}}
-                    {{else}}
-                    <span class="font-yellow"><i class="icon-question-sign"></i></span>
-                    {{/if}}
-                  </div>
-                  <div class="table" >
+                          {{#if this.condition}}
+                            condition :
+                            {{loadCondition this.condition}}
+                          {{/if}}
+                        </p>
+                        <a class="btn btn-mini btn-collapse" data-toggle="collapse" href="#collapse-{{this._id}}" role="button" aria-expanded="false" aria-controls="collapse-{{this._id}}">
+                          <i class="icon-chevron-down"></i>
+                        </a>
+                      </div>
+                      <div class="operation-btns">
+                        <button type="button" class="btn btn-mini btn-xs editBtn" id="editBtn-{{this._id}}">
+                          <i class="media-icon icon-edit"></i>
+                        </button>
+                        <button type="button" class="btn btn-mini btn-xs unsubBtn" id="unsubBtn-{{this._id}}">
+                          <i class="media-icon icon-remove"></i>
+                        </button>
+                      </div>
+                      <div class="sensor-value">
+                        {{!-- load sensor value ,different symbol and color  depending condition --}}
+                        {{loadGroupValue this._sensorID this.groupType this.condition}}
+                      </div>
 
-                    <div class="collapse multi-collapse" id="collapse-{{this._id}}">
-                      <table class="table table-bordered">
-                        <thead>
-                        <tr>
-                          <th>Name</th>
-                          <th>Status</th>
-                          <th>last updated</th>
-                        </tr>
-                        </thead>
+                      {{!-- {{#if this._sensorID.[0].onConnect}}
+                        <div class="sensor-value animated infinite slow bounceIn">
+                          {{loadValue this._sensorID.[0].value this.option this.condition}}
+                        </div>
+                      {{else}}
+                        <div class="sensor-value">
+                          <span class="font-yellow ">
+                            <i class="icon-question-sign "></i>
+                          </span>
+                        </div>
+                      {{/if}} --}}
+                      {{!-- <div class="sensor-value animated infinite slow bounceIn">
+                        {{#if this._sensorID.[0].onConnect}}
+                          {{loadValue this._sensorID.[0].value this.option this.condition}}
+                        {{else}}
+                          <span class="font-yellow ">
+                            <i class="icon-question-sign "></i>
+                          </span>
+                        {{/if}}
+                      </div> --}}
+                      <div class="table">
 
-                        <tbody>
-                          {{#each this._sensorID}}
-                          <tr id="table-row-{{this._id}}">
-                            <td>
-                              <a href="Web/{{this._id}}">
-                                {{this.name}}
-                              </a>
-                            </td>
-                            <td class="status">
-                              {{#if this.onConnect}}
-                                <b class="online">online</b>
-                              {{else}}
-                                <b class="offline">offline</b>
-                              {{/if}}
-                            </td>
-                            <td class="date">{{this.date}}</td>
-                          </tr>
-                          {{/each}}
-                        </tbody>
-                      </table>
+                        <div class="collapse multi-collapse" id="collapse-{{this._id}}">
+                          <table class="table table-bordered">
+                            <thead>
+                              <tr>
+                                <th>Name</th>
+                                <th>Status</th>
+                                <th>last updated</th>
+                              </tr>
+                            </thead>
+
+                            <tbody>
+                              {{#each this._sensorID}}
+                                <tr id="table-row-{{this._id}}">
+                                  <td>
+                                    <a href="Web/{{this._id}}">
+                                      {{this.name}}
+                                    </a>
+                                  </td>
+                                  <td class="status">
+                                    {{#if this.onConnect}}
+                                      <b class="online">online</b>
+                                    {{else}}
+                                      <b class="offline">offline</b>
+                                    {{/if}}
+                                  </td>
+                                  <td class="date">{{this.date}}</td>
+                                </tr>
+                              {{/each}}
+                            </tbody>
+                          </table>
+                        </div>
+                      </div>
                     </div>
-                  </div>
-                </div>
-                {{else}}
-                <div class="list" id="subscription-{{this._id}}">
-                  <div class="sub-info" >
-                    <h3 class="mb-1">
-                        <a href="Web/{{this._sensorID.[0]._id}}">{{this._sensorID.[0].name}}</a>
-                    </h3>
-                    <p>
-                      option : {{this.option}}<br/>
-                      {{#if this.condition}}
-                      condition : {{loadCondition this.condition}}
-                      {{/if}}
-                    </p>
-                    {{#if this._sensorID.[0].onConnect}}
-                    <b class="online">online</b>
-                    {{else}}
-                    <b class="offline">offline</b>
-                    {{/if}}
-                    <span class="ml-2 date">{{this._sensorID.[0].date}}</span>
-                  </div>
-                  <div class="operation-btns" >
-                    <button type="button" class="btn btn-mini btn-xs editBtn"
-                      id="editBtn-{{this._id}}">
-                      <i class="media-icon icon-edit"></i>
-                    </button>
-                    <button type="button" class="btn btn-mini btn-xs unsubBtn"
-                      id="unsubBtn-{{this._id}}">
-                      <i class="media-icon icon-remove"></i>
-                    </button>
-                  </div>
-                  <div class="sensor-value" >
-                    {{#if this._sensorID.[0].onConnect}}
-                    {{loadValue this._sensorID.[0].temp this.option this.condition}}
-                    {{else}}
-                    <span class="font-yellow"><i class="icon-question-sign"></i></span>
-                    {{/if}}
-                  </div>
-                </div>
-                {{/if}}
-              {{/each}}
+                  {{else}}
+                    <div class="list" id="subscription-{{this._id}}">
+                      <div class="sub-info">
+                        <h3 class="mb-1">
+                          {{this.title}}
+                        </h3>
+                        <p>
+                          <a href="Web/{{this._sensorID.[0]._id}}">
+                            {{this._sensorID.[0].name}}
+                          </a><br/>
+                          {{#if this.description}}
+                            description :
+                            {{this.description}}<br/>
+                          {{/if}}
+                          option :
+                          {{this.option}}<br />
+                          {{#if this.condition}}
+                            condition :
+                            {{loadCondition this.condition}}
+                          {{/if}}
+                        </p>
+                        {{#if this._sensorID.[0].onConnect}}
+                          <b class="online">online</b>
+                        {{else}}
+                          <b class="offline">offline</b>
+                        {{/if}}
+                        <span class="ml-2 date">{{this._sensorID.[0].date}}</span>
+                      </div>
+                      <div class="operation-btns">
+                        <button type="button" class="btn btn-mini btn-xs editBtn" id="editBtn-{{this._id}}">
+                          <i class="media-icon icon-edit"></i>
+                        </button>
+                        <button type="button" class="btn btn-mini btn-xs unsubBtn" id="unsubBtn-{{this._id}}">
+                          <i class="media-icon icon-remove"></i>
+                        </button>
+                      </div>
+                      <div class="sensor-value">
+                        {{#if this._sensorID.[0].onConnect}}
+                          <div class="animated infinite slow bounceIn">
+                            {{loadValue this._sensorID.[0].value this.option this.condition}}
+                          </div>
+                        {{else}}
+                          <div class="">
+                            <span class="font-yellow ">
+                              <i class="icon-question-sign "></i>
+                            </span>
+                          </div>
+                        {{/if}}
+                      </div>
+                    </div>
+                  {{/if}}
+                {{/each}}
+              </div>
             </div>
           </div>
-        </div>
-        <br />
-        <!--*******************-->
+          <br />
+          <!--*******************-->
 
-        </div><!--/.content-->
-      </div><!--/.span9-->
+        </div>
+        <!--/.content-->
+      </div>
+      <!--/.span9-->
     </div>
   </div>
 </div>

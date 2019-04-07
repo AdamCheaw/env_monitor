@@ -1,12 +1,19 @@
 const mongoose = require('mongoose');
 const bodyParser = require('body-parser');
-const expressSession = require('express-session');
 const jwt = require('jsonwebtoken');
-const { findUserID, createUser } = require('../../model/action/user');
-var UserLogin = (req, res, next) => {
-  console.log(`POST - ${req.body.name} try to login`);
-  //session = user name
-  req.session.views = req.body.name;
+const {
+  findUserID,
+  createUser
+} = require('../../model/action/user');
+
+const Authentication = (req, res, next) => {
+  if(!req.body.name) {
+    res.status(400).json({
+      message: "request is being reject"
+    });
+    return;
+  }
+  console.log(`POST - ${req.body.name} try to login through API`);
   findUserID(req.body.name)
     .then(userID => {
       if(!userID) {
@@ -26,14 +33,16 @@ var UserLogin = (req, res, next) => {
               console.log(result);
               console.log(token);
               return res.status(200).json({
-                message: "login successful",
+                message: "authentication success",
                 token: token
               });
             }
           })
           .catch(err => {
             console.log(err);
-            res.send({ err: err.message });
+            res.status(406).json({
+              err: err.message
+            });
             return;
           });
       } else {
@@ -48,14 +57,14 @@ var UserLogin = (req, res, next) => {
         req.session.userID = userID._id;
         console.log(token);
         return res.status(200).json({
-          message: "login successful",
+          message: "authentication success",
           token: token
         });
       }
 
     })
-  //console.log("sessionID: "+req.session.id);
 }
+
 module.exports = {
-  UserLogin
-};
+  Authentication
+}

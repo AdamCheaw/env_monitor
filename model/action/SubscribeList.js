@@ -5,47 +5,46 @@ const mongoose = require('mongoose');
 const express = require('express');
 const ObjectId = require('mongodb').ObjectID;
 const moment = require('moment');
-const {convertCondition} = require('../../server/utils/convert');
-const {aggregatedConditions} = require('../../server/utils/aggregatedConditions');
-const {generateNotificationList} = require('../../server/utils/notificationList');
+const { convertCondition } = require('../../server/utils/convert');
+const { aggregatedConditions } = require('../../server/utils/aggregatedConditions');
+const { generateNotificationList } = require('../../server/utils/notificationList');
 // find all subscriber subscribe this sensor
-const searchSubscribeList_withSensorID = (sensorID,callback) => {
+const searchSubscribeList_withSensorID = (sensorID, callback) => {
   //console.log("DB : "+sensorID);
-  SubscribeListData.find({ _sensorID:ObjectId(sensorID) })
+  SubscribeListData.find({ _sensorID: ObjectId(sensorID) })
     // .populate({
     //   path:'_sensorID',
     //   match: {_id:ObjectId(sensorID)},
     //   select:' ',
     // })
     .populate({
-      path:'_subscriber',
-      match:{onConnect:true},
-      select:'socketID'
+      path: '_subscriber',
+      match: { onConnect: true },
+      select: 'socketID'
     })
     .select('_subscriber option condition')
     .exec()
     .then(docs => {
-      if(docs){
+      if(docs) {
         console.log(docs);
         var items = [];
         //find the current onConnect subscriber
 
         docs.forEach(item => {
-          if(item._subscriber){//if !null push to the items
+          if(item._subscriber) { //if !null push to the items
             var doc = {
-              socketID : item._subscriber.socketID,
-              option : item.option,
-              condition : item.condition
+              socketID: item._subscriber.socketID,
+              option: item.option,
+              condition: item.condition
             };
             items.push(doc);
             //console.log("items.push(item._subscriber.socketID)"+item._subscriber.socketID);
           }
         });
-        callback(items,sensorID);
+        callback(items, sensorID);
         return;
         //console.log("data: "+docs);
-      }
-      else {
+      } else {
         //callback(null);
         return;
       }
@@ -56,15 +55,15 @@ const searchSubscribeList_withSensorID = (sensorID,callback) => {
     });
 }
 const findAllSubscriber_bySensorID = (sensorID) => {
-  return SubscribeListData.find({ _sensorID:ObjectId(sensorID) })
+  return SubscribeListData.find({ _sensorID: ObjectId(sensorID) })
     .populate({
-      path:'_subscriber',
+      path: '_subscriber',
       //match:{onConnect:true},
-      select:'socketID _id onConnect'
+      select: 'socketID _id onConnect'
     })
     .populate({
-      path:'_sensorID',
-      select:'_id temp onConnect data'
+      path: '_sensorID',
+      select: '_id value onConnect data'
     })
     .select('_id _subscriber _sensorID option condition groupType title ')
     .exec();
@@ -72,46 +71,46 @@ const findAllSubscriber_bySensorID = (sensorID) => {
 
 const searchSubList_withSubName = (name, callback) => {
   var doc;
-  SubscribeListData.find({subscriberName:name})
+  SubscribeListData.find({ subscriberName: name })
     .populate({
-      path:'_sensorID',
-      select:'_id name temp date onConnect type'
+      path: '_sensorID',
+      select: '_id name value date onConnect type'
     })
-    .select('subscriberName option condition groupType title')
+    .select('subscriberName option condition groupType title description')
     .exec()
     .then(docs => {
-      if(docs && docs.length){
+      if(docs && docs.length) {
         var result = [];
         docs.forEach(doc => {
           if(doc._sensorID && doc._sensorID.length) {
             //mapping every sensor in this subscription
             var sensors = doc._sensorID.map(thisSensor => {
               return {
-                 _id: thisSensor._id,
-                 name: thisSensor.name,
-                 temp: thisSensor.temp,
-                 date: moment.parseZone(thisSensor.date).local().format('YYYY MMM Do, h:mm:ssa'),
-                 type: thisSensor.type,
-                 onConnect: thisSensor.onConnect
+                _id: thisSensor._id,
+                name: thisSensor.name,
+                value: thisSensor.value,
+                date: moment.parseZone(thisSensor.date).local().format('YYYY MMM Do, h:mm:ssa'),
+                type: thisSensor.type,
+                onConnect: thisSensor.onConnect
               };
             });
             var item = {
-               _id: doc._id,
-               _sensorID: sensors,
-               subscriberName: doc.subscriberName,
-               option: doc.option,
-               condition: doc.condition,
-               groupType: doc.groupType,
-               title: doc.title
+              _id: doc._id,
+              _sensorID: sensors,
+              subscriberName: doc.subscriberName,
+              option: doc.option,
+              condition: doc.condition,
+              groupType: doc.groupType,
+              title: doc.title,
+              description: doc.description
             };
             result.push(item);
           }
         })
-                callback(result);
+        callback(result);
         //console.log("searchSubscribeList_withSubscriberName: "+docs);
         return;
-      }
-      else {
+      } else {
         callback(null);
         return;
       }
@@ -120,28 +119,28 @@ const searchSubList_withSubName = (name, callback) => {
       console.log(err);
       return err
     });
-    // if(doc)
-    // {
-    //   return doc;
-    // }
+  // if(doc)
+  // {
+  //   return doc;
+  // }
 }
 
-const subscribeOne = (name,userID,sensorID,option,condition,callback) => {
+const subscribeOne = (name, userID, sensorID, option, condition, callback) => {
   SubscribeListData.findOne({
-      _subscriber : mongoose.Types.ObjectId(userID),
-      _sensorID : mongoose.Types.ObjectId(sensorID),
-      subscriberName : name
-    },(err,doc) => {
-      if (!doc) { //nothing found , insert a new document
-        var item = {
-          _subscriber : mongoose.Types.ObjectId(userID),
-          _sensorID : mongoose.Types.ObjectId(sensorID),
-          subscriberName : name,
-          option:option,
-          condition : condition
-        };
-        var data = new SubscribeListData(item);
-        data.save()
+    _subscriber: mongoose.Types.ObjectId(userID),
+    _sensorID: mongoose.Types.ObjectId(sensorID),
+    subscriberName: name
+  }, (err, doc) => {
+    if(!doc) { //nothing found , insert a new document
+      var item = {
+        _subscriber: mongoose.Types.ObjectId(userID),
+        _sensorID: mongoose.Types.ObjectId(sensorID),
+        subscriberName: name,
+        option: option,
+        condition: condition
+      };
+      var data = new SubscribeListData(item);
+      data.save()
         .then(result => {
           if(result) {
             console.log("DB : subscribe success");
@@ -153,11 +152,10 @@ const subscribeOne = (name,userID,sensorID,option,condition,callback) => {
           console.log(err);
           callback("error");
         });
-      }
-      else {//already insert before
-        doc.option = option;
-        doc.condition = condition;
-        doc.save()
+    } else { //already insert before
+      doc.option = option;
+      doc.condition = condition;
+      doc.save()
         .then(result => {
           if(result) {
             console.log("DB : subscribe success");
@@ -171,27 +169,24 @@ const subscribeOne = (name,userID,sensorID,option,condition,callback) => {
         });
 
 
-      }
-    });
-    return;
+    }
+  });
+  return;
 }
-const unsubscribeOne = (subscribeListID,callback) => {
-  SubscribeListData.deleteOne({_id:ObjectId(subscribeListID)}, (err) => {
-    if (err) return callback(err);
+const unsubscribeOne = (subscribeListID, callback) => {
+  SubscribeListData.deleteOne({ _id: ObjectId(subscribeListID) }, (err) => {
+    if(err) return callback(err);
     return callback("success");
     console.log('the subdocs were removed');
   });
 }
 
-const unsubscribeOneSensor = (sensorID,subscribeListID) => {
+const unsubscribeOneSensor = (sensorID, subscribeListID) => {
   return new Promise((resolve, reject) => {
-    SubscribeListData.updateOne(
-      {_id: ObjectId(subscribeListID)},
-      { $pull: { _sensors:ObjectId(sensorID) } }
-    )
+    SubscribeListData.updateOne({ _id: ObjectId(subscribeListID) }, { $pull: { _sensors: ObjectId(sensorID) } })
       .exec()
       .then(() => {
-        return SubscribeListData.deleteMany( {_sensorID:[]} ).exec();
+        return SubscribeListData.deleteMany({ _sensorID: [] }).exec();
       })
       .then(() => {
         resolve("success");
@@ -207,23 +202,22 @@ const unsubscribeOneSensor = (sensorID,subscribeListID) => {
 }
 
 //no callback style
-const subscribeMany = (name,userID,subscription) => {
+const subscribeMany = (name, userID, subscription) => {
   var insertData = subscription.map(doc => {
     return {
       option: doc.option,
-      _subscriber : userID,
-      _sensorID : doc._sensorID.map(sensorID => ObjectId(sensorID)),
-      subscriberName : name,
+      _subscriber: userID,
+      _sensorID: doc._sensorID.map(sensorID => ObjectId(sensorID)),
+      subscriberName: name,
       condition: convertCondition(doc.condition),
       groupType: (typeof doc.groupType === 'undefined') ? null : doc.groupType,
-      title: doc.title
-      //the title is user defined  or sensor name ,it depend on groupType
+      title: doc.title,
+      description: (typeof doc.description === 'undefined') ? "" : doc.description
     };
   });
   return new Promise((resolve, reject) => {
-    SubscribeListData.insertMany(insertData,(err,result) => {
-      if(err)
-      {
+    SubscribeListData.insertMany(insertData, (err, result) => {
+      if(err) {
         reject(err);
       }
       resolve(result);
@@ -231,14 +225,14 @@ const subscribeMany = (name,userID,subscription) => {
   })
 
 }
-const unsubscribeMany = (userName,sensorID) => {
+const unsubscribeMany = (userName, sensorID) => {
   return SubscribeListData.deleteMany({
-    subscriberName:userName,
-    _id: {$in:sensorID}
+    subscriberName: userName,
+    _id: { $in: sensorID }
   }).exec();
 }
 //find the sensor already subscribe by user before
-const findSubscribeBefore = (subscriberID,subscription) => {
+const findSubscribeBefore = (subscriberID, subscription) => {
   var sensorIDArray = [];
   subscription.forEach(doc => {
     doc._sensorID.forEach(sensorID => {
@@ -247,80 +241,71 @@ const findSubscribeBefore = (subscriberID,subscription) => {
   });
   return SubscribeListData.find({
     _subscriber: ObjectId(subscriberID),
-    _sensorID: { $in:sensorIDArray }
+    _sensorID: { $in: sensorIDArray }
   }).select("_id").exec();
 }
 // update the subscribeList 's previous value
 // for the next time can compare new value with this previous value
-const updateSubList_PreviousValue = (idArray,newValue) => {
+const updateSubList_PreviousValue = (idArray, newValue) => {
   //console.log(idArray);
-  SubscribeListData.updateMany(
-    { _id: {$in:idArray} },
-    { $set: { previousValue : newValue } },
-    { multi:true }, (err,res) => {
-      if(err) {
-        console.log(err);
-      }
-      else {
-        console.log(`DB: updateSubList_PreviousValue to newValue : ${newValue}`);
-      }
-    });
+  SubscribeListData.updateMany({ _id: { $in: idArray } }, { $set: { previousValue: newValue } }, { multi: true }, (err, res) => {
+    if(err) {
+      console.log(err);
+    } else {
+      console.log(`DB: updateSubList_PreviousValue to newValue : ${newValue}`);
+    }
+  });
 }
 
-const updateSubList_PreviousMatchCondition = (idArray,isMatch) => {
+const updateSubList_PreviousMatchCondition = (idArray, isMatch) => {
   if(idArray && idArray.length) {
-    SubscribeListData.updateMany(
-      { _id: {$in:idArray} },
-      { $set: { previousMatch : isMatch} },
-      { multi:true }, (err,res) => {
-        if(err) {
-          console.log(err);
-        }
-        else {
-          console.log(`DB: update matching flag`);
-        }
-      });
+    SubscribeListData.updateMany({ _id: { $in: idArray } }, { $set: { previousMatch: isMatch } }, { multi: true }, (err, res) => {
+      if(err) {
+        console.log(err);
+      } else {
+        console.log(`DB: update matching flag`);
+      }
+    });
   }
 }
 
 //generate the notificationList to user when a sensor notifify a new value
-const notificationList = (sensorData,callback) => {
+const notificationList = (sensorData, callback) => {
   SubscribeListData.find({ _sensorID: ObjectId(sensorData._id) })
-  .populate({
-    path:'_sensorID',
-    select:'_id name temp date onConnect'
-  })
-  .populate({
-    path:'_subscriber',
-    select:'_id socketID onConnect'
-  })
-  .select('_id _subscriber _sensorID option title condition previousValue groupType previousMatch')
-  .exec((err,results) => {
+    .populate({
+      path: '_sensorID',
+      select: '_id name value date onConnect'
+    })
+    .populate({
+      path: '_subscriber',
+      select: '_id socketID onConnect'
+    })
+    .select('_id _subscriber _sensorID option title condition previousValue groupType previousMatch')
+    .exec((err, results) => {
 
-    if(err) {
-      console.log(err);
-      return;
-    }
-    else {
-      let currentData = {
-        sensorName: sensorData.name,
-        value: sensorData.temp
-      };
-      console.log("current notification Data:");
-      console.log(currentData);
-      console.log();
-      //console.log(results);
-      let data = generateNotificationList(results,currentData);
-      //console.log(data);
-      return callback(data);
-    }
-  });
+      if(err) {
+        console.log(err);
+        return;
+      } else {
+        let currentData = {
+          sensorName: sensorData.name,
+          value: sensorData.value
+        };
+        console.log("current notification Data:");
+        console.log(currentData);
+        console.log();
+        //console.log(results);
+        let data = generateNotificationList(results, currentData);
+        //console.log(data);
+        return callback(data);
+      }
+    });
 }
 
 //get subscription info
 const getSubscriptionInfo = (id) => {
   return SubscribeListData.findById(id)
-    .select('option condition groupType title _sensorID')
+    .select('_id title option condition groupType  _sensorID')
     .exec();
 }
 //get subscription related sensor's info
@@ -328,9 +313,9 @@ const getSubscription_relatedSensorInfo = (id) => {
   return SubscribeListData.findById(id)
     .populate({
       path: '_sensorID',
-      select:'_id name temp onConnect'
+      select: '_id name value onConnect'
     })
-    .select('previousMatch option condition groupType title')
+    .select('title option condition groupType previousMatch _sensorID')
     .exec();
 }
 //update subscription info
@@ -339,22 +324,20 @@ const updateSubscriptionInfo = (doc) => {
   //filter update data
   if(doc.option) {
     updateData = {
-      option : doc.option,
-      condition : convertCondition(doc.condition)
+      option: doc.option,
+      condition: convertCondition(doc.condition)
     };
-  }
-  else if(doc.groupType) {
+  } else if(doc.groupType) {
     updateData = {
-      groupType : doc.groupType,
-      condition : convertCondition(doc.condition)
+      groupType: doc.groupType,
+      condition: convertCondition(doc.condition)
     };
   }
   //console.log(updateData);
 
 
   return new Promise((resolve, reject) => {
-    SubscribeListData.updateOne({ _id: ObjectId(doc._id) },
-      { $set: updateData })
+    SubscribeListData.updateOne({ _id: ObjectId(doc._id) }, { $set: updateData })
       .exec()
       .then(result => {
         console.log(result);
@@ -367,11 +350,11 @@ const updateSubscriptionInfo = (doc) => {
   });
 }
 const getSubscriptions_bySubscriber = (id) => {
-  return SubscribeListData.find({_subscriber:ObjectId(id)})
-    .select('_id title').exec();
+  return SubscribeListData.find({ _subscriber: ObjectId(id) })
+    .select('_id title _sensorID option groupType condition').exec();
 }
 const getSubCondition_bySID = (id) => {
-  return SubscribeListData.find({_sensorID:ObjectId(id)})
+  return SubscribeListData.find({ _sensorID: ObjectId(id) })
     .select('_id condition').exec();
 }
 module.exports = {

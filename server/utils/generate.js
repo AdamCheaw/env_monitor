@@ -1,8 +1,8 @@
-var generateSensorData = (data,subInfo) => {
+var generateSensorData = (data, subInfo) => {
   return {
     _id: data._id,
     name: data.name,
-    temp: data.temp,
+    value: data.value,
     date: data.date,
     onConnect: data.onConnect,
     option: subInfo.option,
@@ -18,14 +18,14 @@ var generateNotification = (data) => {
     _sensorID: data._sensorID.map(sensor => {
       return {
         _id: sensor._id,
-        temp: sensor.temp,
+        value: sensor.value,
         onConnect: sensor.onConnect,
         date: sensor.date,
       };
     })
   };
 }
-var generateSensorDisconnectData = (doc,sensorID) => {
+var generateSensorDisconnectData = (doc, sensorID) => {
   return {
     _id: doc._id,
     groupType: doc.groupType,
@@ -33,7 +33,7 @@ var generateSensorDisconnectData = (doc,sensorID) => {
   }
 }
 module.exports = {
-  generateSensorData ,
-  generateNotification ,
+  generateSensorData,
+  generateNotification,
   generateSensorDisconnectData
 };

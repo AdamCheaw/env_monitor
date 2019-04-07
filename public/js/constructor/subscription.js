@@ -7,29 +7,28 @@ function Subscription() {
     return;
   };
   this.removeOneSubscription = function(index) {
-    this.subscriptions.splice(index,1);
+    this.subscriptions.splice(index, 1);
   }
   //getting a subscription's info
   this.getOneSubscription = function(index) {
     return this.subscriptions[index];
   }
   //update a subscription's info
-  this.updateOneSubscription = function(index,doc) {
+  this.updateOneSubscription = function(index, doc) {
     if(doc.option) {
       this.subscriptions[index].option = doc.option;
       this.subscriptions[index].condition = doc.condition;
-    }
-    else if(doc.groupType) {
+    } else if(doc.groupType) {
       this.subscriptions[index].groupType = doc.groupType;
       this.subscriptions[index].condition = doc.condition;
     }
   }
   this.findSensorDuplicate = function(id) {
-    for(let i = 0;i < this.subscriptions.length;i++) {
+    for(let i = 0; i < this.subscriptions.length; i++) {
       var result = this.subscriptions[i]._sensorID.find(sensorID => {
         return sensorID == id;
       });
-      if(result !== undefined){
+      if(result !== undefined) {
         return result;
       }
     }
@@ -53,18 +52,18 @@ function Subscription() {
   //return all group title
   this.findAllGroupTitle = function() {
     var result = this.subscriptions.filter(subscription => {
-      return subscription.groupType == "AND" || subscription.groupType == "OR"
-    })
-    .map(res => res.groupTitle);
+        return subscription.groupType == "AND" || subscription.groupType == "OR"
+      })
+      .map(res => res.groupTitle);
 
     return result;
   }
   this.getAllSubscription = function() {
     return this.subscriptions;
   }
-  // remove a sensor form the group
-  this.removeFromGroup = function(subIndex,sensorIndex) {
-    this.subscriptions[subIndex]._sensorID.splice(sensorIndex,1);
+  // remove a sensor from the group
+  this.removeFromGroup = function(subIndex, sensorIndex) {
+    this.subscriptions[subIndex]._sensorID.splice(sensorIndex, 1);
   }
   //adding new sensor with groupType = (AND || OR)
   this.addToGroup = function(doc) {
@@ -77,56 +76,18 @@ function Subscription() {
       let sensorNameArray = this.subscriptions[index].sensorName;
       sensorNameArray.push(doc.sensorName[0]);
       let newDoc = {
-        groupType : doc.groupType,
-        option : doc.option,
-        groupTitle : doc.groupTitle,
-        _sensorID : sensorIDArray,
-        sensorName : sensorNameArray,
-        condition : doc.condition
-      };//update the subscription
+        groupType: doc.groupType,
+        option: doc.option,
+        groupTitle: doc.groupTitle,
+        _sensorID: sensorIDArray,
+        sensorName: sensorNameArray,
+        condition: doc.condition,
+        description: doc.description
+      }; //update the subscription
       this.subscriptions[index] = newDoc;
-    }
-    else {//create a new subscription
+    } else { //create a new subscription
       this.addOneSubscription(doc);
     }
     return;
   }
 }
-
-// var subs = new Subscription();
-// var doc1 = {
-//   _sensorID : 1234,
-//   name : "sensor1",
-//   option : "default",
-//   groupType : null
-// };
-// var doc2 = {
-//   groupType : "OR",
-//   option : "advanded",
-//   groupTitle : "In my room",
-//   _sensorID : [111,222,333],
-//   condition : [{
-//     type : "max",
-//     value : 20
-//   }]
-// };
-// var doc3 = {
-//   groupType : "AND",
-//   option : "advanded",
-//   groupTitle : "In my rooms",
-//   _sensorID : 444,
-//   condition : [{
-//     type : "max",
-//     value : 20
-//   }]
-// };
-// subs.addOneSubscription(doc1);
-// subs.addOneSubscription(doc2);
-// subs.addToGroup(doc3);
-//
-// // subs.removeFromGroup(1,1);
-// // subs.removeOneSubscription(2);
-// // var index = subs.findGroup("In my room");
-// console.log(subs.getAllSubscription());
-// console.log("find group -");
-// console.log(subs.findAllGroupTitle());
