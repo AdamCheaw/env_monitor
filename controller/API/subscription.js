@@ -136,58 +136,64 @@ const SubscribeMany = async (req, res, next) => {
       return subscribeMany(req.userData.name, req.userData._id, req.body.subscription);
     })
     .then(async (results) => {
-      res.json({
-        msg: "success"
-      });
-      var docs = results.map(doc => {
-        return {
-          _subscription: doc._id,
-          _subscriber: req.userData._id,
-          title: `created a subscription`,
-          logMsg: doc.groupType === null ? doc.title : `group "${doc.title}"`,
-          logStatus: 3
-        }
-      });
-      // --- save the subscription logs ---
-      //about user created the subscription info
-      saveSubscriptionLogs(docs);
-      // --- aggregated the related conditions ---
-      //convert group subscription into single subscription
-      var subscriptions = destructureSubCondition(req.body.subscription);
-      //find all related sensor 's current publish condition
-      var sensors = await searchMultiSensorPubCondition_byID(subscriptions);
-      var results = [];
-      //aggregate sensor publish condition according user current subscriptions
-      for(let i = 0; i < subscriptions.length; i++) {
-        if(sensors[i].publishCondition && sensors[i].publishCondition.length) {
-          var condition = aggregatedConditions(
-            sensors[i].publishCondition, subscriptions[i].condition
-          );
-        } else {
-          let preConditions = [{
-              type: "greater",
-              value: null
-            },
-            {
-              type: "lower",
-              value: null
-            }
-          ];
-          var condition = aggregatedConditions(preConditions, subscriptions[i].condition);
-        }
-        console.log("id - ", subscriptions[i].sensorID);
-        console.log(condition);
-        results.push({
-          sensorID: subscriptions[i].sensorID,
-          condition: condition
+      try {
+        res.status(200).json({
+          msg: "success"
         });
+        var docs = results.map(doc => {
+          return {
+            _subscription: doc._id,
+            _subscriber: req.userData._id,
+            title: `created a subscription`,
+            logMsg: doc.groupType === null ? doc.title : `group "${doc.title}"`,
+            logStatus: 3
+          }
+        });
+        // --- save the subscription logs ---
+        //about user created the subscription info
+        saveSubscriptionLogs(docs);
+        // --- aggregated the related conditions ---
+        //convert group subscription into single subscription
+        var subscriptions = destructureSubCondition(req.body.subscription);
+        //find all related sensor 's current publish condition
+        var sensors = await searchMultiSensorPubCondition_byID(subscriptions);
+        var results = [];
+        //aggregate sensor publish condition according user current subscriptions
+        for(let i = 0; i < subscriptions.length; i++) {
+          if(sensors[i].publishCondition && sensors[i].publishCondition.length) {
+            var condition = aggregatedConditions(
+              sensors[i].publishCondition, subscriptions[i].condition
+            );
+          } else {
+            let preConditions = [{
+                type: "greater",
+                value: null
+              },
+              {
+                type: "lower",
+                value: null
+              }
+            ];
+            var condition = aggregatedConditions(preConditions, subscriptions[i].condition);
+          }
+          console.log("id - ", subscriptions[i].sensorID);
+          console.log(condition);
+          results.push({
+            sensorID: subscriptions[i].sensorID,
+            condition: condition
+          });
+        }
+        //update multiple sensor publish condition in DB
+        updateMultiSensor_PubCondition(results);
+        //--- Emit an Event ---
+        //emit an EVENT to sensor handler file (controller/sensor.js)
+        //about sensor publish condition is changing
+        subscribeEvent.emit('publishConditionChange', results);
+      } catch (err) {
+        console.log(err);
+        return;
       }
-      //update multiple sensor publish condition in DB
-      updateMultiSensor_PubCondition(results);
-      //--- Emit an Event ---
-      //emit an EVENT to sensor handler file (controller/sensor.js)
-      //about sensor publish condition is changing
-      subscribeEvent.emit('publishConditionChange', results);
+
     })
     .catch(err => {
       res.status(406).json({
@@ -200,16 +206,32 @@ const SubscribeMany = async (req, res, next) => {
 }
 
 var Unsubscribe = async (req, res, next) => {
-  console.log(`POST - ${req.session.views} request a ajax call /unsubscribe`);
-  var subscription = await getSubscriptionInfo(req.body.subscribeListID);
+  console.log(`POST - ${req.session.views||req.userData.name} request a ajax call /unsubscribe`);
+  if(!req.body.subscriptionID) {
+    res.status(400).json({
+      msg: "request not acceptable"
+    });
+    return;
+  }
+  try {
+    var subscription = await getSubscriptionInfo(req.body.subscriptionID);
+    if(subscription === null || subscription === undefined) {
+      throw new Error("request not acceptable");
+    }
+  } catch (err) {
+    res.status(400).json({
+      msg: err.message
+    });
+    return;
+  }
   // data = {_id:subscribeListID}
-  unsubscribeOne(req.body.subscribeListID, (result) => {
+  unsubscribeOne(req.body.subscriptionID, (result) => {
     if(result == "success") { //response to ajax
       res.json({
         msg: "success"
       });
       var doc = { //generate delete log
-        _subscription: req.body.subscribeListID,
+        _subscription: req.body.subscriptionID,
         _subscriber: req.userData._id,
         title: `delete a subscription`,
         logMsg: (subscription.groupType === null) ?
@@ -229,7 +251,7 @@ var Unsubscribe = async (req, res, next) => {
 
 }
 var GetSubscriptionInfo = (req, res, next) => {
-  console.log(`POST - ${req.session.views} request a ajax call /getSubscriptionInfo`);
+  console.log(`POST - ${req.session.views||req.userData.name} request a ajax call /getSubscriptionInfo`);
   getSubscriptionInfo(req.params.id)
     .then(doc => {
       if(doc && doc !== null && doc !== undefined) {

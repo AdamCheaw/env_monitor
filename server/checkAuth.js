@@ -4,7 +4,6 @@ const checkAuth = (req, res, next) => { //check token for API routes
     const token = req.headers.authorization.split(" ")[1];
     const decoded = jwt.verify(token, "secret");
     req.userData = decoded;
-    console.log(decoded);
     next();
   } catch (error) {
     return res.status(401).json({
@@ -18,12 +17,12 @@ const checkWebToken = (req, res, next) => { //check token for web
     req.userData = jwt.verify(token, "secret");
     next();
   } catch (error) {
-    return res.render('login');
+    return res.redirect('/Web');
   }
 }
 var checkSession = (req, res, next) => { //check session
   if(!req.session.userID || !req.cookies.user_id || !req.session.views) {
-    res.render('login');
+    res.redirect('/Web');
     return;
   } else {
     next();

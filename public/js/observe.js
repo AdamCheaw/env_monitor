@@ -169,7 +169,7 @@ $(document).ready(function() {
     // console.log("idClicked: "+idClicked);
     if(idClicked) {
       var data = {
-        "subscribeListID": idClicked
+        "subscriptionID": idClicked
       };
       $.ajax({
         type: 'POST', // define the type of HTTP verb we want to use (POST for our form)

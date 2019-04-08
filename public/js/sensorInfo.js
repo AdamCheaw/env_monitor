@@ -73,7 +73,6 @@ function drawGraph(results, queryDate) {
       responsive: true,
       title: {
         display: true,
-        text: "title"
       },
       scales: {
         xAxes: [{

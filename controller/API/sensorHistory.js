@@ -9,7 +9,7 @@ const {
 } = require('../../model/action/sensorHistory');
 const {
   getStartAndEnd,
-  avgInInterval,
+  avgIntervalValue,
   findInterval
 } = require('../../server/utils/DateAndTime')
 
@@ -48,7 +48,7 @@ var GetHistoryData = (req, res, next) => {
         return;
       }
       //reduce multiple data into different interval of data
-      var afterAvgResult = avgInInterval(
+      var afterAvgResult = avgIntervalValue(
         result,
         intervalNum,
         intervalUnit,

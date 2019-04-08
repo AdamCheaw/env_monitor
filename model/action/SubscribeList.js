@@ -175,7 +175,7 @@ const subscribeOne = (name, userID, sensorID, option, condition, callback) => {
 }
 const unsubscribeOne = (subscribeListID, callback) => {
   SubscribeListData.deleteOne({ _id: ObjectId(subscribeListID) }, (err) => {
-    if(err) return callback(err);
+    if(err) return callback();
     return callback("success");
     console.log('the subdocs were removed');
   });
