@@ -1,67 +1,12 @@
 var i = 1;
 var sensorId, IP, port, name, type, value;
+var publishCondition = [];
 var timer = 0;
 var loop;
 
 function getRandomValue(min, max) {
   return Math.floor(Math.random() * (+max - +min)) + +min;
   // return Math.floor(Math.random() * (max - min) + min);
-}
-
-function startGenerateValue() {
-  var isValueChange = getRandomValue(0, 10);
-  var second = getRandomValue(10, 60) * 1000;
-  timer += second;
-  if(timer >= (180 * 1000)) { //2m 30s
-    console.log(`${timer/1000}sc time up`);
-    timer = second;
-    var data = {
-      sensorId: sensorId,
-      value: value
-    };
-    postData(`http://${IP}:${port}/sensors/update`, data)
-      .then(res => {
-        console.log(res);
-        return res.json();
-      })
-      .then(data => {
-        console.log(data);
-      }) // JSON-string from `response.json()` call
-      .catch(error => {
-        console.log("something went wrong");
-        console.log(error)
-      });
-  } else if(isValueChange % 3 !== 0) {
-    console.log("value did not change");
-    console.log(`current timer is ${timer/1000}sc`);
-  } else {
-    timer = second;
-    var upOrDown = getRandomValue(0, 2);
-    value = (upOrDown === 1) ? value += 1 : value -= 1;
-    console.log("value is change");
-    console.log(`value : ${value}`);
-    var data = {
-      sensorId: sensorId,
-      value: value
-    };
-    postData(`http://${IP}:${port}/sensors/update`, data)
-      .then(res => {
-        console.log(res);
-        return res.json();
-      })
-      .then(data => {
-        console.log(data);
-      }) // JSON-string from `response.json()` call
-      .catch(error => {
-        console.log("something went wrong");
-        console.log(error)
-      });
-  }
-  console.log(`next time to generate is ${second /1000}sc`);
-
-  if(i > 0) {
-    loop = setTimeout(startGenerateValue, second);
-  }
 }
 
 function postData(url = ``, data) {
@@ -82,6 +27,107 @@ function postData(url = ``, data) {
     mode: 'cors'
   })
 }
+//changing publish condition according server response
+function changePubCondition(condition) {
+  if(condition === null) {
+    console.log("publish condition stay still");
+    return;
+  } else if(Array.isArray(condition) && condition.length === 0) {
+    console.log("publish condition had change to default");
+    publishCondition = [];
+  } else {
+    console.log("publish condition had change");
+    console.log(condition);
+    publishCondition = condition;
+  }
+  return;
+}
+//matching current value with publish condition
+function matchingValue_byPubCondition(value, conditions) {
+  let isMatch = false
+  if(Array.isArray(conditions) && conditions.length === 0) {
+    console.log("publish condition is default ");
+    isMatch = true;
+  } else {
+    console.log("publish condition is advanced ");
+    for(let condition in conditions) {
+      if(condition.type == "greater" && condition.value !== null) {
+        isMatch = (condition.value > value) ? true : isMatch;
+      } else if(condition.type == "lower" && condition.value !== null) {
+        isMatch = (condition.value < value) ? true : isMatch;
+      }
+    }
+  }
+  console.log(`isMatch : ${isMatch}`);
+  return isMatch
+}
+
+function startGenerateValue() {
+  var isValueChange = getRandomValue(0, 10);
+  var second = getRandomValue(10, 60) * 1000;
+  timer += second;
+  if(timer >= (180 * 1000)) { //2m 30s
+    console.log(`${timer/1000}sc time up`);
+    timer = second;
+    var data = {
+      sensorId: sensorId,
+      value: value
+    };
+    postData(`http://${IP}:${port}/sensors/update`, data)
+      .then(res => {
+        console.log(res);
+        return res.json();
+      })
+      .then(data => {
+        console.log(data);
+        changePubCondition(data.publishCondition);
+      }) // JSON-string from `response.json()` call
+      .catch(error => {
+        console.log("something went wrong");
+        console.log(error)
+      });
+  } else if(isValueChange % 3 !== 0) {
+    console.log("value did not change");
+    console.log(`current timer is ${timer/1000}sc`);
+  } else {
+    var upOrDown = getRandomValue(0, 2);
+    value = (upOrDown === 1) ? value += 1 : value -= 1;
+    console.log("value is change");
+    console.log(`value : ${value}`);
+    //if true
+    //publish value to server
+    if(matchingValue_byPubCondition(value, publishCondition)) {
+      var data = {
+        sensorId: sensorId,
+        value: value
+      };
+      timer = second;
+      postData(`http://${IP}:${port}/sensors/update`, data)
+        .then(res => {
+          console.log(res);
+          return res.json();
+        })
+        .then(data => {
+          console.log(data);
+          changePubCondition(data.publishCondition);
+        }) // JSON-string from `response.json()` call
+        .catch(error => {
+          console.log("something went wrong");
+          console.log(error)
+        });
+    } else {
+      console.log("value did not match publish condition");
+    }
+
+  }
+  console.log(`next time to generate is ${second /1000}sc`);
+
+  if(i > 0) {
+    loop = setTimeout(startGenerateValue, second);
+  }
+}
+
+
 $('#input-submit').click(function(e) {
   IP = $("#input-IP").val();
   port = $("#input-port").val();
