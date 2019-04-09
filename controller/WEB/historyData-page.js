@@ -8,7 +8,7 @@ const { searchSensorHistory } = require('../../model/action/sensorHistory');
 const { searchSensorByID } = require('../../model/action/sensor');
 const {
   getStartAndEnd,
-  avgInInterval,
+  avgIntervalValue,
   findInterval
 } = require('../../server/utils/DateAndTime');
 
@@ -38,7 +38,7 @@ var GetSensorInfo = (req, res, next) => {
           }
           // console.log(result);
           //reduce multiple data into different interval of data
-          var afterAvg = avgInInterval(result, 5, "minutes", time.startOfTime, time.endOfTime); //avg the result in every 5 min
+          var afterAvg = avgIntervalValue(result, 5, "minutes", time.startOfTime, time.endOfTime); //avg the result in every 5 min
           console.log();
           console.log(afterAvg);
           res.render('sensorInfo', {
