@@ -129,10 +129,26 @@ const SensorUpdated = async (req, res, next) => {
     sensor.expireDate = moment(currentDate).add(210, 's'); //210
     //doc.onConnect = true;
     sensor.save();
+    let condition = newPubCondition.getPublishCondition_byID(req.body.sensorId);
+    let publishStatus;
+    switch (true) {
+      case condition == null:
+        publishStatus = 0; //stay with oiriginal publishCondition
+        break;
+      case Array.isArray(condition) && condition.length === 0:
+        publishStatus = 1; //change publishCondition to default
+        break;
+      case Array.isArray(condition) && condition.length > 0:
+        publishStatus = 2; //change publishCondition to advanced
+        break;
+      default:
+        break;
+    }
+    console.log(`publishStatus = ${publishStatus}`);
     res.status(200).json({
       message: "receive request packet!",
-      publishCondition: newPubCondition
-        .getPublishCondition_byID(req.body.sensorId)
+      publishStatus: publishStatus,
+      publishCondition: condition
     });
     let socket = io('http://localhost:3000');
     if(!sensorPreviousConnect) { //sensor is offline before

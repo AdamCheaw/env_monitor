@@ -76,7 +76,7 @@ const searchSubList_withSubName = (name, callback) => {
       path: '_sensorID',
       select: '_id name value date onConnect type'
     })
-    .select('subscriberName option condition groupType title description')
+    .select('subscriberName option condition groupType title description decimal')
     .exec()
     .then(docs => {
       if(docs && docs.length) {
@@ -88,7 +88,7 @@ const searchSubList_withSubName = (name, callback) => {
               return {
                 _id: thisSensor._id,
                 name: thisSensor.name,
-                value: thisSensor.value,
+                value: thisSensor.value.toFixed(doc.decimal),
                 date: moment.parseZone(thisSensor.date).local().format('YYYY MMM Do, h:mm:ssa'),
                 type: thisSensor.type,
                 onConnect: thisSensor.onConnect
@@ -280,9 +280,8 @@ const notificationList = (sensorData, callback) => {
       path: '_subscriber',
       select: '_id socketID onConnect'
     })
-    .select('_id _subscriber _sensorID option title condition previousValue groupType previousMatch')
+    .select('_id _subscriber _sensorID option title condition previousValue groupType previousMatch decimal')
     .exec((err, results) => {
-
       if(err) {
         console.log(err);
         return;
@@ -357,6 +356,20 @@ const getSubCondition_bySID = (id) => {
   return SubscribeListData.find({ _sensorID: ObjectId(id) })
     .select('_id condition').exec();
 }
+const resetRelatedSub_PreValue = (id) => {
+  SubscribeListData.updateMany({
+    _subscriber: ObjectId(id),
+    option: "default"
+  }, {
+    $set: { previousValue: null }
+  }, { multi: true }, (err, res) => {
+    if(err) {
+      console.log(err);
+    } else {
+      console.log(`DB: update previousValue`);
+    }
+  })
+}
 module.exports = {
   searchSubscribeList_withSensorID,
   searchSubList_withSubName,
@@ -373,5 +386,6 @@ module.exports = {
   updateSubscriptionInfo,
   getSubscriptions_bySubscriber,
   getSubscription_relatedSensorInfo,
-  getSubCondition_bySID
+  getSubCondition_bySID,
+  resetRelatedSub_PreValue
 };

@@ -4,20 +4,22 @@ const {
   generateSensorDisconnectData
 } = require('./utils/generate');
 // const {subscribe,unsubscribe} = require('./utils/subscribe_event');
-const {userOnConnect,userDisconnect} = require('../model/action/user');
-const {searchSensorByID} = require('../model/action/sensor');
+const { userOnConnect, userDisconnect, findUserID_BySocketID } = require('../model/action/user');
+const { searchSensorByID } = require('../model/action/sensor');
 const {
   searchSubscribeList_withSensorID,
   notificationList,
+  updateSubList_PreviousValue,
   updateSubList_PreviousMatchCondition,
-  findAllSubscriber_bySensorID
+  findAllSubscriber_bySensorID,
+  resetRelatedSub_PreValue
 } = require('../model/action/SubscribeList');
-const {saveSubscriptionLogs} = require('../model/action/subscriptionLogs');
+const { saveSubscriptionLogs } = require('../model/action/subscriptionLogs');
 var webSocket = (io) => {
   io.on('connection', (socket) => {
-    socket.on('auth',(data) => {
-      console.log('SOCKET - '+data.name+' have connected, socket id: '+socket.id);
-      userOnConnect(data.name,socket.id)
+    socket.on('auth', (data) => {
+      console.log('SOCKET - ' + data.name + ' have connected, socket id: ' + socket.id);
+      userOnConnect(data.name, socket.id)
         .then(result => {
           if(result) {
             console.log(result);
@@ -35,33 +37,48 @@ var webSocket = (io) => {
     //when user open new observe page
     socket.on('disconnectSocket', (data) => {
 
-      console.log("SOCKET - disconnect old socket "+data.socketID);
-      if (io.sockets.connected[data.socketID]) {
+      console.log("SOCKET - disconnect old socket " + data.socketID);
+      if(io.sockets.connected[data.socketID]) {
         io.sockets.connected[data.socketID].disconnect();
       }
     });
 
     //sensor notification
     socket.on('update', (SensorData) => {
-      console.log(`SOCKET - listening a updated event from sensor ${SensorData._id}` );
+      console.log(`SOCKET - listening a updated event from sensor ${SensorData._id}`);
       console.log("-----------------------------------------------------------");
-      notificationList(SensorData,(results) => {
-        if(results!= "") {
+      notificationList(SensorData, (results) => {
+        if(results != "") {
           var updateMatch = [];
           var updateNotMatch = [];
           var subscriptionLogs = [];
+          var updatePreviousValueArr = [
+            { id: [], decimal: 0, value: null },
+            { id: [], decimal: 1, value: null }
+          ];
           //starting send notifications
-          for(let i = 0;i < results.length;i++) {
-            if (io.sockets.connected[results[i].socketID]) {
+          for(let i = 0; i < results.length; i++) {
+            if(io.sockets.connected[results[i].socketID]) {
               io.to(results[i].socketID)
                 .emit('notification', generateNotification(results[i]));
               console.log("socket: emit update msg to socket " + results[i].socketID);
+
+              //saving the current notification value ,if subscription is default
+              if(results[i].option == "default") {
+                let decimalIndex = results[i].decimal; //0 or 1
+                //if value did not had value ,
+                //assign current sensor publish 's value
+                if(updatePreviousValueArr[decimalIndex].value === null) {
+                  updatePreviousValueArr[decimalIndex].value =
+                    results[i]._sensorID[0].value;
+                }
+                updatePreviousValueArr[decimalIndex].id.push(results[i]._id);
+              }
             }
             //changing current matching condition to subscription.previousMatch
             if(results[i].previousMatch && results[i].previousMatch !== undefined) {
               updateMatch.push(results[i]._id);
-            }
-            else if(!results[i].previousMatch && results[i].previousMatch !== undefined){
+            } else if(!results[i].previousMatch && results[i].previousMatch !== undefined) {
               updateNotMatch.push(results[i]._id);
             }
 
@@ -71,15 +88,20 @@ var webSocket = (io) => {
               // console.log("xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx");
               subscriptionLogs.push(results[i].subscriptionLog);
             }
-          }//end sending notifications
+          } //end sending notifications
 
-          if (updateMatch || updateNotMatch) {
+          if(updateMatch || updateNotMatch) {
             //update the current notification value to the subscribeList previousValue after emit to user
-            updateSubList_PreviousMatchCondition(updateMatch,true);
-            updateSubList_PreviousMatchCondition(updateNotMatch,false);
+            updateSubList_PreviousMatchCondition(updateMatch, true);
+            updateSubList_PreviousMatchCondition(updateNotMatch, false);
           }
-
-          if(subscriptionLogs && subscriptionLogs.length){
+          //update for each default subscriptions 's previous value
+          updatePreviousValueArr.forEach(doc => {
+            if(doc.id && doc.id.length) {
+              updateSubList_PreviousValue(doc.id, doc.value);
+            }
+          });
+          if(subscriptionLogs && subscriptionLogs.length) {
             //save the multiple subscription 's logs
             saveSubscriptionLogs(subscriptionLogs);
           }
@@ -92,7 +114,7 @@ var webSocket = (io) => {
     socket.on('sensor connect', async (data) => {
       console.log(`SOCKET - listening Sensor ${data._id} onConnect`);
       //save sensor onConnect logs with related subscriber
-      var subscriptionLogs = [];//save sensor onConnect to logs
+      var subscriptionLogs = []; //save sensor onConnect to logs
       // find related subscriptions
       let subscriptions = await findAllSubscriber_bySensorID(data._id);
       subscriptions.forEach(subscription => {
@@ -101,27 +123,28 @@ var webSocket = (io) => {
         //subscriber is connect with socket
         //emit sensor onConnect msg to subscriber
         if(onConnect && io.sockets.connected[socketID]) {
-          io.to(socketID).emit('sensor connect',generateNotification(subscription));
+          io.to(socketID).emit('sensor connect', generateNotification(subscription));
         }
         subscriptionLogs.push({
           title: (subscription.groupType === null) ?
-           subscription.title:`group "${subscription.title}"`,
+            subscription.title : `group "${subscription.title}"`,
           logMsg: data.name + " is connect",
           logStatus: 1,
           _subscription: subscription._id,
           _subscriber: subscription._subscriber
         });
-      });//end subscriptions.forEach
+      }); //end subscriptions.forEach
       if(subscriptionLogs && subscriptionLogs.length) {
-        saveSubscriptionLogs(subscriptionLogs);//save sensor onConnect logs
+        saveSubscriptionLogs(subscriptionLogs); //save sensor onConnect logs
       }
     })
-    socket.on('sensor disconnect',(data) => {
-      console.log("SOCKET - listening Sensor Disconnect event "+data.disconnect_SID);
+    socket.on('sensor disconnect', (data) => {
+      console.log("SOCKET - listening Sensor Disconnect event " + data.disconnect_SID);
       //multiple sensor id,because will have multiple sensor disconnect in a min
       var subscriptionLogs = [];
+      var updatePreviousValueArr = [];
       data.disconnect_SID.forEach(sensorID => {
-        searchSensorByID(sensorID)//find sensor infomation
+        searchSensorByID(sensorID) //find sensor infomation
           .then(sensor => {
             console.log();
             console.log(sensor);
@@ -135,11 +158,16 @@ var webSocket = (io) => {
                   //subscriber is connect with socket
                   if(onConnect && io.sockets.connected[socketID]) {
                     io.to(socketID).emit('sensor disconnect',
-                      generateSensorDisconnectData(doc,sensorID)
+                      generateSensorDisconnectData(doc, sensorID)
                     );
+                    //save default subscription 's id
+                    if(doc.option == "default") {
+                      updatePreviousValueArr.push(doc._id);
+                    }
                   }
+
                   subscriptionLogs.push({
-                    title: (doc.groupType === null) ? doc.title:`group "${doc.title}"`,
+                    title: (doc.groupType === null) ? doc.title : `group "${doc.title}"`,
                     logMsg: sensor[0].name + " is disconnect",
                     logStatus: -1,
                     _subscription: doc._id,
@@ -147,8 +175,12 @@ var webSocket = (io) => {
                   });
                 });
                 if(subscriptionLogs && subscriptionLogs.length) {
-                  console.log(subscriptionLogs);
-                  saveSubscriptionLogs(subscriptionLogs);//save sensor disconnect logs
+                  // console.log(subscriptionLogs);
+                  saveSubscriptionLogs(subscriptionLogs); //save sensor disconnect logs
+                }
+                if(updatePreviousValueArr && updatePreviousValueArr.length) {
+                  //set default subscription previousValue to null
+                  updateSubList_PreviousValue(updatePreviousValueArr, null);
                 }
               })
               .catch(err => {
@@ -158,12 +190,17 @@ var webSocket = (io) => {
           .catch(err => {
             console.log(err);
           });
-      });//end disconnect sensors loops
+      }); //end disconnect sensors loops
 
     })
     socket.on('disconnect', () => {
       console.log('SOCKET - User was disconnected');
-      userDisconnect(socket.id);
+      findUserID_BySocketID(socket.id)
+        .then(userID => {
+          resetRelatedSub_PreValue(userID._id);
+          userDisconnect(socket.id);
+        })
+        .catch(err => console.log(err));
     });
   });
 }

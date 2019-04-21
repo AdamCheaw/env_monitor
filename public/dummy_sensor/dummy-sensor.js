@@ -9,6 +9,10 @@ function getRandomValue(min, max) {
   // return Math.floor(Math.random() * (max - min) + min);
 }
 
+function getRandomFloat(min, max) {
+  return Math.random() * (max - min) + min;
+}
+
 function postData(url = ``, data) {
   console.log(data);
   // Default options are marked with *
@@ -28,14 +32,13 @@ function postData(url = ``, data) {
   })
 }
 //changing publish condition according server response
-function changePubCondition(condition) {
-  if(condition === null) {
+function changePubCondition(condition, publishStatus) {
+  if(publishStatus === 0) {
     console.log("publish condition stay still");
-    return;
-  } else if(Array.isArray(condition) && condition.length === 0) {
+  } else if(publishStatus === 1) {
     console.log("publish condition had change to default");
     publishCondition = [];
-  } else {
+  } else if(publishStatus === 2) {
     console.log("publish condition had change");
     console.log(condition);
     publishCondition = condition;
@@ -80,8 +83,8 @@ function startGenerateValue() {
       })
       .then(data => {
         console.log(data);
-        changePubCondition(data.publishCondition);
-      }) // JSON-string from `response.json()` call
+        changePubCondition(data.publishCondition, data.publishStatus);
+      })
       .catch(error => {
         console.log("something went wrong");
         console.log(error)
@@ -90,8 +93,15 @@ function startGenerateValue() {
     console.log("value did not change");
     console.log(`current timer is ${timer/1000}sc`);
   } else {
-    var upOrDown = getRandomValue(0, 2);
-    value = (upOrDown === 1) ? value += 1 : value -= 1;
+    //do not let value out of limit
+    if(value > 30 || value < 20) {
+      value = (value > 30) ? value -= randValue : value += randValue;
+    } else {
+      let upOrDown = getRandomValue(0, 2);
+      let randValue = getRandomFloat(0, 2); //generate random value
+      value = (upOrDown === 1) ? value += randValue : value -= randValue;
+      value = Number(value.toFixed(1));
+    }
     console.log("value is change");
     console.log(`value : ${value}`);
     //if true
@@ -109,7 +119,7 @@ function startGenerateValue() {
         })
         .then(data => {
           console.log(data);
-          changePubCondition(data.publishCondition);
+          changePubCondition(data.publishCondition, data.publishStatus);
         }) // JSON-string from `response.json()` call
         .catch(error => {
           console.log("something went wrong");
@@ -133,7 +143,7 @@ $('#input-submit').click(function(e) {
   port = $("#input-port").val();
   name = $("#input-name").val();
   type = $("#input-type").val();
-  value = getRandomValue(20, 30);
+  value = Number(getRandomFloat(20, 30).toFixed(1));
   var data = {
     "name": name,
     "value": value,

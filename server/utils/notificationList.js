@@ -47,7 +47,9 @@ var mapValueToCondition_withOR =
     //var match = false;
     //previous did not match ,so just need match current sensor's value
     if(!previousMatch) {
-      matchingResult = mapValueToCondition(condition, currentData.value);
+      matchingResult = mapValueToCondition(
+        condition, currentData.value.toFixed(result.decimal)
+      );
       if(matchingResult.match) {
         matchingResult.matchMsg = currentData.sensorName + " " + matchingResult.matchMsg;
       }
@@ -60,7 +62,9 @@ var mapValueToCondition_withOR =
           };
           break;
         } else {
-          matchingResult = mapValueToCondition(condition, sensors[i].value);
+          matchingResult = mapValueToCondition(
+            condition, sensors[i].value.toFixed(result.decimal)
+          );
           //console.log(`check sensor ${sensors[i].name} : ${matchingResult.match}`);
         }
         //if at least there is one sensor matching condition ,
@@ -83,7 +87,9 @@ var mapValueToCondition_withAND =
     // previous is match ,
     // so just need to know current sensor's matching condition
     if(previousMatch) {
-      matchingResult = mapValueToCondition(condition, currentData.value);
+      matchingResult = mapValueToCondition(
+        condition, currentData.value.toFixed(result.decimal)
+      );
     } else {
       for(let i = 0; i < sensors.length; i++) {
         matchingResult = null;
@@ -93,7 +99,9 @@ var mapValueToCondition_withAND =
           };
           break;
         } else {
-          matchingResult = mapValueToCondition(condition, sensors[i].value);
+          matchingResult = mapValueToCondition(
+            condition, sensors[i].value.toFixed(result.decimal)
+          );
         }
         //console.log("in mapping: "+matchingResult);
         //if at least there is one sensor DID NOT matching condition ,
@@ -113,28 +121,41 @@ const generateNotificationList = (results, currentData) => {
   results.forEach(result => {
     var doc = {};
     if(result.option == "default") {
-      doc = {
-        _id: result._id,
-        socketID: result._subscriber.socketID,
-        onConnect: result._subscriber.onConnect,
-        option: result.option,
-        condition: result.condition,
-        _sensorID: result._sensorID.map(sensor => {
-          return {
-            _id: sensor._id,
-            name: sensor.name,
-            value: sensor.value,
-            date: sensor.date,
-            onConnect: sensor.onConnect
-          };
-        }),
-        groupType: result.groupType,
-        //previousMatch: true
-      };
+      let isNotify = false;
+      let value = currentData.value.toFixed(result.decimal);
+      if(result.previousValue === null) {
+        isNotify = true;
+      } else if(result.previousValue - value > 1 || value - result.previousValue > 1) {
+        isNotify = true;
+      }
+      if(isNotify) {
+        doc = {
+          _id: result._id,
+          socketID: result._subscriber.socketID,
+          onConnect: result._subscriber.onConnect,
+          option: result.option,
+          condition: result.condition,
+          decimal: result.decimal,
+          _sensorID: result._sensorID.map(sensor => {
+            return {
+              _id: sensor._id,
+              name: sensor.name,
+              value: value,
+              date: sensor.date,
+              onConnect: sensor.onConnect
+            };
+          }),
+          groupType: result.groupType,
+          //previousMatch: true
+        };
+      }
+
     }
     // option = "advanced" , no grouping
     else if(result.option == "advanced" && result.groupType == null) {
-      let matchingResult = mapValueToCondition(result.condition, currentData.value);
+      let matchingResult = mapValueToCondition(
+        result.condition, currentData.value.toFixed(result.decimal)
+      );
       // current matching condition result different than-
       // previous  matching condition result
       if(matchingResult.match !== result.previousMatch) {
@@ -154,11 +175,12 @@ const generateNotificationList = (results, currentData) => {
           onConnect: result._subscriber.onConnect,
           option: result.option,
           condition: result.condition,
+          decimal: result.decimal,
           _sensorID: result._sensorID.map(sensor => {
             return {
               _id: sensor._id,
               name: sensor.name,
-              value: sensor.value,
+              value: sensor.value.toFixed(result.decimal),
               date: sensor.date,
               onConnect: sensor.onConnect
             };
@@ -200,11 +222,12 @@ const generateNotificationList = (results, currentData) => {
           onConnect: result._subscriber.onConnect,
           option: result.option,
           condition: result.condition,
+          decimal: result.decimal,
           _sensorID: result._sensorID.map(sensor => {
             return {
               _id: sensor._id,
               name: sensor.name,
-              value: sensor.value,
+              value: sensor.value.toFixed(result.decimal),
               date: sensor.date,
               onConnect: sensor.onConnect
             };
@@ -248,11 +271,12 @@ const generateNotificationList = (results, currentData) => {
           onConnect: result._subscriber.onConnect,
           option: result.option,
           condition: result.condition,
+          decimal: result.decimal,
           _sensorID: result._sensorID.map(sensor => {
             return {
               _id: sensor._id,
               name: sensor.name,
-              value: sensor.value,
+              value: sensor.value.toFixed(result.decimal),
               date: sensor.date,
               onConnect: sensor.onConnect
             };

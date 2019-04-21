@@ -19,6 +19,8 @@ var SubscribeListSchema = new mongoose.Schema({
   socketID: { type: String },
   option: { type: String, default: 'default' },
   condition: { type: Schema.Types.Mixed },
+  //value decimal , 0 = integer , 1 = 1 decimal(0.6)
+  decimal: { type: Number, default: 0 },
   //flag ,get to know previous is matching condition
   previousMatch: { type: Boolean, default: null },
   previousValue: { type: Number, default: null },
