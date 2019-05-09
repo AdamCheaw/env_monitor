@@ -3679,6 +3679,36 @@ table td .online, .media .media-body .online, .list .online {
   color: white;
 }
 
+.dataTables_paginate .paginate_button {
+  border-top: 1px solid #cccccc;
+  border-bottom: 1px solid #cccccc;
+  border-left: 1px solid #cccccc;
+  padding: 5px 12px;
+}
+
+.dataTables_paginate .paginate_button:last-child {
+  border-right: 1px solid #cccccc;
+}
+
+.dataTables_paginate .paginate_button.current {
+  border: 1px solid #248aaf;
+  background-color: #248aaf;
+  color: white;
+}
+
+.dataTables_paginate .paginate_button.disabled {
+  color: gray;
+}
+
+.dataTables_paginate .paginate_button.disabled:hover {
+  cursor: not-allowed;
+}
+
+.dataTables_paginate .paginate_button:hover {
+  text-decoration: none;
+  cursor: pointer;
+}
+
 .enabled {
   pointer-events: none;
   opacity: 0.3;
@@ -3719,7 +3749,7 @@ table td .online, .media .media-body .online, .list .online {
 
 .vertical-menu {
   /* width: 200px; */
-  max-height: 380px;
+  max-height: 460px;
   overflow-y: auto;
   border-radius: 2px;
   border: 1px solid #ccc;

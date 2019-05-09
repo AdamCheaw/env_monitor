@@ -212,7 +212,8 @@ const subscribeMany = (name, userID, subscription) => {
       condition: convertCondition(doc.condition),
       groupType: (typeof doc.groupType === 'undefined') ? null : doc.groupType,
       title: doc.title,
-      description: (typeof doc.description === 'undefined') ? "" : doc.description
+      description: (typeof doc.description === 'undefined') ? "" : doc.description,
+      decimal: doc.decimal
     };
   });
   return new Promise((resolve, reject) => {

@@ -104,7 +104,7 @@ function refreshSubscription(docs) {
     i += 1;
   })
 }
-//filter the subscription and post to back-end
+//filter the subscription and POST to back-end
 function filterSubscriptions(docs) {
   let results = docs.map(doc => {
     if(doc.groupType == "AND" || doc.groupType == "OR") { //group
@@ -115,7 +115,8 @@ function filterSubscriptions(docs) {
         title: doc.groupTitle,
         groupType: doc.groupType,
         description: (doc.description === false) ?
-          "" : doc.description
+          "" : doc.description,
+        decimal: doc.decimal
       }
     } else { // no group
       return {
@@ -124,7 +125,8 @@ function filterSubscriptions(docs) {
         option: doc.option,
         condition: (typeof doc.condition === 'undefined') ? [] : doc.condition,
         description: (doc.description === false) ?
-          "" : doc.description
+          "" : doc.description,
+        decimal: doc.decimal
       }
     }
   });
@@ -228,6 +230,7 @@ $(document).ready(function() {
     var groupType = $("input[name='group-optionsRadios']:checked").val();
     var title = $("#title-input").val();
     var description = $("#description").val();
+    var decimal = $("#form1_decimalValue").val();
     //find the sensor._id
     for(var i = 0; i < allSensor.data.length; i++) {
       if(form1_inputName == allSensor.data[i].name) {
@@ -254,7 +257,8 @@ $(document).ready(function() {
         option: form1_optionValue,
         groupType: null,
         title: title,
-        description: description
+        description: description,
+        decimal: decimal
       };
       subs.addOneSubscription(doc);
     } else { //optionValue is advanced
@@ -272,7 +276,8 @@ $(document).ready(function() {
           condition: condition,
           groupType: groupType,
           groupTitle: title,
-          description: description
+          description: description,
+          decimal: decimal
         };
         subs.addToGroup(doc);
       } else { //option value is advanced and groupType is none||null
@@ -283,7 +288,8 @@ $(document).ready(function() {
           condition: condition,
           groupType: null,
           title: title,
-          description: description
+          description: description,
+          decimal: decimal
         };
         subs.addOneSubscription(doc);
       }

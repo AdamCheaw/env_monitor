@@ -1,4 +1,5 @@
 const socket = io().connect('http://localhost:3000');
+var countNotification = 0 //for testing
 //filter sensor value with condition to finding match or not
 const filterByCondition = (condition, sensorValue) => {
   for(let i = 0; i < condition.length; i++) {
@@ -322,8 +323,9 @@ socket.on('notification', function(subscription) {
   } else {
     changeOneSubscriptionView(subscription);
   }
-
+  countNotification += 1;
   console.log("listen a notification");
+  console.log(countNotification);
   console.log(subscription);
 });
 socket.on('sensor connect', function(subscription) {

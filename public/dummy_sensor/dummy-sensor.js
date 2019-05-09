@@ -53,12 +53,11 @@ function matchingValue_byPubCondition(value, conditions) {
     isMatch = true;
   } else {
     console.log("publish condition is advanced ");
-    for(let condition in conditions) {
-      if(condition.type == "greater" && condition.value !== null) {
-        isMatch = (condition.value > value) ? true : isMatch;
-      } else if(condition.type == "lower" && condition.value !== null) {
-        isMatch = (condition.value < value) ? true : isMatch;
-      }
+    if(conditions[0] !== null) { //matching with greater
+      isMatch = (condition.value > value) ? true : isMatch;
+    }
+    if(conditions[1] !== null) { //matching with lower
+      isMatch = (condition.value < value) ? true : isMatch;
     }
   }
   console.log(`isMatch : ${isMatch}`);

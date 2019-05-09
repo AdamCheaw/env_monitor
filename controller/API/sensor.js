@@ -115,10 +115,12 @@ const SensorRegister = async (req, res, next) => {
 };
 
 const SensorUpdated = async (req, res, next) => {
+  var currentDate = new Date();
   console.log();
   console.log("received notification message from sensor(" + req.body.sensorId + ")");
+  console.log(currentDate);
   console.log();
-  var currentDate = new Date();
+
   try {
     let sensor = await searchOneSensor_byID(req.body.sensorId);
     let sensorPreviousConnect = sensor.onConnect;
@@ -148,7 +150,8 @@ const SensorUpdated = async (req, res, next) => {
     res.status(200).json({
       message: "receive request packet!",
       publishStatus: publishStatus,
-      publishCondition: condition
+      publishCondition: (publishStatus < 2) ?
+        null : [condition[0].value, condition[1].value]
     });
     let socket = io('http://localhost:3000');
     if(!sensorPreviousConnect) { //sensor is offline before

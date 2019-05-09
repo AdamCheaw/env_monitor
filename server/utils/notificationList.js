@@ -42,13 +42,13 @@ var mapValueToCondition = (condition, currentValue) => {
 //matching multiple sensor ,if AT LEAST there is ONE sensor matching condition
 //will return true
 var mapValueToCondition_withOR =
-  (sensors, condition, currentData, previousMatch) => {
+  (sensors, condition, currentData, previousMatch, decimal) => {
     let matchingResult;
     //var match = false;
     //previous did not match ,so just need match current sensor's value
     if(!previousMatch) {
       matchingResult = mapValueToCondition(
-        condition, currentData.value.toFixed(result.decimal)
+        condition, Number(currentData.value.toFixed(decimal))
       );
       if(matchingResult.match) {
         matchingResult.matchMsg = currentData.sensorName + " " + matchingResult.matchMsg;
@@ -63,14 +63,12 @@ var mapValueToCondition_withOR =
           break;
         } else {
           matchingResult = mapValueToCondition(
-            condition, sensors[i].value.toFixed(result.decimal)
+            condition, Number(sensors[i].value.toFixed(decimal))
           );
-          //console.log(`check sensor ${sensors[i].name} : ${matchingResult.match}`);
         }
         //if at least there is one sensor matching condition ,
         //not need to check other sensor's value
         if(matchingResult.match) {
-          //console.log(`check sensor ${sensors[i].name} : ${matchingResult.match}`);
           matchingResult.matchMsg = sensors[i].name + " " + matchingResult.matchMsg;
           break;
         }
@@ -82,13 +80,13 @@ var mapValueToCondition_withOR =
 //matching multiple sensor ,if ALL sensor matching condition
 //will return true
 var mapValueToCondition_withAND =
-  (sensors, condition, currentData, previousMatch) => {
+  (sensors, condition, currentData, previousMatch, decimal) => {
     let matchingResult;
     // previous is match ,
     // so just need to know current sensor's matching condition
     if(previousMatch) {
       matchingResult = mapValueToCondition(
-        condition, currentData.value.toFixed(result.decimal)
+        condition, Number(currentData.value.toFixed(decimal))
       );
     } else {
       for(let i = 0; i < sensors.length; i++) {
@@ -100,7 +98,7 @@ var mapValueToCondition_withAND =
           break;
         } else {
           matchingResult = mapValueToCondition(
-            condition, sensors[i].value.toFixed(result.decimal)
+            condition, Number(sensors[i].value.toFixed(decimal))
           );
         }
         //console.log("in mapping: "+matchingResult);
@@ -122,10 +120,10 @@ const generateNotificationList = (results, currentData) => {
     var doc = {};
     if(result.option == "default") {
       let isNotify = false;
-      let value = currentData.value.toFixed(result.decimal);
+      let value = Number(currentData.value.toFixed(result.decimal));
       if(result.previousValue === null) {
         isNotify = true;
-      } else if(result.previousValue - value > 1 || value - result.previousValue > 1) {
+      } else if(result.previousValue - value > 0.1 || value - result.previousValue > 0.1) {
         isNotify = true;
       }
       if(isNotify) {
@@ -154,7 +152,7 @@ const generateNotificationList = (results, currentData) => {
     // option = "advanced" , no grouping
     else if(result.option == "advanced" && result.groupType == null) {
       let matchingResult = mapValueToCondition(
-        result.condition, currentData.value.toFixed(result.decimal)
+        result.condition, Number(currentData.value.toFixed(result.decimal))
       );
       // current matching condition result different than-
       // previous  matching condition result
@@ -201,7 +199,8 @@ const generateNotificationList = (results, currentData) => {
     // need to match "all" the sensor condition
     else if(result.option == "advanced" && result.groupType == "AND") {
       let matchingResult = mapValueToCondition_withAND(
-        result._sensorID, result.condition, currentData, result.previousMatch
+        result._sensorID, result.condition, currentData,
+        result.previousMatch, result.decimal
       );
       //console.log(matchingResult);
       //compare every condition in the subscription
@@ -249,7 +248,8 @@ const generateNotificationList = (results, currentData) => {
     // just need to match one sensor condition
     else if(result.option == "advanced" && result.groupType == "OR") {
       let matchingResult = mapValueToCondition_withOR(
-        result._sensorID, result.condition, currentData, result.previousMatch
+        result._sensorID, result.condition, currentData,
+        result.previousMatch, result.decimal
       );
       //console.log(matchingResult);
       //the sensor currentValue matching 's condition

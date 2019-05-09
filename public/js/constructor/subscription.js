@@ -82,7 +82,8 @@ function Subscription() {
         _sensorID: sensorIDArray,
         sensorName: sensorNameArray,
         condition: doc.condition,
-        description: doc.description
+        description: doc.description,
+        decimal: doc.decimal
       }; //update the subscription
       this.subscriptions[index] = newDoc;
     } else { //create a new subscription
