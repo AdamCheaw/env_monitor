@@ -168,8 +168,8 @@
                     <th>Name</th>
                     <th>Type</th>
                     <th>Descrition</th>
+                    <th>Last updated</th>
                     <th>Status</th>
-                    <th>Action</th>
                   </tr>
                 </thead>
                 <tbody>
@@ -180,11 +180,9 @@
                         <td class="sensor-name"><a href="Web/{{this._id}}">{{this.name}}</a></td>
                         <td>{{{findIcon this.type}}}</td>
                         <td>{{limitStr this.description 0 50}}</td>
+                        <td>{{this.date}}</td>
                         <td><b class="online">online</b></td>
-                        <td class="setting">
-                          <a class="btn-icon btn-success sub-btn" id="btn-{{ this._id }}"><i class="icon-eye-open "></i></a>
-                          {{!-- <i class="icon-eye-open sub-btn" id="btn-{{ this._id }}"></i> --}}
-                        </td>
+
                       </tr>
                     {{else}}
                       <tr id="{{this._id}}">
@@ -192,10 +190,8 @@
                         <td class="sensor-name"><a href="Web/{{this._id}}">{{this.name}}</a></td>
                         <td>{{{findIcon this.type}}}</td>
                         <td>{{limitStr this.description 0 50}}</td>
+                        <td>{{this.date}}</td>
                         <td><b class="offline">offline</b></td>
-                        <td class="setting">
-                          <a class="enabled btn-icon btn-success sub-btn" id="btn-{{ this._id }}"><i class="icon-eye-open"></i></a>
-                        </td>
                       </tr>
                     {{/if}}
                   {{/each}}
