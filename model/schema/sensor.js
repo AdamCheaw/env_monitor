@@ -11,7 +11,8 @@ var SensorDataSchema = new mongoose.Schema({
   expireDate: { type: Date, requires: true },
   type: { type: String, requires: true },
   previousValue: { type: String },
-  publishCondition: { type: Schema.Types.Mixed, default: [] }
+  publishCondition: { type: Schema.Types.Mixed, default: [] },
+  description: { type: String }
 }, { collection: 'sensor-data' });
 
 module.exports = mongoose.model('SensorData', SensorDataSchema);

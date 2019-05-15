@@ -3853,15 +3853,15 @@ table td .online, .media .media-body .online, .list .online {
 #subscription-board {
   margin: 5px;
   overflow-x: hidden;
-  max-height: 500px;
-  height: 500px;
+  max-height: 620px;
+  height: 650px;
 }
 
 .subscription-container {
   overflow-y: auto;
   border: 1px dashed #cccccc;
   padding: 5px;
-  height: 580px;
+  height: 700px;
 }
 
 .subscription-container .card {

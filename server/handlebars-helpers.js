@@ -178,11 +178,15 @@ module.exports = {
     return result;
   },
   limitStr: function(str, start, last) {
-    var res = str.substr(start, last);
-    if(str.length > last) {
-      res += "..."
+    if(str !== "" && str !== null && str !== undefined) {
+      var res = str.substr(start, last);
+      if(str.length > last) {
+        res += "..."
+      }
+      return res;
+    } else {
+      return "no description..";
     }
-    return res;
   },
   isGroup: function(value, options) {
     if(value == "AND" || "OR") {

@@ -179,7 +179,7 @@
                         <td>{{@index}}</td>
                         <td class="sensor-name"><a href="Web/{{this._id}}">{{this.name}}</a></td>
                         <td>{{{findIcon this.type}}}</td>
-                        <td>{{limitStr "Lorem ipsum dolor sit amet, consectetur adipisicing elit," 0 50}}</td>
+                        <td>{{limitStr this.description 0 50}}</td>
                         <td><b class="online">online</b></td>
                         <td class="setting">
                           <a class="btn-icon btn-success sub-btn" id="btn-{{ this._id }}"><i class="icon-eye-open "></i></a>
@@ -191,7 +191,7 @@
                         <td>{{@index}}</td>
                         <td class="sensor-name"><a href="Web/{{this._id}}">{{this.name}}</a></td>
                         <td>{{{findIcon this.type}}}</td>
-                        <td>{{limitStr "Lorem ipsum dolor sit amet, consectetur adipisicing elit," 0 50}}</td>
+                        <td>{{limitStr this.description 0 50}}</td>
                         <td><b class="offline">offline</b></td>
                         <td class="setting">
                           <a class="enabled btn-icon btn-success sub-btn" id="btn-{{ this._id }}"><i class="icon-eye-open"></i></a>

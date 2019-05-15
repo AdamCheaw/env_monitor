@@ -62,7 +62,7 @@ var checkDisconnect = () => {
 }
 var searchAllSensor = (callback) => {
   SensorData.find()
-    .select("name date _id value expireTime type")
+    .select("name date _id value expireTime type description")
     .exec()
     .then(docs => {
       //console.log(docs);
@@ -80,7 +80,8 @@ var searchAllSensor = (callback) => {
             value: doc.value,
             onConnect: checkExpire(doc.date, parseInt(doc.expireTime)),
             expireTime: doc.expireTime,
-            type: doc.type
+            type: doc.type,
+            description: doc.description
             //line: countLine(number+=1)
           };
         })
@@ -92,7 +93,7 @@ var searchAllSensor = (callback) => {
 var searchSensorByID = (sensorID) => {
   return SensorData.find({
     _id: ObjectId(sensorID)
-  }).select('name type onConnect value').exec();
+  }).select('name type onConnect value description').exec();
 }
 var searchOneSensor_byID = (sensorID) => {
   return SensorData.findOne({
