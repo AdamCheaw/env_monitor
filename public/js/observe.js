@@ -158,7 +158,7 @@ const handleSensorDisconnect = (doc) => {
 }
 //handle when editBtn being click and change modal show up 's views
 const handleEditSubscription = (doc, id) => {
-  //scrisrc from ./editSubscription.js
+  //script src from ./editSubscription.js
   changeEditSubView(doc, id);
   mapSubscriptionToEditForm(doc);
 }
@@ -300,6 +300,10 @@ $(document).ready(function() {
         }
       });
     }
+  });
+  //show subscription related sensor data
+  $('#subscription-1').on('click', '.showDataBtn', function(e) {
+    $("#dataDisplayModal").modal("show");
   });
 });
 

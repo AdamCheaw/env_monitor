@@ -62,7 +62,9 @@ const SensorRegister = async (req, res, next) => {
         });
       res.status(200).json({
         message: "receive request packet!",
-        sensorId: data._id
+        sensorId: data._id,
+        publishStatus: 1,
+        publishCondition: null
       });
 
       console.log();
@@ -84,7 +86,14 @@ const SensorRegister = async (req, res, next) => {
       sensor.save(); //update sensor info
       res.status(200).json({
         message: "receive request packet!",
-        sensorId: sensor._id
+        sensorId: sensor._id,
+        //if publishCondition equal default ,status = 1, else status = 2
+        publishStatus: (
+          Array.isArray(sensor.publishCondition) && sensor.publishCondition.length === 0
+        ) ? 1 : 2,
+        publishCondition: (
+          Array.isArray(sensor.publishCondition) && sensor.publishCondition.length === 0
+        ) ? null : [sensor.publishCondition[0].value, sensor.publishCondition[1].value]
       });
       console.log();
       console.log("sensor already find in the document");

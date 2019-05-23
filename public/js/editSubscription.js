@@ -13,7 +13,7 @@ const changeEditSubView = (doc, id) => {
   $("#editSub-Modal .modal-content").html("");
   $("#editSub-Modal .modal-content").append(html);
 }
-//mapping subscription to edit form modal
+//mapping subscription info to edit form modal
 const mapSubscriptionToEditForm = (doc) => {
   if(doc.groupType && doc.groupType !== null) { //is grouping
     $('#editSub-Modal .input-condition').parent().parent()
@@ -70,7 +70,11 @@ const mapSubscriptionToEditForm = (doc) => {
       }
     })
   }
-
+  //mapping decimal value to input selected
+  if(doc.decimal) {
+    //changing decimalValue's input selected value
+    $('#editSub-Modal #decimalValue').val(doc.decimal).change();
+  }
 }
 //getting edit form condition value
 const getEditFormCondition = () => {
@@ -86,13 +90,6 @@ const getEditFormCondition = () => {
     var data = {
       type: "lower",
       value: Number($("#editSub-Modal #input-lower").val())
-    };
-    condition.push(data);
-  }
-  if($("#editSub-Modal #select-precision option:selected").val()) {
-    var data = {
-      type: "precision",
-      value: $("#editSub-Modal #select-precision option:selected").val()
     };
     condition.push(data);
   }
@@ -119,6 +116,7 @@ const getEditFormSubmit = () => {
   if($("#editSub-Modal input[name='groupType']:checked").val()) {
     afterEdit = {
       groupType: $("#editSub-Modal input[name='groupType']:checked").val(),
+      decimal: $("#editSub-Modal #decimalValue option:selected").val(),
       condition: getEditFormCondition()
     };
   } else if($("#editSub-Modal input[name='option']:checked").val()) {
@@ -126,11 +124,13 @@ const getEditFormSubmit = () => {
     if(option == "default") {
       afterEdit = {
         option: option,
+        decimal: $("#editSub-Modal #decimalValue option:selected").val(),
         condition: []
       };
     } else {
       afterEdit = {
         option: option,
+        decimal: $("#editSub-Modal #decimalValue option:selected").val(),
         condition: getEditFormCondition()
       };
     }

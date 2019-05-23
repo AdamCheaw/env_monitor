@@ -305,7 +305,7 @@ const notificationList = (sensorData, callback) => {
 //get subscription info
 const getSubscriptionInfo = (id) => {
   return SubscribeListData.findById(id)
-    .select('_id title option condition groupType  _sensorID')
+    .select('_id title option condition groupType  _sensorID decimal')
     .exec();
 }
 //get subscription related sensor's info
@@ -325,11 +325,13 @@ const updateSubscriptionInfo = (doc) => {
   if(doc.option) {
     updateData = {
       option: doc.option,
+      decimal: doc.decimal,
       condition: convertCondition(doc.condition)
     };
   } else if(doc.groupType) {
     updateData = {
       groupType: doc.groupType,
+      decimal: doc.decimal,
       condition: convertCondition(doc.condition)
     };
   }

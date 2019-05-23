@@ -1,0 +1,41 @@
+{{!-- Modal --}}
+{{!-- 用於顯示目前subscription裏sensor的最後更新的數值 --}}
+<div class="modal fade" id="dataDisplayModal" role="dialog">
+  <div class="modal-dialog">
+    <!-- Modal content-->
+    <div class="modal-content">
+      <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal">&times;</button>
+        <h4 class="modal-title">test</h4>
+      </div>
+      <div class="modal-body">
+        <table class="table mt-1">
+          <thead>
+            <tr>
+              <th>Name</th>
+              <th>Status</th>
+              <th>Last Updated</th>
+              <th>Current Value</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td><b>Sensor1</b></td>
+              <td class="status"><b class="offline">offline</b></td>
+              <td><i>2019 May 20th, 11:44:21am</i></td>
+              <td>29.2</td>
+            </tr>
+            {{!-- <tr>
+              <td>Sensor1</td>
+              <td>offline</td>
+              <td>2019 May 20th, 11:44:21am</td>
+              <td>29.2</td>
+            </tr> --}}
+          </tbody>
+        </table>
+      </div>
+
+    </div>
+
+  </div>
+</div>

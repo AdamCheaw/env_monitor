@@ -54,10 +54,10 @@ function matchingValue_byPubCondition(value, conditions) {
   } else {
     console.log("publish condition is advanced ");
     if(conditions[0] !== null) { //matching with greater
-      isMatch = (condition.value > value) ? true : isMatch;
+      isMatch = (conditions[0] < value) ? true : isMatch;
     }
     if(conditions[1] !== null) { //matching with lower
-      isMatch = (condition.value < value) ? true : isMatch;
+      isMatch = (conditions[1] > value) ? true : isMatch;
     }
   }
   console.log(`isMatch : ${isMatch}`);
@@ -94,6 +94,7 @@ function startGenerateValue() {
   } else {
     //do not let value out of limit
     if(value > 30 || value < 20) {
+      let randValue = getRandomFloat(0, 2); //generate random value
       value = (value > 30) ? value -= randValue : value += randValue;
     } else {
       let upOrDown = getRandomValue(0, 2);
@@ -119,7 +120,7 @@ function startGenerateValue() {
         .then(data => {
           console.log(data);
           changePubCondition(data.publishCondition, data.publishStatus);
-        }) // JSON-string from `response.json()` call
+        })
         .catch(error => {
           console.log("something went wrong");
           console.log(error)
@@ -161,6 +162,7 @@ $('#input-submit').click(function(e) {
         var second = getRandomValue(10, 60) * 1000;
         console.log(`initial timer is ${second /1000}sc`);
         timer += second;
+        changePubCondition(data.publishCondition, data.publishStatus);
         loop = setTimeout(startGenerateValue, second);
       }
     })

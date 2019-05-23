@@ -81,6 +81,9 @@
                         </a>
                       </div>
                       <div class="operation-btns">
+                        <button type="button" class="btn btn-mini btn-xs showDataBtn" id="">
+                          <i class="media-icon icon-eye-open"></i>
+                        </button>
                         <button type="button" class="btn btn-mini btn-xs editBtn" id="editBtn-{{this._id}}">
                           <i class="media-icon icon-edit"></i>
                         </button>
@@ -92,27 +95,6 @@
                         {{!-- load sensor value ,different symbol and color  depending condition --}}
                         {{loadGroupValue this._sensorID this.groupType this.condition}}
                       </div>
-
-                      {{!-- {{#if this._sensorID.[0].onConnect}}
-                        <div class="sensor-value animated infinite slow bounceIn">
-                          {{loadValue this._sensorID.[0].value this.option this.condition}}
-                        </div>
-                      {{else}}
-                        <div class="sensor-value">
-                          <span class="font-yellow ">
-                            <i class="icon-question-sign "></i>
-                          </span>
-                        </div>
-                      {{/if}} --}}
-                      {{!-- <div class="sensor-value animated infinite slow bounceIn">
-                        {{#if this._sensorID.[0].onConnect}}
-                          {{loadValue this._sensorID.[0].value this.option this.condition}}
-                        {{else}}
-                          <span class="font-yellow ">
-                            <i class="icon-question-sign "></i>
-                          </span>
-                        {{/if}}
-                      </div> --}}
                       <div class="table">
 
                         <div class="collapse multi-collapse" id="collapse-{{this._id}}">
@@ -177,6 +159,9 @@
                         <span class="ml-2 date">{{this._sensorID.[0].date}}</span>
                       </div>
                       <div class="operation-btns">
+                        <button type="button" class="btn btn-mini btn-xs showDataBtn" id="">
+                          <i class="media-icon icon-eye-open"></i>
+                        </button>
                         <button type="button" class="btn btn-mini btn-xs editBtn" id="editBtn-{{this._id}}">
                           <i class="media-icon icon-edit"></i>
                         </button>
@@ -215,6 +200,7 @@
 </div>
 {{>footer}}
 {{>editForm}}
+{{>dataDisplayModal}}
 <script type="text/javascript">
   var name = "{{session}}";
   //var data = {{{subInfo}}};
