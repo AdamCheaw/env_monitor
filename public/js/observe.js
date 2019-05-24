@@ -303,7 +303,44 @@ $(document).ready(function() {
   });
   //show subscription related sensor data
   $('#subscription-1').on('click', '.showDataBtn', function(e) {
-    $("#dataDisplayModal").modal("show");
+    let idClicked = e.target.id; //get btn clicked id
+    idClicked = idClicked.replace('dataDisplayBtn-', '');
+    $.ajax({
+      type: 'GET', // define the type of HTTP verb we want to use (POST for our form)
+      url: `/API/subscription/${idClicked}/sensors`, // the url where we want to POST
+      dataType: 'json', // what type of data do we expect back from the server
+      encode: true,
+      beforeSend: function(xhr) {
+        if(localStorage.token) {
+          xhr.setRequestHeader('Authorization', 'Bearer ' + localStorage.token);
+        }
+      },
+      complete: function() {
+        // $.LoadingOverlay("hide");
+        console.log("ajax send finish");
+
+      },
+      success: function(data) {
+        //get dataDisplayModal handlebars template
+        let scriptHtml = $("#dataDisplayModal-temp")[0].innerHTML;
+        //compile the handlebars template and return html
+        let html = generateDataDisplayModalHTML(scriptHtml, data);
+        $("#dataDisplayModal .modal-content").html(""); //clear content
+        $("#dataDisplayModal .modal-content").append(html); //replace content
+        $("#dataDisplayModal").modal("show"); //show modal
+      },
+      error: function(err) {
+        if(err.status == 401) {
+          swal("invalid request", " please login to our system again...", "error")
+            .then(() => {
+              window.location.href = '/logout';
+            });
+        } else {
+          toastr.error('something went wrong!');
+        }
+      }
+    });
+    //$("#dataDisplayModal").modal("show");
   });
 });
 

@@ -13,6 +13,10 @@ router.get('/', checkAuth, subscriptionController.GetAllSubscription);
 //handle ajax call for getting subscription info like condition , option ...
 router.get('/:id', checkAuth, subscriptionController.GetSubscriptionInfo);
 
+// url : {...}/API/subscription/{id}/sensors
+//handle ajax call for getting subscription info and all related sensor
+router.get('/:id/sensors', checkAuth, subscriptionController.GetSubscriptionInfoAndRelatedSensor);
+
 // url : {...}/API/subscription/subscribe
 //handle ajax call for user subscribe one or multiple sensor
 router.post('/subscribe', checkAuth, subscriptionController.SubscribeMany);

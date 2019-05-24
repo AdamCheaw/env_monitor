@@ -3739,12 +3739,16 @@ table td .online, .media .media-body .online, .list .online {
   color: #29b7d3
 }
 
+.font-lg {
+  font-size: 30px;
+}
+
 .font-md {
   font-size: 20px;
 }
 
-.font-lg {
-  font-size: 30px;
+.font-sm {
+  font-size: 15px;
 }
 
 .vertical-menu {

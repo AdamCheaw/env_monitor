@@ -81,7 +81,7 @@
                         </a>
                       </div>
                       <div class="operation-btns">
-                        <button type="button" class="btn btn-mini btn-xs showDataBtn" id="">
+                        <button type="button" class="btn btn-mini btn-xs showDataBtn" id="dataDisplayBtn-{{this._id}}">
                           <i class="media-icon icon-eye-open"></i>
                         </button>
                         <button type="button" class="btn btn-mini btn-xs editBtn" id="editBtn-{{this._id}}">
@@ -159,7 +159,7 @@
                         <span class="ml-2 date">{{this._sensorID.[0].date}}</span>
                       </div>
                       <div class="operation-btns">
-                        <button type="button" class="btn btn-mini btn-xs showDataBtn" id="">
+                        <button type="button" class="btn btn-mini btn-xs showDataBtn" id="dataDisplayBtn-{{this._id}}">
                           <i class="media-icon icon-eye-open"></i>
                         </button>
                         <button type="button" class="btn btn-mini btn-xs editBtn" id="editBtn-{{this._id}}">
@@ -208,4 +208,5 @@
 <script src="/js/libs/handlebars-v4.0.12.min.js"></script>
 <script src="/js/libs/moment.min.js"></script>
 <script src="/js/editSubscription.js"></script>
+<script src="js/displayDataModal.js"></script>
 <script src="/js/observe.js"></script>
