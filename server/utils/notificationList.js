@@ -244,7 +244,7 @@ const generateNotificationList = (results, currentData) => {
       }
     }
     //end result.option == "advanced" && result.groupType == "AND"
-    // when result.option == "advanced" || groupType == "OR"
+    // when result.option == "advanced" & groupType == "OR"
     // just need to match one sensor condition
     else if(result.option == "advanced" && result.groupType == "OR") {
       let matchingResult = mapValueToCondition_withOR(
@@ -252,7 +252,7 @@ const generateNotificationList = (results, currentData) => {
         result.previousMatch, result.decimal
       );
       //console.log(matchingResult);
-      //the sensor currentValue matching 's condition
+      //the sensor currentValue matching 's condition-
       //different than previous matching 's condition
       if(matchingResult.notOnConnect !== undefined) {
         console.log("sensor not onConnect");
