@@ -3,6 +3,9 @@ var sensorId, IP, port, name, type, value;
 var publishCondition = [];
 var timer = 0;
 var loop;
+var valueRange;
+var sensors;
+var probability;
 
 function getRandomValue(min, max) {
   return Math.floor(Math.random() * (+max - +min)) + +min;
@@ -11,6 +14,41 @@ function getRandomValue(min, max) {
 
 function getRandomFloat(min, max) {
   return Math.random() * (max - min) + min;
+}
+
+function getValueRangeByType(type) {
+  let valueRange;
+  switch (type) {
+    case "temperature":
+      valueRange = [20, 30];
+      break;
+    case "humidity":
+      valueRange = [30, 50];
+    case "volume":
+      valueRange = [40, 80];
+      break;
+    case "pm2.5":
+      valueRange = [10, 30];
+      break;
+    default:
+      valueRange = [20, 30]
+  }
+  return valueRange
+}
+
+function getAllSensor(url) {
+  fetch(url)
+    .then(res => res.json())
+    .then(data => {
+      sensors = [];
+      data.forEach(doc => {
+        sensors.push({ name: doc.name, type: doc.type });
+        $("#sensor-name").append(`<option>${doc.name}</option>`)
+      });
+    })
+    .catch(err => {
+      console.log(err);
+    })
 }
 
 function postData(url = ``, data) {
@@ -88,14 +126,15 @@ function startGenerateValue() {
         console.log("something went wrong");
         console.log(error)
       });
-  } else if(isValueChange % 3 !== 0) {
+  } else if(isValueChange % probability !== 0) {
     console.log("value did not change");
     console.log(`current timer is ${timer/1000}sc`);
   } else {
     //do not let value out of limit
-    if(value > 30 || value < 20) {
+    if(value > valueRange[1] || value < valueRange[0]) {
       let randValue = getRandomFloat(0, 2); //generate random value
-      value = (value > 30) ? value -= randValue : value += randValue;
+      value = (value > valueRange[1]) ? value -= randValue : value += randValue;
+      value = Number(value.toFixed(1));
     } else {
       let upOrDown = getRandomValue(0, 2);
       let randValue = getRandomFloat(0, 2); //generate random value
@@ -136,14 +175,31 @@ function startGenerateValue() {
     loop = setTimeout(startGenerateValue, second);
   }
 }
-
+//get all sensor info
+getAllSensor(`http://localhost:3000/API/sensor`);
+//check sensor name datalist being click
+var eventKey = null;
+$("#input-name").bind('keydown', function(ev) {
+  eventKey = ev.which; //get keydown value when this input being key in
+});
+//when sensor name input being change
+$("#input-name").bind('input', function(ev) {
+  //check if being click or being keydown
+  //if datalist being clicked
+  if($(this).val() !== "" && (eventKey == null || eventKey == undefined)) {
+    let sensor = sensors.find(doc => doc.name == $(this).val());
+    $("#input-type").val(sensor.type); //change the type
+  }
+});
 
 $('#input-submit').click(function(e) {
   IP = $("#input-IP").val();
   port = $("#input-port").val();
   name = $("#input-name").val();
   type = $("#input-type").val();
-  value = Number(getRandomFloat(20, 30).toFixed(1));
+  probability = Number($("#sensitive").val());
+  valueRange = getValueRangeByType(type);
+  value = Number(getRandomFloat(valueRange[0], valueRange[1]).toFixed(1));
   var data = {
     "name": name,
     "value": value,

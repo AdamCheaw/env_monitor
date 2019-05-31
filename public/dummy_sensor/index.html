@@ -62,7 +62,11 @@
                   <div class="control-group">
                     <label class="control-label" for="basicinput">IP</label>
                     <div class="controls">
-                      <input type="text" id="input-IP" name="input-IP" value="localhost" class="span12">
+                      <input type="text" id="input-IP" name="input-IP" list="IP" class="span12">
+                      <datalist id="IP">
+                        <option value="localhost">localhost</option>
+                        <option value="adamcheaw.space">adamcheaw.space</option>
+                      </datalist>
                     </div>
                   </div>
                   <div class="control-group">
@@ -74,13 +78,32 @@
                   <div class="control-group">
                     <label class="control-label" for="basicinput">Sensor Name</label>
                     <div class="controls">
-                      <input type="text" id="input-name" name="input-name" value="sensor1" class="span12">
+                      <input type="text" id="input-name" name="input-name" list="sensor-name" class="span12">
+                      <datalist id="sensor-name">
+                      </datalist>
                     </div>
                   </div>
                   <div class="control-group">
                     <label class="control-label" for="basicinput">Type</label>
                     <div class="controls">
-                      <input type="text" id="input-type" name="input-type" value="" class="span12">
+                      <input type="text" id="input-type" name="input-type" list="type" value="" class="span12">
+                      <datalist id="type">
+                        <option value="temperature">temperature</option>
+                        <option value="humidity">humidity</option>
+                        <option value="volume">volume</option>
+                        <option value="pm2.5">pm2.5</option>
+                      </datalist>
+
+                    </div>
+                  </div>
+                  <div class="control-group">
+                    <label class="control-label" for="basicinput">Sensitive</label>
+                    <div class="controls">
+                      <select id="sensitive" class="span12">
+                        <option value="2">High</option>
+                        <option value="3" selected>Normal</option>
+                        <option value="4">Low</option>
+                      </select>
                     </div>
                   </div>
                   <div class="control-group ">
