@@ -55,137 +55,20 @@
               <img src="Edmin/images/Radio-200px.gif" style="height:25px;width:25px;margin:0px 5px">
             </div>
             <div class="module-body pb-5" id="subscription-1">
-              <div class="subscription-list">
-                {{#each items }}
-                  {{#if this.groupType}}
-                    <div class="list" id="subscription-{{this._id}}">
-                      <div class="sub-info">
-                        <h3 class="mb-1">
-                          {{this.title}}
-                        </h3>
-                        <p>
-                          {{#if this.description}}
-                            description :
-                            {{this.description}}<br/>
-                          {{/if}}
-                          grouping type :
-                          {{this.groupType}}<br />
-
-                          {{#if this.condition}}
-                            condition :
-                            {{loadCondition this.condition}}
-                          {{/if}}
-                        </p>
-                        <a class="btn btn-mini btn-collapse" data-toggle="collapse" href="#collapse-{{this._id}}" role="button" aria-expanded="false" aria-controls="collapse-{{this._id}}">
-                          <i class="icon-chevron-down"></i>
-                        </a>
-                      </div>
-                      <div class="operation-btns">
-                        <button type="button" class="btn btn-mini btn-xs showDataBtn" id="dataDisplayBtn-{{this._id}}">
-                          <i class="media-icon icon-eye-open"></i>
-                        </button>
-                        <button type="button" class="btn btn-mini btn-xs editBtn" id="editBtn-{{this._id}}">
-                          <i class="media-icon icon-edit"></i>
-                        </button>
-                        <button type="button" class="btn btn-mini btn-xs unsubBtn" id="unsubBtn-{{this._id}}">
-                          <i class="media-icon icon-remove"></i>
-                        </button>
-                      </div>
-                      <div class="sensor-value">
-                        {{!-- load sensor value ,different symbol and color  depending condition --}}
-                        {{loadGroupValue this._sensorID this.groupType this.condition}}
-                      </div>
-                      <div class="table">
-
-                        <div class="collapse multi-collapse" id="collapse-{{this._id}}">
-                          <table class="table table-bordered">
-                            <thead>
-                              <tr>
-                                <th>Name</th>
-                                <th>Status</th>
-                                <th>last updated</th>
-                              </tr>
-                            </thead>
-
-                            <tbody>
-                              {{#each this._sensorID}}
-                                <tr id="table-row-{{this._id}}">
-                                  <td>
-                                    <a href="Web/{{this._id}}">
-                                      {{this.name}}
-                                    </a>
-                                  </td>
-                                  <td class="status">
-                                    {{#if this.onConnect}}
-                                      <b class="online">online</b>
-                                    {{else}}
-                                      <b class="offline">offline</b>
-                                    {{/if}}
-                                  </td>
-                                  <td class="date">{{this.date}}</td>
-                                </tr>
-                              {{/each}}
-                            </tbody>
-                          </table>
-                        </div>
-                      </div>
-                    </div>
-                  {{else}}
-                    <div class="list" id="subscription-{{this._id}}">
-                      <div class="sub-info">
-                        <h3 class="mb-1">
-                          {{this.title}}
-                        </h3>
-                        <p>
-                          <a href="Web/{{this._sensorID.[0]._id}}">
-                            {{this._sensorID.[0].name}}
-                          </a><br/>
-                          {{#if this.description}}
-                            description :
-                            {{this.description}}<br/>
-                          {{/if}}
-                          option :
-                          {{this.option}}<br />
-                          {{#if this.condition}}
-                            condition :
-                            {{loadCondition this.condition}}
-                          {{/if}}
-                        </p>
-                        {{#if this._sensorID.[0].onConnect}}
-                          <b class="online">online</b>
-                        {{else}}
-                          <b class="offline">offline</b>
-                        {{/if}}
-                        <span class="ml-2 date">{{this._sensorID.[0].date}}</span>
-                      </div>
-                      <div class="operation-btns">
-                        <button type="button" class="btn btn-mini btn-xs showDataBtn" id="dataDisplayBtn-{{this._id}}">
-                          <i class="media-icon icon-eye-open"></i>
-                        </button>
-                        <button type="button" class="btn btn-mini btn-xs editBtn" id="editBtn-{{this._id}}">
-                          <i class="media-icon icon-edit"></i>
-                        </button>
-                        <button type="button" class="btn btn-mini btn-xs unsubBtn" id="unsubBtn-{{this._id}}">
-                          <i class="media-icon icon-remove"></i>
-                        </button>
-                      </div>
-                      <div class="sensor-value">
-                        {{#if this._sensorID.[0].onConnect}}
-                          <div class="animated infinite slow bounceIn">
-                            {{loadValue this._sensorID.[0].value this.option this.condition}}
-                          </div>
-                        {{else}}
-                          <div class="">
-                            <span class="font-yellow ">
-                              <i class="icon-question-sign "></i>
-                            </span>
-                          </div>
-                        {{/if}}
-                      </div>
-                    </div>
-                  {{/if}}
-                {{/each}}
-              </div>
+              <span class="ml-2">Sort By : &nbsp;<span>
+							<div class="btn-group" id="sortBtn">
+								<button class="btn">Date</button>
+								<button class="btn dropdown-toggle" data-toggle="dropdown">
+									<span class="caret"></span>
+								</button>
+								<ul class="dropdown-menu">
+									<li><a href="#">Date</a></li>
+									<li><a href="#">Title</a></li>
+								</ul>
+							</div>
+               <div class="subscription-list">
+                 {{!-- subscription will insert here --}}
+               </div>
             </div>
           </div>
           <br />
@@ -202,8 +85,140 @@
 {{>editForm}}
 {{>dataDisplayModal}}
 <script type="text/javascript">
+  $.LoadingOverlay("show", {
+    image       : "",
+    fontawesome : "fa fa-cog fa-spin"
+  });
   var name = "{{session}}";
+  var theSubscriptions = {{{toJSON items}}};
+  console.log(theSubscriptions[1]);
   //var data = {{{subInfo}}};
+</script>
+<script id="groupSubscription-temp" type="text/x-handlebars-template">
+  <div class="list" id="subscription-\{{sub._id}}">
+    <div class="sub-info">
+      <h3 class="mb-1">
+        \{{sub.title}} (Group)
+      </h3>
+      <p>
+        \{{#if sub.description}}
+          description :
+          \{{sub.description}}<br/>
+        \{{/if}}
+        grouping type :
+        \{{sub.groupType}}<br />
+        \{{#if sub.condition}}
+          condition :
+          \{{conditionTag}}
+        \{{/if}}
+      </p>
+      <a
+        class="btn btn-mini btn-collapse"
+        data-toggle="collapse"
+        href="#collapse-\{{sub._id}}"
+        role="button" aria-expanded="false"
+        aria-controls="collapse-\{{sub._id}}"
+      >
+        <i class="icon-chevron-down"></i>
+      </a>
+    </div>
+    <div class="operation-btns">
+      <button type="button" class="btn btn-mini btn-xs showDataBtn" id="dataDisplayBtn-\{{sub._id}}">
+        <i class="media-icon icon-eye-open"></i>
+      </button>
+      <button type="button" class="btn btn-mini btn-xs editBtn" id="editBtn-\{{sub._id}}">
+        <i class="media-icon icon-edit"></i>
+      </button>
+      <button type="button" class="btn btn-mini btn-xs unsubBtn" id="unsubBtn-\{{sub._id}}">
+        <i class="media-icon icon-remove"></i>
+      </button>
+    </div>
+    <div class="sensor-value">
+      <!-- load sensor value ,different symbol and color  depending condition -->
+      \{{{valueTag}}}
+    </div>
+    <div class="table">
+
+      <div class="collapse multi-collapse" id="collapse-\{{sub._id}}">
+        <table class="table table-bordered">
+          <thead>
+            <tr>
+              <th>Name</th>
+              <th>Status</th>
+              <th>last updated</th>
+            </tr>
+          </thead>
+
+          <tbody>
+            \{{#each sub._sensorID}}
+              <tr id="table-row-\{{this._id}}">
+                <td>
+                  <a href="Web/\{{this._id}}">
+                    \{{this.name}}
+                  </a>
+                </td>
+                <td class="status">
+                  \{{#if this.onConnect}}
+                    <b class="online">online</b>
+                  \{{else}}
+                    <b class="offline">offline</b>
+                  \{{/if}}
+                </td>
+                <td class="date">\{{this.date}}</td>
+              </tr>
+            \{{/each}}
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+  <!--  -->
+
+</script>
+<script id="subscription-temp" type="text/x-handlebars-template">
+  <div class="list" id="subscription-\{{sub._id}}">
+    <div class="sub-info">
+      <h3 class="mb-1">
+        \{{sub.title}}
+      </h3>
+      <p>
+        name :
+        <a href="Web/\{{sub._sensorID.[0]._id}}">
+          \{{sub._sensorID.[0].name}}
+        </a><br/>
+        \{{#if sub.description}}
+          description :
+          \{{sub.description}}<br/>
+        \{{/if}}
+        option :
+        \{{sub.option}}<br />
+        \{{#if sub.condition}}
+          condition :
+          \{{conditionTag}}
+        \{{/if}}
+      </p>
+      \{{#if sub._sensorID.[0].onConnect}}
+        <b class="online">online</b>
+      \{{else}}
+        <b class="offline">offline</b>
+      \{{/if}}
+      <span class="ml-2 date">\{{sub._sensorID.[0].date}}</span>
+    </div>
+    <div class="operation-btns">
+      <button type="button" class="btn btn-mini btn-xs showDataBtn" id="dataDisplayBtn-\{{sub._id}}">
+        <i class="media-icon icon-eye-open"></i>
+      </button>
+      <button type="button" class="btn btn-mini btn-xs editBtn" id="editBtn-\{{sub._id}}">
+        <i class="media-icon icon-edit"></i>
+      </button>
+      <button type="button" class="btn btn-mini btn-xs unsubBtn" id="unsubBtn-\{{sub._id}}">
+        <i class="media-icon icon-remove"></i>
+      </button>
+    </div>
+    <div class="sensor-value">
+      \{{{valueTag}}}
+    </div>
+  </div>
 </script>
 <script src="/js/libs/handlebars-v4.0.12.min.js"></script>
 <script src="/js/libs/moment.min.js"></script>

@@ -105,6 +105,7 @@ var searchOneSensor_byName = (sensorName) => {
     "name": sensorName
   }).exec();
 }
+
 var searchMultiSensorPubCondition_byID = (docs) => {
   var ids = docs.map(doc => {
     return ObjectId(doc.sensorID);
@@ -118,6 +119,7 @@ var searchMultiSensorPubCondition_byID = (docs) => {
     }
   }).select('_id publishCondition').exec();
 }
+
 var updateMultiSensor_PubCondition = (docs) => {
   //initial multiple "updateOne" operation array
   var operations = docs.map(doc => {
@@ -142,6 +144,7 @@ var updateMultiSensor_PubCondition = (docs) => {
     .then(result => console.log("update multiple sensor publish condition success!"))
     .catch(err => console.log(err));
 }
+
 var getAllSensor = () => {
   return SensorData.find()
     .select('name value type onConnect')

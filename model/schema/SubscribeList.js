@@ -27,5 +27,6 @@ var SubscribeListSchema = new mongoose.Schema({
   groupType: { type: String, default: null },
   title: { type: String, required: true }
 }, { collection: 'SubscribeList' });
+SubscribeListSchema.set('timestamps', true);
 module.exports = mongoose.model('SubscribeList', SubscribeListSchema);
 //console.log();

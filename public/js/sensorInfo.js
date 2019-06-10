@@ -25,6 +25,26 @@ const timeArray = [{
   }
 ];
 var chart;
+//finding the max range value in array
+function findMaxRange(array) {
+  var max = 0;
+  array.forEach(num => {
+    if(num !== null && max < num) {
+      max = num;
+    }
+  });
+  return (Number((max / 10).toFixed(0)) + 1) * 10;
+}
+//finding the min range value in array
+function findMinRange(array) {
+  var min = 10000;
+  array.forEach(num => {
+    if(num !== null && min > num) {
+      min = num;
+    }
+  });
+  return (Number((min / 10).toFixed(0)) - 1) * 10;;
+}
 
 function initialTime(time) {
 
@@ -39,6 +59,8 @@ function initialTime(time) {
 function drawGraph(results, queryDate) {
   var labelArray = [];
   var dataArray = [];
+  var maxRange = findMaxRange(dataArray);
+  var minRange = findMinRange(dataArray);
   if(results === undefined) {
     let startOfTime = initialTime(queryDate || moment());
     //create a empty data array
@@ -47,14 +69,21 @@ function drawGraph(results, queryDate) {
       dataArray.push(null);
       startOfTime = moment(startOfTime).add(5, 'minutes');
     }
+    //finding the range
+    maxRange = 50;
+    minRange = 0;
   } else {
     results.forEach(doc => {
       var date = moment.parseZone(doc.date).local().format('h:mm a');
       labelArray.push(date);
       dataArray.push(doc.value);
     })
+    //finding the range
+    maxRange = findMaxRange(dataArray);
+    minRange = findMinRange(dataArray);
   }
   var ctx = document.getElementById('myChart').getContext('2d');
+
   chart = new Chart(ctx, {
     // The type of chart we want to create
     type: 'line',
@@ -85,9 +114,9 @@ function drawGraph(results, queryDate) {
             display: true
           },
           ticks: {
-            min: 0,
-            max: 50,
-            stepSize: 10
+            min: minRange,
+            max: maxRange,
+            stepSize: ((maxRange - minRange) > 20) ? 10 : 5
           }
         }]
       }

@@ -138,6 +138,90 @@ const changeGroupStatus = (docs) => {
 
   }
 }
+//mapping group subscription 's status (safe or not safe) to html tag
+const mapGroupStatusToHTMLTag = (docs) => {
+  let sensors = docs._sensorID;
+  var isSafe;
+  let matchNum = 0;
+  if(docs.groupType == "AND") {
+    //all the sensor value need to match with condition
+    isSafe = true;
+    for(let i = 0; i < sensors.length; i++) {
+      if(!sensors[i].onConnect) {
+        isSafe = null;
+        break;
+      }
+      //a sensor match condition , matchNum +1
+      if(filterByCondition(docs.condition, sensors[i].value)) {
+        matchNum += 1;
+      }
+    }
+    if(matchNum === sensors.length && isSafe !== null) {
+      isSafe = false;
+    }
+    console.log("check finish");
+  } else if(docs.groupType == "OR") {
+    //just need a sensor matching condition
+    isSafe = true;
+    for(let i = 0; i < sensors.length; i++) {
+      if(!sensors[i].onConnect) {
+        isSafe = null;
+        break;
+      }
+      //if a single sensor matching condition ,matchNum + 1
+      if(filterByCondition(docs.condition, sensors[i].value)) {
+        matchNum += 1;
+      }
+    }
+    if(matchNum > 0 && isSafe !== null) {
+      isSafe = false;
+    }
+  }
+  if(isSafe === null) {
+    html = '<div class="">' +
+      '<span class="font-yellow"><i class="icon-question-sign"></i></span>' +
+      '</div>';
+  } else if(isSafe) {
+    html = '<div class="animated infinite slow bounceIn">' +
+      '<span class="font-safe"><i class="icon-star "></i></span>' +
+      '</div>';
+  } else if(!isSafe) {
+
+    html = '<div class="animated infinite slow bounceIn">' +
+      '<span class="font-warning"><i class="icon-warning-sign "></i></span>' +
+      '</div>';
+  }
+  return html
+}
+//mapping subscription 's status (safe or not safe) to html tag
+const mapStatusToHTMLTag = (docs) => {
+  let html;
+  if(docs._sensorID[0].onConnect) { //onConnet
+    onConnectStatus = "online";
+    animated = "animated infinite slow bounceIn";
+    if(docs.option == "default") { //default status
+      html = '<div class="animated infinite slow bounceIn">' +
+        `<span class="font-blue">${docs._sensorID[0].value}</span>` +
+        '</div>';
+    } else if(docs.option == "advanced") {
+      //danger status
+      if(filterByCondition(docs.condition, docs._sensorID[0].value)) {
+        html = '<div class="animated infinite slow bounceIn">' +
+          '<span class="font-warning"><i class="icon-warning-sign "></i></span>' +
+          '</div>';
+      } else { //safe status
+        html = '<div class="animated infinite slow bounceIn">' +
+          '<span class="font-safe"><i class="icon-star "></i></span>' +
+          '</div>';
+      }
+    }
+  } else if(!docs._sensorID[0].onConnect) { //not onConnect
+    html = '<div class="">' +
+      '<span class="font-yellow"><i class="icon-question-sign"></i></span>' +
+      '</div>';
+  }
+  return html
+}
 //when sensor disconnect , change status to offline
 const handleSensorDisconnect = (doc) => {
   if(doc.groupType) { //groupType != null
@@ -162,7 +246,129 @@ const handleEditSubscription = (doc, id) => {
   changeEditSubView(doc, id);
   mapSubscriptionToEditForm(doc);
 }
+//map condition to string for user readable
+const mappingConditionToStr = (condition) => {
+  if(condition.type == "greater") {
+    return `greater than ${condition.value}`;
+  } else if(condition.type == "lower") {
+    return `lower than ${condition.value}`;
+  } else if(condition.type == "equal") {
+    return `equal to ${condition.value}`;
+  } else if(condition.type == "precision") {} else if(condition.type == "between") {
+    return `in between ${condition.minValue} ~ ${condition.maxValue}`;
+  }
+}
+//merge all condition
+const mapAllConditionsToStr = (conditions) => {
+  var html = "";
+  conditions.forEach((condition, index, arr) => {
+    if(index == arr.length - 1) {
+      html += mappingConditionToStr(condition);
+    } else {
+      html += mappingConditionToStr(condition) + " , ";
+    }
+  });
+  return html;
+}
+//display subscription by Handlebars template
+const displaySubscription = (docs) => {
+  let subscriptionHTML = "";
+  docs.forEach(doc => {
+    if(doc.groupType !== null && doc.option === "advanced") {
+      var scriptHtml = $("#groupSubscription-temp")[0].innerHTML;
+      var template = Handlebars.compile(scriptHtml);
+      var obj = {
+        sub: doc,
+        valueTag: mapGroupStatusToHTMLTag(doc),
+        conditionTag: mapAllConditionsToStr(doc.condition)
+      };
+      subscriptionHTML += template(obj);
+    } else {
+      var scriptHtml = $("#subscription-temp")[0].innerHTML;
+      var template = Handlebars.compile(scriptHtml);
+      var obj = {
+        sub: doc,
+        valueTag: mapStatusToHTMLTag(doc),
+        conditionTag: mapAllConditionsToStr(doc.condition)
+      };
+      subscriptionHTML += template(obj);
+    }
+
+  });
+  //append subscrition list to observe page
+  $("#subscription-1 .subscription-list").html(subscriptionHTML);
+}
+//update subscription's sensor info(ex: value, onConnect, date)
+const updateSubscriptionInfo = (e, doc) => {
+  if(e === "notification" || e === "connect") {
+    //loop all local subscription
+    for(let i = 0; i < theSubscriptions.length; i++) {
+      if(theSubscriptions[i]._id === doc._id) { //find the match subscription
+        //change the local sensor value
+        let sensors = theSubscriptions[i]._sensorID;
+        for(let j = 0; j < sensors.length; j++) {
+          sensors[j].value = doc._sensorID[j].value;
+          sensors[j].onConnect = doc._sensorID[j].onConnect;
+          sensors[j].date = moment.parseZone(doc._sensorID[j].date)
+            .local().format('YYYY MMM Do, h:mm:ssa');
+        }
+        theSubscriptions[i]._sensorID = sensors;
+        console.log("change:");
+        console.log(theSubscriptions[i]);
+        break;
+      }
+    }
+  } else if(e === "disconnect") {
+    for(let i = 0; i < theSubscriptions.length; i++) {
+      if(theSubscriptions[i]._id === doc._id) {
+        let sensors = theSubscriptions[i]._sensorID;
+        for(let j = 0; j < sensors.length; j++) {
+          if(sensors[j]._id === doc.sensorID) {
+            sensors[j].onConnect = false;
+            sensors[j].date = moment().local().format('YYYY MMM Do, h:mm:ssa');
+            break;
+          }
+        }
+        theSubscriptions[i]._sensorID = sensors;
+        console.log("change:");
+        console.log(theSubscriptions[i]);
+        break;
+      }
+    }
+  }
+
+
+}
+//sort the local subscriptions
+const sortSubscription = (sortBy) => {
+  theSubscriptions.sort((a, b) => {
+    // setting compare value
+    let A, B;
+    if(sortBy === "title") {
+      A = a.title.toLowerCase();
+      B = b.title.toLowerCase();
+    } else if(sortBy === "date") {
+      A = a._id.toString().substring(0, 8);
+      B = b._id.toString().substring(0, 8);
+    }
+    //compare
+    if(A < B) {
+      return -1;
+    }
+    if(A > B) {
+      return 1;
+    }
+    // equal
+    return 0;
+  });
+}
+
+//manage DOM change
 $(document).ready(function() {
+  // initial subscription
+  displaySubscription(theSubscriptions);
+
+  $.LoadingOverlay("hide");
   //delete a subscription
   $('#subscription-1').on('click', '.unsubBtn', function(e) {
     let idClicked = e.target.id; //get btn clicked id
@@ -342,6 +548,16 @@ $(document).ready(function() {
     });
     //$("#dataDisplayModal").modal("show");
   });
+  //sorting dropdown btn being clicked
+  $('#sortBtn').on('click', 'li', function(e) {
+    e.preventDefault();
+    //sorting the local subscriptions by btn being selected
+    sortSubscription($(this).text().toLowerCase());
+    //refresh the subscription view
+    displaySubscription(theSubscriptions);
+    //changing the sort btn value
+    $('#sortBtn .btn:first-child').html($(this).text());
+  })
 });
 
 // handle socket msg
@@ -367,25 +583,24 @@ socket.on('notification', function(subscription) {
   countNotification += 1;
   console.log("listen a notification");
   console.log(countNotification);
-  console.log(subscription);
+  // console.log(subscription);
+  updateSubscriptionInfo("notification", subscription);
 });
 socket.on('sensor connect', function(subscription) {
   console.log("a sensor is connect");
-  console.log(subscription);
+  // console.log(subscription);
   if(subscription.groupType == 'AND' || subscription.groupType == 'OR') {
     changeGroupStatus(subscription);
     changeTableView(subscription);
   } else {
     changeOneSubscriptionView(subscription);
   }
+  updateSubscriptionInfo("connect", subscription);
 })
 socket.on('sensor disconnect', function(data) {
-  handleSensorDisconnect(data)
-  // var html = "<b class=\"offline\" >offline</b>";
-  // $("#"+data.disconnectSensorID+' .sensor-status').html(html);
-  // html = "?";
-  // $("#"+data.disconnectSensorID+' .sensor-value').html(html);
+  handleSensorDisconnect(data);
   console.log("sensor disconnect :" + data._id);
+  updateSubscriptionInfo("disconnect", data);
 });
 socket.on('disconnect', function() {
   swal("Disconnected from server", "", "error")
