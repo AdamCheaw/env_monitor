@@ -1,7 +1,7 @@
 const socket = io().connect('http://localhost:3000');
 var countNotification = 0 //for testing
-//filter sensor value with condition to finding match or not
-const filterByCondition = (condition, sensorValue) => {
+//check sensor value is reach condition
+const checkIsReachCondition = (condition, sensorValue) => {
   for(let i = 0; i < condition.length; i++) {
     if(condition[i].type == "greater" &&
       Number(sensorValue) > Number(condition[i].value)) {
@@ -24,6 +24,48 @@ const filterByCondition = (condition, sensorValue) => {
   }
   return false;
 }
+//check if the group matching condition according groupType
+const checkGroupStatus = (docs) => {
+
+  let sensors = docs._sensorID;
+  var isSafe;
+  let matchNum = 0;
+  if(docs.groupType == "AND") {
+    //all the sensor value need to match with condition
+    isSafe = true;
+    for(let i = 0; i < sensors.length; i++) {
+      if(!sensors[i].onConnect) {
+        isSafe = null;
+        break;
+      }
+      //a sensor match condition , matchNum +1
+      if(checkIsReachCondition(docs.condition, sensors[i].value)) {
+        matchNum += 1;
+      }
+    }
+    if(matchNum === sensors.length && isSafe !== null) {
+      isSafe = false;
+    }
+    console.log("check finish");
+  } else if(docs.groupType == "OR") {
+    //just need a sensor matching condition
+    isSafe = true;
+    for(let i = 0; i < sensors.length; i++) {
+      if(!sensors[i].onConnect) {
+        isSafe = null;
+        break;
+      }
+      //if a single sensor matching condition ,matchNum + 1
+      if(checkIsReachCondition(docs.condition, sensors[i].value)) {
+        matchNum += 1;
+      }
+    }
+    if(matchNum > 0 && isSafe !== null) {
+      isSafe = false;
+    }
+  }
+  return isSafe;
+}
 //changing single subscription 's view
 const changeOneSubscriptionView = (docs) => {
   let html = "";
@@ -37,7 +79,7 @@ const changeOneSubscriptionView = (docs) => {
 
       html = `<span class="font-blue">${docs._sensorID[0].value}</span>`;
     } else if(docs.option == "advanced") {
-      if(filterByCondition(docs.condition, docs._sensorID[0].value)) {
+      if(checkIsReachCondition(docs.condition, docs._sensorID[0].value)) {
         html = `<span class="font-warning">
                   <i class="icon-warning-sign"></i>
                 </span>`;
@@ -58,20 +100,12 @@ const changeOneSubscriptionView = (docs) => {
     .removeClass().addClass(onConnectStatus).text(onConnectStatus);
   //change last updated 's date
   $("#subscription-" + docs._id + " .sub-info .date").text(date);
-  //$("#subscription-"+docs._id+" .sensor-value").html(html);
 }
 //changing group subscription 's table info
 const changeTableView = (docs) => {
   let condition = docs.condition;
   docs._sensorID.forEach(doc => {
     let value = date = status = "";
-    // if(filterByCondition(condition,doc.value)) {
-    //   value = `<span class="font-warning"><i class="icon-warning-sign"></i></span>`;
-    // }
-    // else {
-    //   value = `<span class="font-safe"><i class="icon-star font-md"></i></span>`;
-    // }
-
     if(doc.onConnect) {
       status = '<b class="online">online</b>';
     } else {
@@ -85,43 +119,7 @@ const changeTableView = (docs) => {
 }
 //changing group subscription 's status (safe or not safe) symbol
 const changeGroupStatus = (docs) => {
-  let sensors = docs._sensorID;
-  var isSafe;
-  let matchNum = 0;
-  if(docs.groupType == "AND") {
-    //all the sensor value need to match with condition
-    isSafe = true;
-    for(let i = 0; i < sensors.length; i++) {
-      if(!sensors[i].onConnect) {
-        isSafe = null;
-        break;
-      }
-      //a sensor match condition , matchNum +1
-      if(filterByCondition(docs.condition, sensors[i].value)) {
-        matchNum += 1;
-      }
-    }
-    if(matchNum === sensors.length && isSafe !== null) {
-      isSafe = false;
-    }
-    console.log("check finish");
-  } else if(docs.groupType == "OR") {
-    //just need a sensor matching condition
-    isSafe = true;
-    for(let i = 0; i < sensors.length; i++) {
-      if(!sensors[i].onConnect) {
-        isSafe = null;
-        break;
-      }
-      //if a single sensor matching condition ,matchNum + 1
-      if(filterByCondition(docs.condition, sensors[i].value)) {
-        matchNum += 1;
-      }
-    }
-    if(matchNum > 0 && isSafe !== null) {
-      isSafe = false;
-    }
-  }
+  let isSafe = checkGroupStatus(docs);
   if(isSafe === null) {
     html = '<span class="font-yellow"><i class="icon-question-sign"></i></span>';
     $("#subscription-" + docs._id + " .sensor-value div")
@@ -140,43 +138,7 @@ const changeGroupStatus = (docs) => {
 }
 //mapping group subscription 's status (safe or not safe) to html tag
 const mapGroupStatusToHTMLTag = (docs) => {
-  let sensors = docs._sensorID;
-  var isSafe;
-  let matchNum = 0;
-  if(docs.groupType == "AND") {
-    //all the sensor value need to match with condition
-    isSafe = true;
-    for(let i = 0; i < sensors.length; i++) {
-      if(!sensors[i].onConnect) {
-        isSafe = null;
-        break;
-      }
-      //a sensor match condition , matchNum +1
-      if(filterByCondition(docs.condition, sensors[i].value)) {
-        matchNum += 1;
-      }
-    }
-    if(matchNum === sensors.length && isSafe !== null) {
-      isSafe = false;
-    }
-    console.log("check finish");
-  } else if(docs.groupType == "OR") {
-    //just need a sensor matching condition
-    isSafe = true;
-    for(let i = 0; i < sensors.length; i++) {
-      if(!sensors[i].onConnect) {
-        isSafe = null;
-        break;
-      }
-      //if a single sensor matching condition ,matchNum + 1
-      if(filterByCondition(docs.condition, sensors[i].value)) {
-        matchNum += 1;
-      }
-    }
-    if(matchNum > 0 && isSafe !== null) {
-      isSafe = false;
-    }
-  }
+  var isSafe = checkGroupStatus(docs)
   if(isSafe === null) {
     html = '<div class="">' +
       '<span class="font-yellow"><i class="icon-question-sign"></i></span>' +
@@ -205,7 +167,7 @@ const mapStatusToHTMLTag = (docs) => {
         '</div>';
     } else if(docs.option == "advanced") {
       //danger status
-      if(filterByCondition(docs.condition, docs._sensorID[0].value)) {
+      if(checkIsReachCondition(docs.condition, docs._sensorID[0].value)) {
         html = '<div class="animated infinite slow bounceIn">' +
           '<span class="font-warning"><i class="icon-warning-sign "></i></span>' +
           '</div>';
@@ -466,9 +428,6 @@ $(document).ready(function() {
       let afterEdit = getEditFormSubmit();
       afterEdit._id = idClicked;
       console.log(JSON.stringify(afterEdit));
-      // let data = {
-      //   "_id" : idClicked,
-      // };
       $.ajax({
         type: 'POST', // define the type of HTTP verb we want to use (POST for our form)
         url: '/API/subscription/updateSubscriptionInfo', // the url where we want to POST
@@ -546,7 +505,6 @@ $(document).ready(function() {
         }
       }
     });
-    //$("#dataDisplayModal").modal("show");
   });
   //sorting dropdown btn being clicked
   $('#sortBtn').on('click', 'li', function(e) {

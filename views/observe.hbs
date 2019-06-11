@@ -194,15 +194,16 @@
         \{{sub.option}}<br />
         \{{#if sub.condition}}
           condition :
-          \{{conditionTag}}
+          \{{conditionTag}}<br />
         \{{/if}}
+        last updated : <span class="date">\{{sub._sensorID.[0].date}}</span>
       </p>
       \{{#if sub._sensorID.[0].onConnect}}
         <b class="online">online</b>
       \{{else}}
         <b class="offline">offline</b>
       \{{/if}}
-      <span class="ml-2 date">\{{sub._sensorID.[0].date}}</span>
+
     </div>
     <div class="operation-btns">
       <button type="button" class="btn btn-mini btn-xs showDataBtn" id="dataDisplayBtn-\{{sub._id}}">

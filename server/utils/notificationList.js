@@ -300,7 +300,7 @@ const generateNotificationList = (results, currentData) => {
   });
   // end results.forEach
   //console.log(data);
-  return data;
+  return data; //return notification data
 }
 
 module.exports = {
