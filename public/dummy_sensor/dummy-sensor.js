@@ -132,12 +132,12 @@ function startGenerateValue() {
   } else {
     //do not let value out of limit
     if(value > valueRange[1] || value < valueRange[0]) {
-      let randValue = getRandomFloat(0, 2); //generate random value
+      let randValue = getRandomFloat(0.1, 1.2); //generate random value
       value = (value > valueRange[1]) ? value -= randValue : value += randValue;
       value = Number(value.toFixed(1));
     } else {
       let upOrDown = getRandomValue(0, 2);
-      let randValue = getRandomFloat(0, 2); //generate random value
+      let randValue = getRandomFloat(0.1, 1.2); //generate random value
       value = (upOrDown === 1) ? value += randValue : value -= randValue;
       value = Number(value.toFixed(1));
     }
