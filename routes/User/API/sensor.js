@@ -10,7 +10,14 @@ const SensorController = require('../../../controller/API/sensor');
 //handle ajax call for HistoryData
 router.post('/getHistoryData/:sensorID', SensorHistoryController.GetHistoryData);
 
+// url : {...}/API/sensor/{id}
+//API get all sensor
+router.get('/:sensorID', SensorController.GetSensorByID);
+
 // url : {...}/API/sensor/
 //API get all sensor
 router.get('/', SensorController.GetAllSensor);
+
+
+
 module.exports = router;

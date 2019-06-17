@@ -12,6 +12,7 @@ const {
 const {
   searchOneSensor_byName,
   searchOneSensor_byID,
+  searchSensorByID,
   getAllSensor
 } = require('../../model/action/sensor');
 const moment = require('moment');
@@ -196,12 +197,23 @@ const GetAllSensor = async (req, res, next) => {
     });
   }
 
-
-
-
 };
+
+const GetSensorByID = async (req, res, next) => {
+  try {
+    var result = await searchSensorByID(req.params.sensorID);
+    res.status(200).json(result);
+  } catch (err) {
+    console.log(err);
+    res.status(404).json({
+      error: err.message
+    });
+  }
+};
+
 module.exports = {
   SensorRegister,
   SensorUpdated,
-  GetAllSensor
+  GetAllSensor,
+  GetSensorByID
 }
