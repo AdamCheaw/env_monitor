@@ -24,6 +24,8 @@ const subscribeEvent = require('../../server/events/subEvent');
 const {
   PublishCondition
 } = require('../../server/constructor/publisher');
+
+let socket = io('http://localhost:3000');
 var newPubCondition = new PublishCondition();
 //listening user changing subscription condition events
 subscribeEvent.on('publishConditionChange', (docs) => {
@@ -112,7 +114,6 @@ const SensorRegister = async (req, res, next) => {
         _sensorID: ObjectId(sensor._id),
       });
       record.save();
-      let socket = io('http://localhost:3000');
       socket.emit('sensor connect', generateSensorData(sensor, ""));
       console.log('emit an sensor onConnect event');
     }
@@ -163,7 +164,7 @@ const SensorUpdated = async (req, res, next) => {
       publishCondition: (publishStatus < 2) ?
         null : [condition[0].value, condition[1].value]
     });
-    let socket = io('http://localhost:3000');
+
     if(!sensorPreviousConnect) { //sensor is offline before
       socket.emit('sensor connect', generateSensorData(sensor, ""));
       console.log('emit an sensor onConnect event');
