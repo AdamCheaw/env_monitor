@@ -39,6 +39,7 @@ const changeValueFontColor = (option, value, condition) => {
 
 //display data by show a modal
 const generateDataDisplayModalHTML = (scriptHtml, doc) => {
+  console.log(doc._sensorID);
   let template = Handlebars.compile(scriptHtml);
   let obj = {
     title: "test",
@@ -46,6 +47,7 @@ const generateDataDisplayModalHTML = (scriptHtml, doc) => {
     sensor: doc._sensorID.map(sensor => {
       return {
         name: sensor.name,
+        type: sensor.type,
         value: changeValueFontColor(doc.option, sensor.value, doc.condition),
         onConnect: sensor.onConnect
       }

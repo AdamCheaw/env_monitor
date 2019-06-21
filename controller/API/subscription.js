@@ -341,6 +341,7 @@ const GetSubscriptionInfoAndRelatedSensor = async (req, res, next) => {
         _sensorID: result._sensorID.map(sensor => {
           return {
             name: sensor.name,
+            type: sensor.type,
             value: (!sensor.onConnect) ? null : sensor.value,
             onConnect: sensor.onConnect
           }

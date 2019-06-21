@@ -313,7 +313,7 @@ const getSubscription_relatedSensorInfo = (id) => {
   return SubscribeListData.findById(id)
     .populate({
       path: '_sensorID',
-      select: '_id name value onConnect'
+      select: '_id name value onConnect type'
     })
     .select('title option condition groupType previousMatch _sensorID')
     .exec();

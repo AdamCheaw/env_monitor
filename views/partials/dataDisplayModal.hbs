@@ -19,6 +19,7 @@
       <thead>
         <tr>
           <th>Name</th>
+          <th>Type</th>
           <th>Status</th>
           <th>Current Value</th>
         </tr>
@@ -27,6 +28,7 @@
         \{{#each sensor}}
           <tr>
             <td><b>\{{this.name}}</b></td>
+            <td>\{{this.type}}</td>
             <td>
               \{{#if this.onConnect}}
                 <b class="online">
@@ -38,7 +40,6 @@
                 </b>
               \{{/if}}
             </td>
-
             <td>
               \{{#if this.onConnect}}
                 <b>\{{{this.value}}}</b>
