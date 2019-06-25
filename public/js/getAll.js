@@ -355,7 +355,7 @@ $(document).ready(function() {
           //alert("success");
           // $.LoadingOverlay("hide");
           $(".subscription-container #subscrition-submitBtn").removeAttr('disabled').text('Submit');
-          swal("Yours subscribe is success", " ", "success")
+          swal("Your subscription is completed", " ", "success")
             .then(() => {
               window.location.reload();
             });

@@ -358,7 +358,7 @@ $(document).ready(function() {
         },
         success: function(data) {
           $("#subscription-" + idClicked).remove();
-          toastr.success('unsubscribe success!')
+          toastr.success('unsubscribe completed!')
         },
         error: function(err) {
           if(err.status == 401) {

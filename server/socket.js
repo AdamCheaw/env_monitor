@@ -128,7 +128,7 @@ var webSocket = (io) => {
         subscriptionLogs.push({
           title: (subscription.groupType === null) ?
             subscription.title : `group "${subscription.title}"`,
-          logMsg: data.name + " is connect",
+          logMsg: data.name + " is connected",
           logStatus: 1,
           _subscription: subscription._id,
           _subscriber: subscription._subscriber
@@ -168,7 +168,7 @@ var webSocket = (io) => {
 
                   subscriptionLogs.push({
                     title: (doc.groupType === null) ? doc.title : `group "${doc.title}"`,
-                    logMsg: sensor[0].name + " is disconnect",
+                    logMsg: sensor[0].name + " is disconnected",
                     logStatus: -1,
                     _subscription: doc._id,
                     _subscriber: doc._subscriber
